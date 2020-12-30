@@ -1,0 +1,27 @@
+nginx-docker-builder:
+  # Official docker image.
+  image: nginx:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE_NGINX" .
+    - docker push "$CI_REGISTRY_IMAGE_NGINX"
+  only:
+    - main
+
+flask-docker-build:
+  # Official docker image.
+  image: flask:latest
+  stage: build
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD"
+  script:
+    - docker build --pull -t "$CI_REGISTRY_IMAGE_FLASK" .
+    - docker push "$CI_REGISTRY_IMAGE_FLASK"
+  except:
+    - main
