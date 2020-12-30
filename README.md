@@ -13,9 +13,3 @@ This is a project designed to more efficiently track and analyze multiple contra
 ##### Relevant Repositories:
 
 Documentation: [[Website](https://mtt.murphs.team)] [[Repository](https://github.com/teammurphy/Multi_Tissue_Documentation)]
-
-Raspberry Pi 4 Recording Software: [[Repository](https://github.com/teammurphy/Multi_Tissue_Recording)]
-
-Tracking and Analysis Web App: [[Current Repository](https://github.com/teammurphy/Multi_Tissue_Tracking)]
-
-CAD Hardware Designs: [[Repository](https://github.com/teammurphy/Multi_Tissue_CAD)]
