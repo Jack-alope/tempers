@@ -1,0 +1,32 @@
+{% extends "dbBase.html" %}
+{% block title %}Show Experiment{% endblock %}
+
+
+{% block morecontent %}
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Number</th>
+    <th>Delete</th>
+    <th>Edit</th>
+    <th>Download</th>
+  </tr>
+  {% for i in data %}
+  <tr>
+    <td>{{ i['experiment_id'] }}</td>
+    <td>{{ i['experiment_num'] }}</td>
+    <td>
+      <button type="button" onclick="makeSure({{ i['experiment_id'] }}, '/deleteExp')">Delete</button>
+    </td>
+    <td>
+      <button type="button">Edit</button>
+    </td>
+    <td>
+      <form action="/downloadExp" method="POST">
+        <button type="submit" name="download" value="{{ i['experiment_num'] }}">Download</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

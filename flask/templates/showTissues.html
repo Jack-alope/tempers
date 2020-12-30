@@ -1,0 +1,42 @@
+{% extends "dbBase.html" %}
+{% block title %}Show Tissues{% endblock %}
+
+
+{% block morecontent %}
+
+<table>
+  <tr>
+    <th>Tissue ID</th>
+    <th>Tisssue Number</th>
+    <th>Post</th>
+    <th>CSV Path</th>
+    <th>Video ID</th>
+    <th>Cross Section Dist(mm)</th>
+    <th>Delete</th>
+    <th>Edit</th>
+    <th>Download</th>
+  </tr>
+  {% for tissue in data %}
+  <tr>
+    <td>{{ tissue['tissue_id'] }}</td>
+    <td>{{ tissue['tissue_number'] }}</td>
+    <td>{{ tissue['post'] }}</td>
+    <td>{{ tissue['csv_path'] }}</td>
+    <td>{{ tissue['video_id'] }}</td>
+    <td>{{ tissue['cross_section_dist'] }}
+    <td>
+      <button type="button" onclick="makeSure({{ tissue['tissue_id'] }}, '/deleteTissue')">Delete</button>
+    </td>
+    <td>
+      <button type="button" onclick="test()">Edit</button>
+    </td>
+    <td>
+      <form action="/download" method="POST">
+        <button type="submit" name="download" value="{{ tissue['csv_path'] }}">Download</button>
+      </form>
+    </td>
+
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}
