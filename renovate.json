@@ -1,1 +1,8 @@
-{}
+{
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "prConcurrentLimit": 0
+    }
+  ]
+}
