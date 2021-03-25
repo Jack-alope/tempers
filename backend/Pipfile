@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+uvicorn = "*"
+aiofiles = "*"
+jinja2 = "*"
+python-dotenv = "*"
+sqlalchemy = "*"
+pymysql = "*"
+cryptography = "*"
+pytz = "*"
+python-multipart = "*"
+werkzeug = "*"
+autopep8 = "*"
+scipy = "*"
+pandas = "*"
+opencv-contrib-python-headless = "~=4.4.0.46"
+peakutils = "*"
+
+[dev-packages]
+autopep8 = "*"
+
+[requires]
+python_version = "3.8"

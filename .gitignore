@@ -1,3 +1,6 @@
+#ignore uploads folder
+uploads/
+
 *.DS_Store
 *.csv
 *.mp4
@@ -10,6 +13,8 @@ __pycache__/
 
 #Pycharm
 .idea/
+# VS COde
+.vscode
 # C extensions
 *.so
 
@@ -98,8 +103,6 @@ ipython_config.py
 #   However, in case of collaboration, if having platform-specific dependencies or dependencies
 #   having no cross-platform support, pipenv may install dependencies that don't work, or not
 #   install all needed dependencies.
-Pipfile.lock
-Pipfile
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow
 __pypackages__/
@@ -119,8 +122,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-Pipfile
-Pipfile.lock
 
 # Spyder project settings
 .spyderproject
@@ -139,3 +140,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+#svelte stuff
+/node_modules/
+/public/build/
+
+.DS_Store
+
