@@ -2,7 +2,8 @@ version: "3.9"
 
 services:
   frontend:
-    build: ./frontend/
+    # build: ./frontend/ # For development
+    image: registry.gitlab.com/costa-lab/multi-tissue-tracking/analysis/frontend
     container_name: frontend
     restart: always
     ports:
@@ -13,11 +14,12 @@ services:
       - backend
 
   backend:
-    build: ./backend/
+    # build: ./backend/ # For development
+    image: registry.gitlab.com/costa-lab/multi-tissue-tracking/analysis/backend
     container_name: backend
     restart: always
     environment:
-      - DATABASE_URL=mysql+pymysql://newuser:newpassword@mysql/test_db
+      - DATABASE_URL=mysql+pymysql://newuser:newpassword@mysql:3306/test_db
     expose:
       - 8000
     ports:

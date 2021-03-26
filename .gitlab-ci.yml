@@ -12,4 +12,5 @@ docker-builder:
     - docker push $CI_REGISTRY_IMAGE_BACKEND
   only:
     - main
+  when: manual
 
