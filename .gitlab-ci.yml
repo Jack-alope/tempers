@@ -4,7 +4,7 @@ docker-builder:
   services:
     - docker:dind
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
   script:
     - docker build --pull -t $CI_REGISTRY_IMAGE_FRONTEND ./frontend/
     - docker build --pull -t $CI_REGISTRY_IMAGE_BACKEND ./backend/
