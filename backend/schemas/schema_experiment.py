@@ -8,7 +8,7 @@ from . import schema_video
 
 class ExperimentBase(BaseModel):
     experiment_idenifer: str
-    date_started: date
+    start_date: date
 
     class Config:
         orm_mode = True
@@ -18,5 +18,5 @@ class Experiment(ExperimentBase):
     id: int
 
 
-class Experiment(Experiment):
+class ExperimentWithVids(Experiment):
     videos: List[schema_video.Video] = []

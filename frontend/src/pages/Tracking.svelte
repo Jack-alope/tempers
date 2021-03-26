@@ -1,8 +1,8 @@
 <script lang="ts">
-  import SelectPosts from "../componets/SelectPosts.svelte";
-  import SelectVideo from "../componets/SelectVideo.svelte";
+  import SelectPosts from "../components/SelectPosts.svelte";
+  import SelectVideo from "../components/SelectVideo.svelte";
 
-  import { video_id } from "../componets/Stores.js";
+  import { video_id } from "../components/Stores.js";
 
   let vidSelected = false;
   let num_tissues: number;

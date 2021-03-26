@@ -2,7 +2,7 @@
   import { onMount, createEventDispatcher } from "svelte";
   import { createForm } from "svelte-forms-lib";
 
-  import { video_id } from "../componets/Stores.js";
+  import { video_id } from "../components/Stores.js";
 
   const dispatch = createEventDispatcher();
 
