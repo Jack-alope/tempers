@@ -24,6 +24,11 @@
           >
         </li>
         <li class="sm:inline-block">
+          <a href="/database" class="p-3 text-white hover:text-black"
+            >Database</a
+          >
+        </li>
+        <li class="sm:inline-block">
           <a href="https://mtt.mrph.dev" class="p-3 text-white hover:text-black"
             >Docs</a
           >

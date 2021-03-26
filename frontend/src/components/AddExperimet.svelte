@@ -5,7 +5,7 @@
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
-      date_started: "",
+      start_date: "",
       experiment_idenifer: "",
     },
     onSubmit: (values) => {
@@ -28,7 +28,7 @@
       id="date_recorded"
       name="date_recorded"
       class="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-      bind:value={$form.date_started}
+      bind:value={$form.start_date}
     />
   </div>
 

@@ -7,9 +7,7 @@
     const formData = new FormData();
     formData.append("info", JSON.stringify(values));
     formData.append("file", files[0]);
-    console.log(formData);
 
-    console.log(files);
     const res = await fetch(process.env.url + "/upload", {
       method: "POST",
       body: formData,

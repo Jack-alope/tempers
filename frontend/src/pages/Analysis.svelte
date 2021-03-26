@@ -1,8 +1,8 @@
 <script lang="ts">
-  import SelectVideo from "../componets/SelectVideo.svelte";
-  import Grapher from "../componets/grapher.svelte";
+  import SelectVideo from "../components/SelectVideo.svelte";
+  import Grapher from "../components/Grapher.svelte";
 
-  import { video_id, json_data_list, files } from "../componets/Stores.js";
+  import { video_id, json_data_list, files } from "../components/Stores.js";
 
   let vidSelected = false;
 

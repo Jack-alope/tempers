@@ -1,5 +1,5 @@
 <script>
-  import { json_data_list } from "../componets/Stores.js";
+  import { json_data_list } from "../components/Stores.js";
 
   import { onMount } from "svelte";
 
