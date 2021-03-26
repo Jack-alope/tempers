@@ -44,7 +44,7 @@ export default {
 			preventAssignment: true,
 			process: JSON.stringify({
 			  env: {
-				url: "http://localhost:8000",
+				url: "http://0.0.0.0:8000",
 			  }
 			}),
 		}),
@@ -78,7 +78,7 @@ export default {
 		}),
 		commonjs(),
 		typescript({
-			sourceMap: !production,
+			sourceMap: true,
 			inlineSources: !production
 		}),
 
