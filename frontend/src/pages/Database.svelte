@@ -1,32 +1,40 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import AddExperimet from "../components/AddExperimet.svelte";
   import AddBioReactor from "../components/AddBioReactor.svelte";
   import Modal from "../components/Modal.svelte";
 
   import { getBioReactors, getExperiments } from "../apiCalls.js";
 
-  let showExperiment = false;
-  let showBioReactor = false;
+  import {
+    showBioReactor,
+    showExperiment,
+    bio_reactors,
+    experiments,
+  } from "../components/Stores.js";
 
-  interface experiment {
-    id: number;
-    experiment_idenifer: string;
-    start_date: Date;
-  }
+  import type {
+    bio_reactor_interface,
+    experiment_interface,
+  } from "../interfaces";
 
-  interface bio_reactor {
-    id: number;
-    bio_reactor_number: number;
-    date_added: Date;
-  }
+  let experiments_value: experiment_interface[];
+  let bio_reactors_value: bio_reactor_interface[];
 
-  let experiments: experiment[];
-  let bio_reactors: bio_reactor[];
+  showExperiment.set(false);
+  showBioReactor.set(false);
+
+  const unsubscribe = bio_reactors.subscribe((value) => {
+    bio_reactors_value = value;
+  });
+
+  const expunsubscribe = experiments.subscribe((value) => {
+    experiments_value = value;
+  });
 
   onMount(async () => {
-    bio_reactors = await getBioReactors();
-    experiments = await getExperiments();
+    await getBioReactors();
+    await getExperiments();
   });
 
   async function handleBioReactorDel(id: number) {
@@ -37,7 +45,7 @@
       },
     });
     if (res.ok) {
-      bio_reactors = bio_reactors.filter(
+      bio_reactors_value = bio_reactors_value.filter(
         (bio_reactor) => bio_reactor.id !== id
       );
     } else {
@@ -53,51 +61,16 @@
       },
     });
     if (res.ok) {
-      experiments = experiments.filter((experiment) => experiment.id !== id);
+      experiments_value = experiments_value.filter(
+        (experiment) => experiment.id !== id
+      );
     } else {
       alert("Something went wrong");
     }
   }
 
-  async function handleExperimentSubmitted(event) {
-    const experimentInfo = event.detail.experimentInfo;
-    console.log(experimentInfo);
-    const res = await fetch(process.env.url + "/addExperiment", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(experimentInfo),
-    });
-
-    if (res.ok) {
-      showExperiment = false;
-      // REVIEW: try to emit and avoid extra call
-      experiments = await getExperiments();
-    } else {
-      alert("Something went wrong");
-    }
-  }
-
-  async function handleBioReactorSubmitted(event) {
-    const bio_reactor_info = event.detail.bioReactorInfo;
-    console.log(bio_reactor_info);
-    const res = await fetch(process.env.url + "/addBioReactor", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(bio_reactor_info),
-    });
-
-    if (res.ok) {
-      showBioReactor = false;
-      // REVIEW: try to emit and avoid extra call
-      bio_reactors = await getBioReactors();
-    } else {
-      alert("Something went wrong");
-    }
-  }
+  onDestroy(unsubscribe);
+  onDestroy(expunsubscribe);
 </script>
 
 <div class="flex flex-wrap overflow-hidden">
@@ -112,10 +85,10 @@
         </tr>
       </thead>
       <tbody>
-        {#if experiments === undefined}
+        {#if experiments_value == undefined}
           No Experiments
         {:else}
-          {#each experiments as experiment}
+          {#each experiments_value as experiment}
             <tr>
               <td>{experiment.id}</td>
               <td>{experiment.experiment_idenifer}</td>
@@ -133,7 +106,7 @@
 
     <button
       class="appearance-none block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-      on:click={() => (showExperiment = true)}>Add Experiment</button
+      on:click={() => showExperiment.set(true)}>Add Experiment</button
     >
   </div>
 
@@ -148,10 +121,10 @@
         </tr>
       </thead>
       <tbody>
-        {#if bio_reactors === undefined}
+        {#if bio_reactors_value === undefined}
           No Bio Reactors
         {:else}
-          {#each bio_reactors as bio_reactor}
+          {#each bio_reactors_value as bio_reactor}
             <tr>
               <td>{bio_reactor.id}</td>
               <td>{bio_reactor.bio_reactor_number}</td>
@@ -169,7 +142,7 @@
 
     <button
       class="appearance-none justify-center block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-      on:click={() => (showBioReactor = true)}>Add Bio Reactor</button
+      on:click={() => showBioReactor.set(true)}>Add Bio Reactor</button
     >
   </div>
 
@@ -182,18 +155,18 @@
   </div>
 </div>
 
-{#if showExperiment}
-  <Modal on:close={() => (showExperiment = false)}>
+{#if $showExperiment}
+  <Modal on:close={() => showExperiment.set(false)}>
     <h1 slot="header">Add a Experiment</h1>
     <p slot="content">
-      <AddExperimet on:submitted={handleExperimentSubmitted} />
+      <AddExperimet />
     </p>
   </Modal>
-{:else if showBioReactor}
-  <Modal on:close={() => (showBioReactor = false)}>
+{:else if $showBioReactor}
+  <Modal on:close={() => showBioReactor.set(false)}>
     <h1 slot="header">Add a Bio Reactor</h1>
     <p slot="content">
-      <AddBioReactor on:submitted={handleBioReactorSubmitted} />
+      <AddBioReactor />
     </p>
   </Modal>
 {/if}

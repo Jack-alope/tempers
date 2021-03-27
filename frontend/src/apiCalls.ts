@@ -1,3 +1,5 @@
+import { bio_reactors, experiments } from "./components/Stores.js";
+
 export async function getBioReactors() {
   const res = await fetch(process.env.url + "/bio_reactors", {
     method: "GET",
@@ -6,9 +8,9 @@ export async function getBioReactors() {
     },
   });
   if (res.ok) {
-    return await res.json();
+    bio_reactors.set(await res.json());
   } else {
-    return false;
+    return undefined;
   }
 }
 
@@ -20,8 +22,8 @@ export async function getExperiments() {
     },
   });
   if (res.ok) {
-    return await res.json();
+    experiments.set(await res.json());
   } else {
-    return false;
+    return undefined;
   }
 }

@@ -1,7 +1,26 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
+
   import { createForm } from "svelte-forms-lib";
-  import { createEventDispatcher } from "svelte";
-  const dispatch = createEventDispatcher();
+  import { showExperiment, experiments } from "../components/Stores.js";
+
+  import type { experiment_interface } from "../interfaces";
+
+  async function handleExperimentSubmitted(experimentInfo) {
+    const res = await fetch(process.env.url + "/addExperiment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(experimentInfo),
+    });
+
+    if (res.ok) {
+      showExperiment.set(false);
+    } else {
+      alert("Something went wrong");
+    }
+  }
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
@@ -9,9 +28,7 @@
       experiment_idenifer: "",
     },
     onSubmit: (values) => {
-      dispatch("submitted", {
-        experimentInfo: values,
-      });
+      handleExperimentSubmitted(values);
     },
   });
 </script>

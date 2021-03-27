@@ -44,7 +44,7 @@ export default {
 			preventAssignment: true,
 			process: JSON.stringify({
 			  env: {
-				url: "http://0.0.0.0:8000",
+				url: "http://localhost:8000",
 			  }
 			}),
 		}),
