@@ -4,6 +4,8 @@
   import AddBioReactor from "../components/AddBioReactor.svelte";
   import Modal from "../components/Modal.svelte";
 
+  import { getBioReactors, getExperiments } from "../apiCalls.js";
+
   let showExperiment = false;
   let showBioReactor = false;
 
@@ -26,32 +28,6 @@
     bio_reactors = await getBioReactors();
     experiments = await getExperiments();
   });
-
-  async function getBioReactors() {
-    const res = await fetch(process.env.url + "/bio_reactors", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (res.ok) {
-      return await res.json();
-    } else {
-    }
-  }
-
-  async function getExperiments() {
-    const res = await fetch(process.env.url + "/experiments", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    if (res.ok) {
-      return await res.json();
-    } else {
-    }
-  }
 
   async function handleBioReactorDel(id: number) {
     const res = await fetch(process.env.url + `/bio_reactor/${id}`, {

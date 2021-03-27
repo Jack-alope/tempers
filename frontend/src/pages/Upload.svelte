@@ -1,5 +1,20 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { createForm } from "svelte-forms-lib";
+  // import * as yup from "yup";
+  import { getBioReactors, getExperiments } from "../apiCalls.js";
+  import type {
+    bio_reactor_interface,
+    experiment_interface,
+  } from "../interfaces";
+
+  let experiments: experiment_interface[];
+  let bio_reactors: bio_reactor_interface[];
+
+  onMount(async () => {
+    bio_reactors = await getBioReactors();
+    experiments = await getExperiments();
+  });
 
   let files;
 
@@ -36,6 +51,14 @@
 
       frequency: "",
     },
+    /*
+    TODO: figure out validation lo dash error
+    validationSchema: yup.object().shape({
+      date_recorded: yup.date().required(),
+      bio_reactor_id: yup.number().required(),
+      experiment_id: yup.number().required(),
+    }),
+    */
     onSubmit: (values) => {
       addVid(values);
     },
@@ -78,13 +101,23 @@
         class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
         for="bio_reactor_id">Bio Reactor</label
       >
-      <input
-        type="number"
+      <select
         id="bio_reactor_id"
         name="bio_reactor_id"
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
         bind:value={$form.bio_reactor_id}
-      />
+      >
+        <option />
+        {#if bio_reactors === undefined}
+          <option>NA</option>>
+        {:else}
+          {#each bio_reactors as bio_reactor}
+            <option value={bio_reactor.id}
+              >{bio_reactor.bio_reactor_number}</option
+            >
+          {/each}
+        {/if}
+      </select>
     </div>
 
     <div class="w-full md:w-1/3 px-3">
@@ -92,13 +125,23 @@
         class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
         for="experiment_id">Experiment Number</label
       >
-      <input
-        type="text"
+      <select
         id="experiment_id"
         name="experiment_id"
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
         bind:value={$form.experiment_id}
-      />
+      >
+        <option />
+        {#if experiments === undefined}
+          <option>NA</option>>
+        {:else}
+          {#each experiments as experiment}
+            <option value={experiment.id}
+              >{experiment.experiment_idenifer} - Start Date: {experiment.start_date}</option
+            >
+          {/each}
+        {/if}
+      </select>
     </div>
     <div class="w-full px-3 py-5">
       <h1
