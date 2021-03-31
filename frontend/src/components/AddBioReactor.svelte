@@ -5,7 +5,7 @@
   import type { bio_reactor_interface } from "../interfaces.js";
 
   async function handleBioReactorSubmitted(bio_reactor_info) {
-    const res = await fetch(process.env.url + "/addBioReactor", {
+    const res = await fetch(process.env.API_URL + "/addBioReactor", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

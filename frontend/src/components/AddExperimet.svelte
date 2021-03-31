@@ -7,7 +7,7 @@
   import type { experiment_interface } from "../interfaces";
 
   async function handleExperimentSubmitted(experimentInfo) {
-    const res = await fetch(process.env.url + "/addExperiment", {
+    const res = await fetch(process.env.API_URL + "/addExperiment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

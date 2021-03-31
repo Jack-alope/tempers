@@ -38,7 +38,7 @@
   });
 
   async function handleBioReactorDel(id: number) {
-    const res = await fetch(process.env.url + `/bio_reactor/${id}`, {
+    const res = await fetch(process.env.API_URL + `/bio_reactor/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -54,7 +54,7 @@
   }
 
   async function handleExperimentDel(id: number) {
-    const res = await fetch(process.env.url + `/experiment/${id}`, {
+    const res = await fetch(process.env.API_URL + `/experiment/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -94,7 +94,9 @@
               <td>{experiment.experiment_idenifer}</td>
               <td>{experiment.start_date}</td>
               <td
-                ><button on:click={() => handleExperimentDel(experiment.id)}
+                ><button
+                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  on:click={() => handleExperimentDel(experiment.id)}
                   >Delete</button
                 ></td
               >
@@ -130,7 +132,9 @@
               <td>{bio_reactor.bio_reactor_number}</td>
               <td>{bio_reactor.date_added}</td>
               <td
-                ><button on:click={() => handleBioReactorDel(bio_reactor.id)}
+                ><button
+                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  on:click={() => handleBioReactorDel(bio_reactor.id)}
                   >Delete</button
                 ></td
               >

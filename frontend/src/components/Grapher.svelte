@@ -16,7 +16,7 @@
   });
 
   async function caculate() {
-    const res = await fetch(process.env.url + "/call_calcs", {
+    const res = await fetch(process.env.API_URL + "/call_calcs", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -558,7 +558,7 @@
     let graph_paramsJson = JSON.stringify(graph_params);
     console.log(graph_paramsJson);
 
-    const res = await fetch(process.env.url + "/graphUpdate", {
+    const res = await fetch(process.env.API_URL + "/graphUpdate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

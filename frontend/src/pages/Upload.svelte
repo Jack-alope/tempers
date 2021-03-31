@@ -3,17 +3,26 @@
   import { createForm } from "svelte-forms-lib";
   // import * as yup from "yup";
   import { getBioReactors, getExperiments } from "../apiCalls.js";
+  import { bio_reactors, experiments } from "../components/Stores.js";
   import type {
     bio_reactor_interface,
     experiment_interface,
   } from "../interfaces";
 
-  let experiments: experiment_interface[];
-  let bio_reactors: bio_reactor_interface[];
+  let experiments_value: experiment_interface[];
+  let bio_reactors_value: bio_reactor_interface[];
+
+  const unsubscribe = bio_reactors.subscribe((value) => {
+    bio_reactors_value = value;
+  });
+
+  const expunsubscribe = experiments.subscribe((value) => {
+    experiments_value = value;
+  });
 
   onMount(async () => {
-    bio_reactors = await getBioReactors();
-    experiments = await getExperiments();
+    await getBioReactors();
+    await getExperiments();
   });
 
   let files;
@@ -23,7 +32,7 @@
     formData.append("info", JSON.stringify(values));
     formData.append("file", files[0]);
 
-    const res = await fetch(process.env.url + "/upload", {
+    const res = await fetch(process.env.API_URL + "/upload", {
       method: "POST",
       body: formData,
     });
@@ -108,10 +117,10 @@
         bind:value={$form.bio_reactor_id}
       >
         <option />
-        {#if bio_reactors === undefined}
+        {#if bio_reactors_value == undefined}
           <option>NA</option>>
         {:else}
-          {#each bio_reactors as bio_reactor}
+          {#each bio_reactors_value as bio_reactor}
             <option value={bio_reactor.id}
               >{bio_reactor.bio_reactor_number}</option
             >
@@ -132,10 +141,10 @@
         bind:value={$form.experiment_id}
       >
         <option />
-        {#if experiments === undefined}
+        {#if experiments_value == undefined}
           <option>NA</option>>
         {:else}
-          {#each experiments as experiment}
+          {#each experiments_value as experiment}
             <option value={experiment.id}
               >{experiment.experiment_idenifer} - Start Date: {experiment.start_date}</option
             >

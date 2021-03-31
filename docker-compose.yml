@@ -2,20 +2,21 @@ version: "3.9"
 
 services:
   frontend:
-    # build: ./frontend/ # For development
-    image: registry.gitlab.com/costa-lab/multi-tissue-tracking/analysis/frontend
+    build: ./frontend/ # For development
+    # image: registry.gitlab.com/costa-lab/multi-tissue-tracking/analysis/frontend
     container_name: frontend
     restart: always
     ports:
       - "5000:5000"
     volumes:
+      # REVIEW: I dont think we need this
       - ~/uploader:/app/static/uploads
     depends_on:
       - backend
 
   backend:
-    # build: ./backend/ # For development
-    image: registry.gitlab.com/costa-lab/multi-tissue-tracking/analysis/backend
+    build: ./backend/ # For development
+    # image: registry.gitlab.com/costa-lab/multi-tissue-tracking/analysis/backend
     container_name: backend
     restart: always
     environment:
@@ -25,7 +26,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-    - mysql
+      - mysql
 
   mysql:
     image: mysql:8.0.23

@@ -187,18 +187,20 @@
 <form id="number_of_posts">
   <input type="hidden" id="videoId" name="videoId" value={video_id} />
   <label for="calDist">Enter the calibration Disttance (mm)</label>
+  <!-- TODO: Make this look better -->
   <input
     type="number"
     step="any"
     id="calDist"
     name="calDist"
+    class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
     bind:value={calibration_distance}
   />
   <input type="button" value="submit" on:click={() => getPostCount()} />
 </form>
 
 <div id="canvas">
-  <img id="pic" src="{process.env.url}/{image_path}" alt="Heart Tissue" />
+  <img id="pic" src="{process.env.API_URL}/{image_path}" alt="Heart Tissue" />
 </div>
 
 <div id="container" />

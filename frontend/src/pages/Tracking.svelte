@@ -16,7 +16,7 @@
   async function handleVideoSelected() {
     vidSelected = true;
     const res = await fetch(
-      process.env.url + `/selectedVideo?video_id=${video_id_value}`,
+      process.env.API_URL + `/selectedVideo?video_id=${video_id_value}`,
       {
         method: "GET",
         headers: {
@@ -27,6 +27,7 @@
 
     if (res.ok) {
       const response_json = await res.json();
+      console.log(response_json);
       image_path = response_json.image_path;
       num_tissues = response_json.number_tissues;
     } else {
@@ -47,7 +48,7 @@
       calibration_distance,
     };
 
-    const res = await fetch(process.env.url + "/boxCoordinates", {
+    const res = await fetch(process.env.API_URL + "/boxCoordinates", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -8,6 +8,7 @@ import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
 import replace from '@rollup/plugin-replace';
 
+
 const production = !process.env.ROLLUP_WATCH;
 
 function serve() {
@@ -42,11 +43,12 @@ export default {
 	plugins: [
 		replace({
 			preventAssignment: true,
-			process: JSON.stringify({
-			  env: {
-				url: "http://localhost:8000",
-			  }
-			}),
+			process:JSON.stringify({
+					env: {
+						isProd: production,
+						API_URL: "http://0.0.0.0:8000"
+					}
+				})
 		}),
 		svelte({
 			preprocess: sveltePreprocess({ sourceMap: !production,
@@ -56,11 +58,13 @@ export default {
      require("tailwindcss"), 
      require("autoprefixer"),
     ],
-}
+},
+
+
 			}),
 			compilerOptions: {
 				// enable run-time checks when not in production
-				dev: !production
+				dev: !production,
 			}
 		}),
 		// we'll extract any component CSS out into
