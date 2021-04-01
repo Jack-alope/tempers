@@ -20,7 +20,7 @@
 
   async function handleVideoSelected() {
     const res = await fetch(
-      process.env.url + `/analyze?video_id=${video_id_value}`,
+      process.env.API_URL + `/analyze?video_id=${video_id_value}`,
       {
         method: "GET",
         headers: {

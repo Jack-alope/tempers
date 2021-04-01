@@ -1,8 +1,25 @@
 <script lang="ts">
   import { createForm } from "svelte-forms-lib";
-  import { createEventDispatcher } from "svelte";
 
-  const dispatch = createEventDispatcher();
+  import { showBioReactor, bio_reactors } from "../components/Stores.js";
+  import type { bio_reactor_interface } from "../interfaces.js";
+
+  async function handleBioReactorSubmitted(bio_reactor_info) {
+    const res = await fetch(process.env.API_URL + "/addBioReactor", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bio_reactor_info),
+    });
+
+    if (res.ok) {
+      showBioReactor.set(false);
+      console.log(await res.json());
+    } else {
+      alert("Something went wrong");
+    }
+  }
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
@@ -19,10 +36,7 @@
       ],
     },
     onSubmit: (values) => {
-      console.log(values);
-      dispatch("submitted", {
-        bioReactorInfo: values,
-      });
+      handleBioReactorSubmitted(values);
     },
   });
 

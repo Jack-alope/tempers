@@ -5,7 +5,7 @@ WORKDIR /app
 
 RUN npm install
 
-RUN npm run-script build
+RUN npm run build
 
 EXPOSE 5000
 

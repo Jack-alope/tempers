@@ -10,7 +10,7 @@
   let videoGroup = -1;
 
   onMount(async () => {
-    const res = await fetch(process.env.url + "/videos");
+    const res = await fetch(process.env.API_URL + "/videos");
     videos = await res.json();
   });
 
