@@ -7,7 +7,7 @@ services:
     container_name: frontend
     restart: always
     ports:
-      - "5000:5000"
+      - 5000:5000
     volumes:
       # REVIEW: I dont think we need this
       - ~/uploader:/app/static/uploads
@@ -24,9 +24,11 @@ services:
     expose:
       - 8000
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    
 
   mysql:
     image: mysql:8.0.23
@@ -40,11 +42,13 @@ services:
     expose:
       - 3306
     ports:
-      - "3306:3306"
+      - 3306:3306
     cap_add:
       - SYS_NICE
     volumes:
       - dbdata:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 0.0.0.0 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
