@@ -8,9 +8,9 @@ services:
     restart: always
     ports:
       - 5000:5000
-    volumes:
-      # REVIEW: I dont think we need this
-      - ~/uploader:/app/static/uploads
+    #volumes:
+    # REVIEW: I dont think we need this
+    #- ~/uploader:/app/static/uploads
     depends_on:
       - backend
 
@@ -28,7 +28,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    
 
   mysql:
     image: mysql:8.0.23
