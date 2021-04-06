@@ -25,6 +25,10 @@ router = APIRouter()
 
 
 def coord_distance(coords_list):
+    '''
+    Accepts a list of coords
+    Returns a list of those coords coverted to distance in pixel
+    '''
     dist_list = []
     for i in range(1, len(coords_list), 2):
         point_one = coords_list[i - 1]
@@ -77,9 +81,13 @@ async def selected_video(video_id: int = Query(...), db: Session = Depends(get_d
 
 @router.post('/boxCoordinates', tags=["tracking"])
 async def boxCoordinates(postInfo: schema_video.PostSelection, db: Session = Depends(get_db)):
+
+    # Get the distance in pix of the calibration line uses [0] b
+    # since there are four points to the box passed but we only care
+    # care ablout the length of the diagnal line
     cal_dist_pix = coord_distance(postInfo.cal_points)[0]
 
-    cross_dist_pix = coord_distance(postInfo.cal_points)
+    cross_dist_pix = coord_distance(postInfo.cross_points)
 
     video_id = int(postInfo.video_id_value)
 
