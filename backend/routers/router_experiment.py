@@ -19,9 +19,9 @@ def get_experiments(db: Session = Depends(get_db)):
     return experiments
 
 
-@router.delete("/experiment/{id}", tags=["Experiment"])
-def delete_experiment(id: int, db: Session = Depends(get_db)):
-    return crud_experiment.delete_experiment(db, id)
+@router.delete("/experiment/{exp_id}", tags=["Experiment"])
+def delete_experiment(exp_id: int, db: Session = Depends(get_db)):
+    return crud_experiment.delete_experiment(db, exp_id)
 
 
 @router.post("/addExperiment", response_model=schema_experiment.Experiment, tags=["Experiment"])

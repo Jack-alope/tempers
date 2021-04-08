@@ -9,7 +9,6 @@ from pydantic import BaseModel
 
 class VideoBase(BaseModel):
     date_recorded: Optional[date]
-    experiment_id: Optional[str]
     frequency: Optional[int]
 
     # bio_reactor_number: int
@@ -22,6 +21,7 @@ class VideoCreate(VideoBase):
     tissues: List[schema_tissue.TissueBase]
     bio_reactor_id: int
     save_location: Optional[str]
+    experiment_id: Optional[str]
 
 
 class VideoInfo(VideoBase):
@@ -29,14 +29,17 @@ class VideoInfo(VideoBase):
     bio_reactor_id: int
 
 
-class VideoLater(VideoBase):
-    date_uploaded: date
-    calibration_distance: float
-    calibration_factor: float
-
-
 class Video(VideoBase):
     id: int
+
+
+class VideoShow(VideoBase):
+    id: int
+    date_uploaded: date
+    calibration_distance: Optional[float]
+    calibration_factor: Optional[float]
+    bio_reactor_number: int
+    experiment_idenifer: str
 
 
 class PostSelection(BaseModel):

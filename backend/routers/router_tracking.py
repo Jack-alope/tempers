@@ -63,22 +63,6 @@ def get_video_info(db, vid_id):
     return (image_path, number_of_tisues)
 
 
-@router.get('/videos', response_model=List[schema_video.VideoInfo], tags=["tracking"])
-async def get_videos(db: Session = Depends(get_db)):
-    all_vids = crud_video.get_all_vids(db)
-    return all_vids
-
-
-@router.get('/selectedVideo/', tags=["tracking"])
-async def selected_video(video_id: int = Query(...), db: Session = Depends(get_db)):
-    tup_path_numTissues = get_video_info(db, video_id)
-
-    res = jsonable_encoder({'image_path': tup_path_numTissues[0],
-                            'number_tissues': tup_path_numTissues[1]})
-
-    return JSONResponse(content=res)
-
-
 @router.post('/boxCoordinates', tags=["tracking"])
 async def boxCoordinates(postInfo: schema_video.PostSelection, db: Session = Depends(get_db)):
 
