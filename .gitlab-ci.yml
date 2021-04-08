@@ -14,8 +14,30 @@ docker-builder:
     - main
   when: manual
 
+stages:
+  - code review
+  - testing
+
+flake8:
+  stage: code review
+  allow_failure: true
+  script:
+  - flake8 --max-line-length=120 *.py
+  only:
+    - merge_requests
+    - main
+
+pylint:
+  stage: code review
+  allow_failure: true
+  script:
+  - pylint -d C0301 *.py
+  only:
+    - merge_requests
+    - main
+
 test:
-  stage: test
+  stage: testing
   image: python:3.8
   script:
     - pip install pytest coverage pipenv
