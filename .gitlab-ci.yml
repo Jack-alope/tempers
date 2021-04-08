@@ -26,6 +26,9 @@ test:
   artifacts:
     reports:
       cobertura: coverage.xml
+  only:
+    - merge_requests
+    - main
 
     
 
