@@ -16,7 +16,7 @@ docker-builder:
 
 run tests:
   stage: test
-  image: python:3
+  image: python:3.8
   script:
     - pip install pytest coverage pipenv
     - cd backend && pipenv install && pipenv shell && cd ..
