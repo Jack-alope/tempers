@@ -43,6 +43,9 @@ pylint:
     reports:
       codequality: codeclimate.json
     when: always
+  only:
+    - merge_requests
+    - main
 
 pages:
   stage: deploy
@@ -53,8 +56,8 @@ pages:
     paths:
       - public
   only:
-    refs:
-      - main
+    - merge_requests
+    - main
 
 test:
   stage: testing
