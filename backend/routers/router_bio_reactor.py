@@ -13,7 +13,6 @@ router = APIRouter()
 @router.get("/bio_reactors", response_model=List[schema_bio_reactor.BioReactor], tags=["Bio_reactor"])
 def get_bio_reactors(db: Session = Depends(get_db)):
     bio_reactors = crud_bio_reactor.get_bio_reactors(db)
-    print (bio_reactors)
     if not bio_reactors:
         raise HTTPException(status_code=404, detail="Bio Reactos not found")
     return bio_reactors
@@ -28,6 +27,6 @@ def add_BioReactor(bio_reactor: schema_bio_reactor.BioReactorCreate, db: Session
     return bio_reactor
 
 
-@router.delete("/bio_reactor/{id}", tags=["Bio_reactor"])
-def delete_bio_reactor(id: int, db: Session = Depends(get_db)):
-    return crud_bio_reactor.delete_bio_reactor(db, id)
+@router.delete("/bio_reactor/{bio_id}", tags=["Bio_reactor"])
+def delete_bio_reactor(bio_id: int, db: Session = Depends(get_db)):
+    return crud_bio_reactor.delete_bio_reactor(db, bio_id)

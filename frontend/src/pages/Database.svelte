@@ -4,22 +4,25 @@
   import AddBioReactor from "../components/AddBioReactor.svelte";
   import Modal from "../components/Modal.svelte";
 
-  import { getBioReactors, getExperiments } from "../apiCalls.js";
+  import { getBioReactors, getExperiments, getVideos } from "../apiCalls.js";
 
   import {
     showBioReactor,
     showExperiment,
     bio_reactors,
     experiments,
+    videos,
   } from "../components/Stores.js";
 
   import type {
     bio_reactor_interface,
     experiment_interface,
+    video_interface,
   } from "../interfaces";
 
   let experiments_value: experiment_interface[];
   let bio_reactors_value: bio_reactor_interface[];
+  let videos_value: video_interface[];
 
   showExperiment.set(false);
   showBioReactor.set(false);
@@ -32,9 +35,14 @@
     experiments_value = value;
   });
 
+  const vidspunsubscribe = videos.subscribe((value) => {
+    videos_value = value;
+  });
+
   onMount(async () => {
     await getBioReactors();
     await getExperiments();
+    await getVideos();
   });
 
   async function handleBioReactorDel(id: number) {
@@ -69,8 +77,23 @@
     }
   }
 
+  async function handleVideoDel(id: number) {
+    const res = await fetch(process.env.API_URL + `/video/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (res.ok) {
+      videos_value = videos_value.filter((video) => video.id !== id);
+    } else {
+      alert("Something went wrong");
+    }
+  }
+
   onDestroy(unsubscribe);
   onDestroy(expunsubscribe);
+  onDestroy(vidspunsubscribe);
 </script>
 
 <div class="flex flex-wrap overflow-hidden">
@@ -118,7 +141,7 @@
         <tr>
           <th>Id</th>
           <th>Bio Reactor Number</th>
-          <th>Datem Added</th>
+          <th>Date Added</th>
           <th>Delete</th>
         </tr>
       </thead>
@@ -151,7 +174,45 @@
   </div>
 
   <div class="w-full overflow-hidden">
-    <!-- Column Content -->
+    <table class="table-auto">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Date Upload</th>
+          <th>Date Recorded</th>
+          <th>Frequency</th>
+          <th>Calibration Distance</th>
+          <th>Calibration Factor</th>
+          <th>Experiment Idenifiyer</th>
+          <th>Bio Reactor Number</th>
+          <th>Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {#if videos_value === undefined}
+          No Videos
+        {:else}
+          {#each videos_value as video}
+            <tr>
+              <td>{video.id}</td>
+              <td>{video.date_uploaded}</td>
+              <td>{video.date_recorded}</td>
+              <td>{video.frequency}</td>
+              <td>{video.calibration_distance}</td>
+              <td>{video.calibration_factor}</td>
+              <td>{video.experiment_idenifer}</td>
+              <td>{video.bio_reactor_number}</td>
+              <td
+                ><button
+                  class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  on:click={() => handleVideoDel(video.id)}>Delete</button
+                ></td
+              >
+            </tr>
+          {/each}
+        {/if}
+      </tbody>
+    </table>
   </div>
 
   <div class="w-full overflow-hidden">

@@ -8,8 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import models
 from database import engine, get_db
-from routers import router_upload, router_tracking, router_analysis, router_experiment, router_bio_reactor
-
+from routers import router_upload, router_tracking, router_analysis, router_experiment, router_bio_reactor, router_video
 
 
 logging.basicConfig(filename='main.log',
@@ -24,6 +23,7 @@ app.include_router(router_tracking.router)
 app.include_router(router_analysis.router)
 app.include_router(router_experiment.router)
 app.include_router(router_bio_reactor.router)
+app.include_router(router_video.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
