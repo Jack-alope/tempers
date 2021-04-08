@@ -23,14 +23,9 @@ test:
     - coverage run -m pytest
     - coverage report
     - coverage xml
-    - coverage html
-    - cp -r htmlcov/* public/
   artifacts:
     reports:
       cobertura: coverage.xml
-    paths:
-      - public
-    expire_in: 10 days
 
     
 
