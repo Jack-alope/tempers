@@ -23,7 +23,22 @@ run tests:
     - coverage run -m pytest
     - coverage report
     - coverage xml
+    - coverage html
   artifacts:
     reports:
       cobertura: coverage.xml
+
+pages:
+  stage: deploy
+  dependencies:
+    - test
+  script:
+    # delete everything in the current public folder
+    # and replace with code coverage HTML report
+    - rm -rf public/*
+    - cp -r htmlcov* public/
+  artifacts:
+    paths:
+      - public
+    expire_in: 10 days
 
