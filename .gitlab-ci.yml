@@ -1,8 +1,8 @@
 stages:
   - build
   - code review
+  - publish code review
   - testing
-  - deploy
 
 docker-builder:
   image: docker:latest
@@ -48,7 +48,7 @@ pylint:
     - main
 
 pages:
-  stage: deploy
+  stage: publish code review
   image: alpine:latest
   script:
     - echo
