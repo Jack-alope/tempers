@@ -1,5 +1,7 @@
 # MTT Analysis
 
+[![coverage report](https://gitlab.com/mrph-dev/analysis/badges/main/coverage.svg)](https://gitlab.com/mrph-dev/analysis/-/commits/main)
+
 ## Built with
 
 ### Frontend
