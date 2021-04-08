@@ -1,5 +1,7 @@
 # MTT Analysis
 
+[![pylint](https://mrph-dev.gitlab.io/analysis/badges/pylint.svg)](https://mrph-dev.gitlab.io/analysis/lint)
+
 ## Built with
 
 ### Frontend
