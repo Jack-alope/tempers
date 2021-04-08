@@ -14,3 +14,15 @@ docker-builder:
     - main
   when: manual
 
+run tests:
+  stage: test
+  image: python:3
+  script:
+    - pip install pytest coverage
+    - coverage run -m pytest
+    - coverage report
+    - coverage xml
+  artifacts:
+    reports:
+      cobertura: coverage.xml
+
