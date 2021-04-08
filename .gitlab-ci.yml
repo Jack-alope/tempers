@@ -21,15 +21,17 @@ docker-builder:
 
 pylint:
   stage: code review
-  allow_failure: true
-  image: python:3.8
+  before_script:
+    - pip install pylint pylint-exit anybadge
   script:
-  - pip install pylint pipenv
-  - cd backend && pipenv install --system --deploy --ignore-pipfile && cd ..
-  - pylint -d C0301 **/*.py
-  only:
-    - merge_requests
-    - main
+    - mkdir ./pylint
+    - pylint --output-format=text **/*.py | tee ./pylint/pylint.log || pylint-exit $?
+    - PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
+    - anybadge --label=Pylint --file=pylint/pylint.svg --value=$PYLINT_SCORE 2=red 4=orange 8=yellow 10=green
+    - echo "Pylint score is $PYLINT_SCORE"
+  artifacts:
+    paths:
+      - ./pylint/
 
 test:
   stage: testing
