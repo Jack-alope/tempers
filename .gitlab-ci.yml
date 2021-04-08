@@ -1,3 +1,8 @@
+stages:
+  - build
+  - code review
+  - testing
+
 docker-builder:
   image: docker:latest
   stage: build
@@ -13,10 +18,6 @@ docker-builder:
   only:
     - main
   when: manual
-
-stages:
-  - code review
-  - testing
 
 flake8:
   stage: code review
