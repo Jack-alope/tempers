@@ -18,7 +18,7 @@ run tests:
   stage: test
   image: python:3
   script:
-    - pip install pytest coverage
+    - pip install pytest coverage pipenv
     - cd backend && pipenv install && pipenv shell && cd ..
     - coverage run -m pytest
     - coverage report
