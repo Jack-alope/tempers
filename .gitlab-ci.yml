@@ -19,7 +19,7 @@ run tests:
   image: python:3.8
   script:
     - pip install pytest coverage pipenv
-    - cd backend && pipenv install && pipenv shell && cd ..
+    - cd backend && pipenv install --system --deploy --ignore-pipfile && pipenv shell && cd ..
     - coverage run -m pytest
     - coverage report
     - coverage xml
