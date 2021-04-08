@@ -14,7 +14,7 @@ docker-builder:
     - main
   when: manual
 
-run tests:
+test:
   stage: test
   image: python:3.8
   script:
