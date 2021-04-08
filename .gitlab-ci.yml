@@ -19,20 +19,13 @@ docker-builder:
     - main
   when: manual
 
-flake8:
-  stage: code review
-  allow_failure: true
-  script:
-  - flake8 --max-line-length=120 *.py
-  only:
-    - merge_requests
-    - main
-
 pylint:
   stage: code review
   allow_failure: true
+  image: python:3.8
   script:
-  - pylint -d C0301 *.py
+  - pip install pylint
+  - pylint -d C0301 **/*.py
   only:
     - merge_requests
     - main
