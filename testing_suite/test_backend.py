@@ -1,6 +1,3 @@
-import sys
-sys.path.append('../')
-
 import backend.analysisFolder.temp as temp
 import backend.analysisFolder.analysis as analysis
 
