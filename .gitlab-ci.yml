@@ -2,6 +2,7 @@ stages:
   - build
   - code review
   - testing
+  - deploy
 
 docker-builder:
   image: docker:latest
