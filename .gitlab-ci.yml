@@ -21,6 +21,7 @@ docker-builder:
 
 pylint:
   stage: code review
+  image: python:3.8
   before_script:
     - pip install pylint pylint-exit anybadge
   script:
