@@ -15,13 +15,13 @@ cryptography = "*"
 pytz = "*"
 python-multipart = "*"
 werkzeug = "*"
-autopep8 = "*"
 scipy = "*"
 pandas = "*"
 opencv-contrib-python-headless = "~=4.4.0.46"
 peakutils = "*"
 
 [dev-packages]
+pylint = "*"
 autopep8 = "*"
 
 [requires]
