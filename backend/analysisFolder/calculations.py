@@ -1,8 +1,11 @@
 import glob
 import importlib
 
-import models
-from crud import crud_tissue
+try:
+    import models
+    from crud import crud_tissue
+except ImportError:
+    print("in the name of testing")
 
 import numpy as np
 import pandas as pd
@@ -302,3 +305,7 @@ def negdfdt(ninety, ten):
     std = np.std(negdft)
     avg = sum(negdft) / len(negdft)
     return avg, std
+
+# REVIEW: REMOVE
+def dummy_calc(x):
+    return x+1
