@@ -47,7 +47,7 @@ class Video(Base):
 
     calibration_factor: float = Column(Float, nullable=True)
 
-    save_location: String = Column(String(120))
+    save_location: String = Column(String(120), nullable=True)
 
     experiment_id: int = Column(Integer, ForeignKey('experiment.id'))
     experiment = relationship("Experiment", back_populates="vids")

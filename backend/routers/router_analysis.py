@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from schemas import schema_analysis
 from crud import crud_video, crud_tissue
-from analysisFolder import analysis
+from analysisFolder import analysis as analysis
 from analysisFolder import calculations as calcs
 
 
@@ -37,6 +37,7 @@ async def analyze(video_id: int = Query(...), db: Session = Depends(get_db)):
     date = date.strftime("%m_%d_%Y")
     files = glob.glob('static/uploads/' + str(exp) +
                       '/' + date + '/csvfiles/*')
+
     tiss_nums = []
     tiss_freq = []
     tiss_types = []

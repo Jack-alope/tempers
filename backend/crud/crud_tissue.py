@@ -10,8 +10,12 @@ def create_tissue(db: Session, tissue: schema_tissue.TissueCreate):
     # TODO: add catch for error if there is no post on that bio
     post_id = crud_post.get_post_by_num_and_bio(
         db, tissue.bio_reactor_id, tissue.post_number).id
+
+    print(post_id)
+    print(tissue)
     db_tissue = models.Tissue(post_id=post_id)
     [setattr(db_tissue, i[0], i[1]) for i in tissue]
+    print(db_tissue)
     db.add(db_tissue)
     db.commit()
     db.refresh(db_tissue)

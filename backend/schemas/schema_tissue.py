@@ -7,6 +7,7 @@ class TissueBase(BaseModel):
     tissue_number: str
     tissue_type: str
     post_number: int
+    csv_path: Optional[str]
 
     class Config:
         orm_mode = True

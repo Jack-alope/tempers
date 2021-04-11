@@ -27,6 +27,7 @@ class VideoCreate(VideoBase):
 class VideoInfo(VideoBase):
     id: int
     bio_reactor_id: int
+    experiment_id: int
 
 
 class Video(VideoBase):
