@@ -1,23 +1,22 @@
-import logging
-import threading
 import glob
 import json
 from typing import List
 
-from template_config import templates
-from database import get_db
-from schemas import schema_analysis
-from crud import crud_video, crud_tissue
-from analysisFolder import analysis as analysis
-from analysisFolder import calculations as calcs
+import pandas as pd
 
-from fastapi import APIRouter, Request, Form,  Depends, Query, Body
+from fastapi import APIRouter,  Depends, Query
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import JSONResponse
 
 from sqlalchemy.orm import Session
 
-import pandas as pd
+
+from database import get_db
+from schemas import schema_analysis
+from crud import crud_video, crud_tissue
+from analysisFolder import analysis
+from analysisFolder import calculations as calcs
+
 
 router = APIRouter()
 

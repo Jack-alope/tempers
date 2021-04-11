@@ -2,7 +2,7 @@ import threading
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-import cv2
+from scipy.spatial import distance
 
 import tracking
 from database import get_db
@@ -23,9 +23,9 @@ def coord_distance(coords_list):
         point_one = coords_list[i - 1]
         point_two = coords_list[i]
 
-        distance = float(distance.euclidean(point_one, point_two))
+        distance_value = float(distance.euclidean(point_one, point_two))
 
-        dist_list.append(distance)
+        dist_list.append(distance_value)
 
     return dist_list
 

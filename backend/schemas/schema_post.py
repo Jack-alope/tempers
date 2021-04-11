@@ -9,6 +9,7 @@ class PostBase(BaseModel):
     left_tissue_height: float
     right_post_height: float
     right_tissue_height: float
+    radius: float
 
     class Config:
         orm_mode = True

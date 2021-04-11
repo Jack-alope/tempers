@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -14,6 +14,7 @@ class TissueBase(BaseModel):
 
 class TissueCreate(TissueBase):
     vid_id: Optional[int]
+    bio_reactor_id: Optional[int]
 
 
 class TissueLater(TissueBase):

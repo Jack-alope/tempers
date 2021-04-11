@@ -8,7 +8,6 @@ import json
 from werkzeug.utils import secure_filename
 
 import models
-from template_config import templates
 from database import get_db
 from crud import crud_video, crud_tissue
 from schemas import schema_video, schema_tissue
@@ -73,24 +72,27 @@ def save_video_file(vid_info, vid_file, db):
     return vid.id
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate], vid_id: int, db: Session):
+def add_tissues(tissue_li: List[schema_tissue.TissueCreate], bio_reactor_id: int,
+                vid_id: int, db: Session):
 
     for tissue in tissue_li:
         tissue_obj = schema_tissue.TissueCreate.parse_obj(tissue)
         tissue_obj.vid_id = vid_id
+        tissue_obj.bio_reactor_id = bio_reactor_id
         crud_tissue.create_tissue(db, tissue_obj)
 
     return True
 
 
 @router.post("/upload", tags=["upload"])
-async def post_upload(info: str = Form(...), file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def post_upload(info: str = Form(...), file: UploadFile = File(...),
+                      db: Session = Depends(get_db)):
     # TODO Add schema to this form anf file make it weird
     vid_json: schema_video.VideoCreate = json.loads(info)
     vid_info = schema_video.VideoCreate.parse_obj(vid_json)
 
     vid_id = save_video_file(vid_info, file, db)
 
-    add_tissues(vid_info.tissues, vid_id, db)
+    add_tissues(vid_info.tissues, vid_info.bio_reactor_id, vid_id, db)
 
     return {200: "OK"}

@@ -1,10 +1,10 @@
 from datetime import datetime
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from typing import List
 import os
 
 from pytz import timezone
-from sqlalchemy import (Boolean, Column, Date, DateTime, ForeignKey, Integer,
+from sqlalchemy import (Column, Date, ForeignKey, Integer,
                         String, Float)
 from sqlalchemy.orm import relationship
 
@@ -71,6 +71,9 @@ class Tissue(Base):
     csv_path: str = Column(String(120), nullable=True)
     cross_section_dist: float = Column(Float, nullable=True)
 
+    post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship("Post", back_populates="tissues")
+
     vid_id = Column(Integer, ForeignKey('video.id'))
     video = relationship("Video", back_populates="tissues")
 
@@ -102,9 +105,12 @@ class Post(Base):
     left_tissue_height: float = Column(Float, nullable=False)
     right_post_height: float = Column(Float, nullable=False)
     right_tissue_height: float = Column(Float, nullable=False)
+    radius: float = Column(Float, nullable=True)
 
     bio_reactor_id = Column(Integer, ForeignKey("bio_reactor.id"))
     bio_reactor = relationship("Bio_reactor", back_populates="posts")
+
+    tissues = relationship("Tissue", back_populates="post")
 
 
 def check_path_exisits(file_path_passed):
