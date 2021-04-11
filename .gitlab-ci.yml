@@ -1,3 +1,9 @@
+stages:
+  - build
+  - code review
+  - publish code review
+  - testing
+
 docker-builder:
   image: docker:latest
   stage: build
@@ -13,4 +19,61 @@ docker-builder:
   only:
     - main
   when: manual
+
+pylint:
+  stage: code review
+  image: python:3.7-slim
+  before_script:
+    - mkdir -p public/badges public/lint
+    - echo undefined > public/badges/$CI_JOB_NAME.score
+    - pip install pylint-gitlab pipenv
+    - cd backend && pipenv install --system --deploy --ignore-pipfile && cd ..
+  script:
+    - pylint --exit-zero --output-format=text $(find -type f -name "*.py" ! -path "**/.venv/**") | tee /tmp/pylint.txt
+    - sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' /tmp/pylint.txt > public/badges/$CI_JOB_NAME.score
+    - pylint --exit-zero --output-format=pylint_gitlab.GitlabCodeClimateReporter $(find -type f -name "*.py" ! -path "**/.venv/**") > codeclimate.json
+    - pylint --exit-zero --output-format=pylint_gitlab.GitlabPagesHtmlReporter $(find -type f -name "*.py" ! -path "**/.venv/**") > public/lint/index.html
+  after_script:
+    - anybadge --overwrite --label $CI_JOB_NAME --value=$(cat public/badges/$CI_JOB_NAME.score) --file=public/badges/$CI_JOB_NAME.svg 4=red 6=orange 8=yellow 10=green
+    - |
+      echo "Your score is: $(cat public/badges/$CI_JOB_NAME.score)"
+  artifacts:
+    paths:
+      - public
+    reports:
+      codequality: codeclimate.json
+    when: always
+  only:
+    - merge_requests
+    - main
+
+pages:
+  stage: publish code review
+  image: alpine:latest
+  script:
+    - echo
+  artifacts:
+    paths:
+      - public
+  only:
+    - merge_requests
+    - main
+
+test:
+  stage: testing
+  image: python:3.8
+  script:
+    - pip install pytest coverage pipenv
+    - cd backend && pipenv install --system --deploy --ignore-pipfile && cd ..
+    - coverage run -m pytest
+    - coverage report
+    - coverage xml
+  artifacts:
+    reports:
+      cobertura: coverage.xml
+  only:
+    - merge_requests
+    - main
+
+    
 
