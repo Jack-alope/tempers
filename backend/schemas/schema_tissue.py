@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -7,6 +7,7 @@ class TissueBase(BaseModel):
     tissue_number: str
     tissue_type: str
     post_number: int
+    csv_path: Optional[str]
 
     class Config:
         orm_mode = True
@@ -14,6 +15,7 @@ class TissueBase(BaseModel):
 
 class TissueCreate(TissueBase):
     vid_id: Optional[int]
+    bio_reactor_id: Optional[int]
 
 
 class TissueLater(TissueBase):

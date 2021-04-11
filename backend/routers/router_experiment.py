@@ -1,12 +1,12 @@
 from typing import List
 
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+
 from database import get_db
 from crud import crud_experiment
 from schemas import schema_experiment
 
-from fastapi import APIRouter, Depends, HTTPException
-
-from sqlalchemy.orm import Session
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ def delete_experiment(exp_id: int, db: Session = Depends(get_db)):
 
 
 @router.post("/addExperiment", response_model=schema_experiment.Experiment, tags=["Experiment"])
-def add_Experiment(experiment: schema_experiment.ExperimentBase, db: Session = Depends(get_db)):
+def add_experiment(experiment: schema_experiment.ExperimentBase, db: Session = Depends(get_db)):
     # TODO: error if exsists
     new_experiment = crud_experiment.create_experiment(db, experiment)
     return new_experiment

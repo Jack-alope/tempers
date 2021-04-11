@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { createForm } from "svelte-forms-lib";
   // import * as yup from "yup";
   import { getBioReactors, getExperiments } from "../apiCalls.js";
@@ -9,6 +9,7 @@
     experiment_interface,
   } from "../interfaces";
 
+  let files;
   let experiments_value: experiment_interface[];
   let bio_reactors_value: bio_reactor_interface[];
 
@@ -24,8 +25,6 @@
     await getBioReactors();
     await getExperiments();
   });
-
-  let files;
 
   async function addVid(values) {
     const formData = new FormData();
@@ -86,6 +85,9 @@
     $form.tissues = $form.tissues.filter((u, j) => j !== i);
     // $errors.tissues = $errors.tissues.filter((u, j) => j !== i);
   };
+
+  onDestroy(unsubscribe);
+  onDestroy(expunsubscribe);
 </script>
 
 <form class="w-full" on:submit={handleSubmit}>

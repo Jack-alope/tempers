@@ -32,6 +32,7 @@
           left_tissue_height: "",
           right_post_height: "",
           right_tissue_height: "",
+          radius: "",
         },
       ],
     },
@@ -47,6 +48,7 @@
       left_tissue_height: "",
       right_post_height: "",
       right_tissue_height: "",
+      radius: "",
     });
     // $errors.posts = $posts.posts.concat({ name: "", email: "" });
   };
@@ -69,7 +71,7 @@
 
     {#each $form.posts as tissue, j}
       <div class="flex flex-wrap py-3">
-        <div class="w-full md:w-1/4 px-3">
+        <div class="w-full md:w-1/5 px-3">
           <input
             type="number"
             name={`posts[${j}].post_number`}
@@ -81,7 +83,7 @@
           />
         </div>
 
-        <div class="w-full md:w-1/4 px-3">
+        <div class="w-full md:w-1/5 px-3">
           <input
             type="number"
             step="any"
@@ -94,7 +96,7 @@
           />
         </div>
 
-        <div class="w-full md:w-1/4 px-3">
+        <div class="w-full md:w-1/5 px-3">
           <input
             type="number"
             step="any"
@@ -107,7 +109,7 @@
           />
         </div>
 
-        <div class="w-full md:w-1/4 px-3">
+        <div class="w-full md:w-1/5 px-3">
           <input
             type="number"
             step="any"
@@ -120,7 +122,7 @@
           />
         </div>
 
-        <div class="w-full md:w-1/4 px-3">
+        <div class="w-full md:w-1/5 px-3">
           <input
             type="number"
             step="any"
@@ -130,6 +132,19 @@
             on:blur={handleChange}
             class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
             bind:value={$form.posts[j].right_tissue_height}
+          />
+        </div>
+
+        <div class="w-full md:w-1/5 px-3">
+          <input
+            type="number"
+            step="any"
+            placeholder="Radius"
+            name={`posts[${j}].radius`}
+            on:change={handleChange}
+            on:blur={handleChange}
+            class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+            bind:value={$form.posts[j].radius}
           />
         </div>
 

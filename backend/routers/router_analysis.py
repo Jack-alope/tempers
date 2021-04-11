@@ -1,23 +1,22 @@
-import logging
-import threading
 import glob
 import json
 from typing import List
 
-from template_config import templates
+import pandas as pd
+
+from fastapi import APIRouter,  Depends, Query
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
+
+from sqlalchemy.orm import Session
+
+
 from database import get_db
 from schemas import schema_analysis
 from crud import crud_video, crud_tissue
 from analysisFolder import analysis as analysis
 from analysisFolder import calculations as calcs
 
-from fastapi import APIRouter, Request, Form,  Depends, Query, Body
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
-
-from sqlalchemy.orm import Session
-
-import pandas as pd
 
 router = APIRouter()
 
@@ -38,6 +37,7 @@ async def analyze(video_id: int = Query(...), db: Session = Depends(get_db)):
     date = date.strftime("%m_%d_%Y")
     files = glob.glob('static/uploads/' + str(exp) +
                       '/' + date + '/csvfiles/*')
+
     tiss_nums = []
     tiss_freq = []
     tiss_types = []
