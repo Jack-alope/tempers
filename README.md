@@ -1,6 +1,6 @@
 # MTT Analysis
 
-[![pylint](https://costa-lab.gitlab.io/multi-tissue-tracking/analysis/badges/pylint.svg)](https://costa-lab.gitlab.io/multi-tissue-tracking/analysis/lint/)
+[![pylint](https://costa-lab.gitlab.io/rianu/badges/pylint.svg)](https://costa-lab.gitlab.io/rianu/lint/)
 
 ## Built with
 
