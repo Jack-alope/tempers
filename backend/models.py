@@ -1,3 +1,7 @@
+"""
+Database models for rianu
+"""
+
 from datetime import datetime
 from dataclasses import dataclass
 from typing import List
@@ -10,7 +14,6 @@ from sqlalchemy.orm import relationship
 
 from database import Base
 
-    
 
 tz = timezone('EST')
 
@@ -42,8 +45,6 @@ class Video(Base):
     date_recorded: Date = Column(Date, nullable=False)
     frequency: float = Column(Float, nullable=False)
 
-    # bio_reactor_number = Column(Integer, nullable=True)
-
     calibration_distance: float = Column(Float, nullable=True)
 
     calibration_factor: float = Column(Float, nullable=True)
@@ -56,7 +57,8 @@ class Video(Base):
     bio_reactor_id: int = Column(Integer, ForeignKey('bio_reactor.id'))
     bio_reactor = relationship("Bio_reactor", back_populates="vids")
 
-    tissues = relationship("Tissue", back_populates="video")
+    tissues = relationship("Tissue", back_populates="video",
+                           cascade="all, delete-orphan")
 
 
 @dataclass
@@ -78,6 +80,26 @@ class Tissue(Base):
     vid_id = Column(Integer, ForeignKey('video.id'))
     video = relationship("Video", back_populates="tissues")
 
+    tissues = relationship(
+        "TissueTracking", back_populates="tissue", cascade="all, delete-orphan", passive_deletes=True)
+
+
+class TissueTracking(Base):
+    __tablename__ = "tissue_tracking"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+
+    tissue_id: int = Column(Integer, ForeignKey(
+        "tissue.id", ondelete="CASCADE"))
+    tissue = relationship("Tissue", back_populates="tissues")
+
+    time: float = Column(Float)
+    displacment: float = Column(Float)
+    odd_x: float = Column(Float)
+    odd_y: float = Column(Float)
+    even_x: float = Column(Float)
+    even_y: float = Column(Float)
+
 
 @dataclass
 class Bio_reactor(Base):
@@ -91,7 +113,8 @@ class Bio_reactor(Base):
 
     vids = relationship("Video", back_populates="bio_reactor")
 
-    posts = relationship("Post", back_populates="bio_reactor")
+    posts = relationship("Post", back_populates="bio_reactor",
+                         cascade="all, delete-orphan")
 
 
 @dataclass

@@ -23,7 +23,7 @@ import pandas as pd
 # youngs = 1330000
 
 
-def carry_calcs(db, all_data, files):
+def carry_calcs(db, all_data, vid_id):
     beat_freq = []
     time2pks = []
     time50rel = []
@@ -307,5 +307,7 @@ def negdfdt(ninety, ten):
     return avg, std
 
 # REVIEW: REMOVE
+
+
 def dummy_calc(x):
     return x+1

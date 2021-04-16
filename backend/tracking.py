@@ -1,17 +1,13 @@
-import logging
-import os
+"""
+Tracks the vid to get the tissue stuff
+"""
+#import os
 
 import cv2
 import pandas as pd
 from scipy.spatial import distance
 
-from crud import crud_video, crud_tissue
-import database
-
-logging.basicConfig(filename='tracking.log',
-                    format='[%(filename)s:%(lineno)d] %(message)s', level=logging.DEBUG)
-logging.warning("New Run Starts Here")
-
+from crud import crud_tissue_tracking
 
 # This just formats the boxes toi be readable by opencv trackers
 
@@ -29,14 +25,10 @@ def format_points(old_points):
 
 
 def start_trackig(db, unformated_points, video_id_passed, calib_factor, video_object, tissues):
-    logging.info('start_trackig')
-
     # getsvidio file path from vid object
     video_file_path = video_object.save_location
-    experiment_num = video_object.experiment_id
-    date_recorded = video_object.date_recorded
-    frequency = video_object.frequency
     tissue_object_list = video_object.tissues
+    tissue_ids = [(tissue_object.id) for tissue_object in tissue_object_list]
 
     # Start a opencv videostream
     videostream = cv2.VideoCapture(video_file_path)
@@ -66,7 +58,7 @@ def start_trackig(db, unformated_points, video_id_passed, calib_factor, video_ob
 
     for box in boxes:
         # Create and add a tracker to the multitracker object for each box drawn
-        #tracker = OPENCV_OBJECT_TRACKERS['csrt']()
+        # tracker = OPENCV_OBJECT_TRACKERS['csrt']()
         tracker = cv2.TrackerCSRT_create()
         trackers.add(tracker, images, box)
 
@@ -84,7 +76,7 @@ def start_trackig(db, unformated_points, video_id_passed, calib_factor, video_ob
         # read in the next frame
         successful, image = videostream.read()
         if not successful:
-            logging.info("tracker failed to follow object")
+            # TODO: exception error
             break
         frame += 1
 
@@ -108,9 +100,9 @@ def start_trackig(db, unformated_points, video_id_passed, calib_factor, video_ob
             # If objectID is odd it has a pair so do stuff
             elif (objectID - 1) == evenID:
                 # Calculate tissue number based on object ID
-                reltissueID = int((objectID - 1) / 2)
+                relative_post_location = int((objectID - 1) / 2)
 
-                if len(displacement) < reltissueID + 1:
+                if len(displacement) < relative_post_location + 1:
                     displacement.append([])
 
                 # Save the x, y position of the odd post
@@ -118,45 +110,33 @@ def start_trackig(db, unformated_points, video_id_passed, calib_factor, video_ob
                 time = videostream.get(cv2.CAP_PROP_POS_MSEC) / 1000
 
                 disp = distance.euclidean(centroid_even, centroid_odd)
-                displacement[reltissueID].append(
-                    (time, disp, centroid_odd[0], centroid_odd[1], centroid_even[0], centroid_even[1]))
+                displacement[relative_post_location].append(
+                    (time, disp, tissue_ids[relative_post_location], centroid_odd[0], centroid_odd[1], centroid_even[0], centroid_even[1]))
 
-    # gets other needed info from video object
-    # date_recorded = video_object.date_recorded
-    # frequency = video_object.frequency
-    frequencyUnder = str(frequency).replace('.', '-')
-    # experiment_num = video_object.experiment_id
+    """
+    tissue_tracking_cols = ["time", "displacment",
+                            "tissue_id", "odd_x", "odd_y", "even_x", "even_y"]
+    [crud_tissue_tracking.create_tissue_tracking(db, pd.DataFrame(
+        an, columns=tissue_tracking_cols)) for an in displacement]
 
-    # list of tissue objects that are childeren of the vid
-    # tissue_object_list = video_object.tissues
-    # gets the id and numbers of the tissues from db
-    li_tissue_ids = [tissue.id for tissue in tissue_object_list]
-    li_tissue_numbers = [
-        tissue.tissue_number for tissue in tissue_object_list]
+    the below could proablly be shorted with list comp or map 
+    but it just makes it harder to read 
+    leaving it here unless i want to review
 
-    date_as_string = date_recorded.strftime('%m_%d_%Y')
+    """
 
-    directory_to_save_path = 'static/uploads/' + \
-        str(experiment_num) + "/" + date_as_string + '/csvfiles/'
+    for i, tissue_tracking_info in enumerate(displacement):
+        dataframe = pd.DataFrame(tissue_tracking_info, columns=[
+            "time", "displacment", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
+        crud_tissue_tracking.create_tissue_tracking(
+            db, tissue_ids[i], dataframe)
 
-    if not os.path.exists(directory_to_save_path):
-        os.makedirs(directory_to_save_path)
-    for i, an in enumerate(displacement):
-        df = pd.DataFrame(
-            an, columns=["time", "disp", "oddX", "oddY", "evenX", "evenY"])
-        path_to_csv = directory_to_save_path + \
-            f'{date_as_string}_T{li_tissue_numbers[i]}_F{frequencyUnder}.csv'
-        logging.info(path_to_csv)
-        df.to_csv(path_to_csv, index=False)
-        crud_tissue.add_tissue_csv(db, li_tissue_ids[i], path_to_csv)
-    logging.info("check csv")
-
-    '''
+    """
     # deletes files in img folder
     # REVIEW: this can probally be done better
-    for file in os.listdir(os.getcwd() + '/static/img'):
-        os.remove(os.getcwd() + '/static/img/' + file)
+    for file in os.listdir(os.getcwd() + '/static/uploads/img'):
+        os.remove(os.getcwd() + '/static/uploads/img/' + file)
 
-    '''
+    """
 
     return boxes

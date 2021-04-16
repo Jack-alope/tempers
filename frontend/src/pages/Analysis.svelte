@@ -2,20 +2,15 @@
   import SelectVideo from "../components/SelectVideo.svelte";
   import Grapher from "../components/Grapher.svelte";
 
-  import { video_id, json_data_list, files } from "../components/Stores.js";
+  import { video_id, json_data_list } from "../components/Stores.js";
 
   let vidSelected = false;
 
   let video_id_value: number;
   let nums, freqs, types;
-  let files_value;
 
   video_id.subscribe((value) => {
     video_id_value = value;
-  });
-
-  files.subscribe((value) => {
-    files_value = value;
   });
 
   async function handleVideoSelected() {
@@ -32,7 +27,6 @@
     if (res.ok) {
       const response_json = await res.json();
       json_data_list.set(response_json.json_data_list);
-      files.set(response_json.files);
       nums = response_json.nums;
       freqs = response_json.freqs;
       types = response_json.types;
@@ -57,5 +51,5 @@
 {#if !vidSelected}
   <SelectVideo on:video_selected={handleVideoSelected} />
 {:else}
-  <Grapher {nums} {freqs} {types} {files_value} />
+  <Grapher {nums} {freqs} {types} />
 {/if}

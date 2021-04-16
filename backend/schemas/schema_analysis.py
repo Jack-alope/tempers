@@ -12,7 +12,7 @@ class AnalysisBase(BaseModel):
     polynomials: int
     windows: int
     minDistances: int
-    files_value: List[str]
+    video_id_value: int
 
     class Config:
         orm_mode = True
