@@ -1,14 +1,19 @@
 <script>
-  import { json_data_list } from "../components/Stores.js";
+  import { json_data_list, video_id } from "../components/Stores.js";
 
   import { onMount } from "svelte";
 
-  export let nums, freqs, types, files_value;
+  export let nums, freqs, types;
 
   let json_data_list_value;
+  let video_id_value;
 
   json_data_list.subscribe((value) => {
     json_data_list_value = value;
+  });
+
+  video_id.subscribe((value) => {
+    video_id_value = value;
   });
 
   onMount(async () => {
@@ -16,13 +21,15 @@
   });
 
   async function caculate() {
-    const res = await fetch(process.env.API_URL + "/call_calcs", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(files_value),
-    });
+    const res = await fetch(
+      process.env.API_URL + `/call_calcs?video_id={video_id_value}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 
   function grapherFunc() {
@@ -553,7 +560,7 @@
       polynomials,
       windows,
       minDistances,
-      files_value,
+      video_id_value,
     };
     let graph_paramsJson = JSON.stringify(graph_params);
     console.log(graph_paramsJson);

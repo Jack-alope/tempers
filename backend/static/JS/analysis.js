@@ -412,11 +412,12 @@ function toPython(xrange, thresholds, buffers, polynomials, windows, minDistance
         mode: 'markers',
         name: 'Base'
       })
-      /*Plotly.addTraces(Div.valueOf().id, {x: response.data.frontx,
-                                          y: response.data.fronty,
-                                          mode: 'markers', name: 'Front'})
-
-       */
+      Plotly.addTraces(Div.valueOf().id, {
+        x: response.data.frontx,
+        y: response.data.fronty,
+        mode: 'markers',
+        name: 'Front'
+      })
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.tencontx,
         y: response.data.tenconty,
@@ -439,7 +440,7 @@ function toPython(xrange, thresholds, buffers, polynomials, windows, minDistance
         x: response.data.tenrelx,
         y: response.data.tenrely,
         mode: 'markers',
-        name: 'Ten % Relaxed'
+        name: 'Eighty % Relaxed'
       })
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.fifrelx,
@@ -447,6 +448,7 @@ function toPython(xrange, thresholds, buffers, polynomials, windows, minDistance
         mode: 'markers',
         name: 'Fifty % Relaxed'
       })
+      /*
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.ninerelx,
         y: response.data.ninerely,
@@ -460,11 +462,10 @@ function toPython(xrange, thresholds, buffers, polynomials, windows, minDistance
         name: 'Raw',
         visible: 'legendonly'
       })
-
       //Plotly.addTraces(Div.valueOf().id, {x: response.data.rawx,
       //                                  y: response.data.rawy,
       //                        mode: 'markers', name: 'Raw'})
-
+      */
 
 
     }

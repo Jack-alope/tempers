@@ -13,14 +13,13 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from schemas import schema_analysis
-from crud import crud_video, crud_tissue
-from analysisFolder import analysis as analysis
+from crud import crud_video, crud_tissue, crud_tissue_tracking
 from analysisFolder import calculations as calcs
 
+from analysis.tissues import TissuePoints
+from scipy.signal import savgol_filter
 
 router = APIRouter()
-
-glob_data = []
 
 
 @router.get('/analyze', tags=["analysis"])
@@ -29,106 +28,58 @@ async def analyze(video_id: int = Query(...), db: Session = Depends(get_db)):
 
     json_list = []
     video_object = crud_video.get_vid_by_id(db, video)
-    # date = form.date.data
-    # exp = form.experiment.data
-    exp = video_object.experiment_id
-    date = video_object.date_recorded
-    # date = date.replace('/', '_')
-    date = date.strftime("%m_%d_%Y")
-    files = glob.glob('static/uploads/' + str(exp) +
-                      '/' + date + '/csvfiles/*')
 
     tiss_nums = []
     tiss_freq = []
     tiss_types = []
-    dataframes = []
-    global glob_data
-    for i, file in enumerate(files):
+    tissues = video_object.tissues
+    for i, tissue_object in enumerate(tissues):
         # Reads each file in as a dataframe
-        glob_data.append([])
-        tissue_object = crud_tissue.get_tissue_by_csv(db, file)
-        tiss_freq.append(tissue_object.video.frequency)
+        tiss_freq.append(video_object.frequency)
         tiss_types.append(tissue_object.tissue_type)
         tiss_nums.append(tissue_object.tissue_number)
-        dataframes.append(pd.read_csv(file))
-        dataframe_smooth, peaks, basepoints, frontpoints, ten, fifty, eighty, ninety = analysis.findpoints(
-            dataframes[i]['disp'], dataframes[i], 3, 3, 13, .6, 5, 0, 0)
-        glob_data[i] = analysis.findpoints(
-            dataframes[i]['disp'], dataframes[i], 3, 3, 13, .6, 5, 0, 0)
-        json_list.append(dataframe_smooth.to_json(orient='columns'))
+        
+        data = crud_tissue_tracking.get_tracking_by_id(db, tissue_object.id)
+            
+        # TODO: Change this is js not here. 
+        data['disp'] = data['displacment']
+        json_list.append(data.to_json(orient='columns'))
 
     json_list = json.dumps(json_list)
 
     res = jsonable_encoder({'json_data_list': json_list,
-                            'nums': tiss_nums, 'freqs': tiss_freq, 'types': tiss_types, "files": files})
+                            'nums': tiss_nums, 'freqs': tiss_freq, 'types': tiss_types})
 
     return JSONResponse(content=res)
 
+@ router.post("/graphUpdate", tags=["analysis"])
+def graphUpdate(data: schema_analysis.AnalysisBase, db: Session = Depends(get_db)):
+    """Function gets called to uodate graph with new parameters"""
 
-@router.post("/graphUpdate", tags=["analysis"])
-def graphUpdate(data: schema_analysis.AnalysisBase):
-    print(data)
+    video_object = crud_video.get_vid_by_id(db, data.video_id_value)
+    tissue_obj = video_object.tissues[data.value]
+    dataframe = crud_tissue_tracking.get_tracking_by_id(db, tissue_obj.id)
+    tracking_obj = TissuePoints(dataframe['displacment'].to_list(), dataframe['time'].to_list())
+    tracking_obj.smooth(int(data.windows), int(data.polynomials))
+    tracking_obj.find_peaks(int(data.thresholds), int(data.minDistances))
 
-    #data = json.loads(data).get("data")
-
-    global glob_data
-    files = data.files_value
-    datafram = []
-    raw = []
-    for i, file in enumerate(files):
-        datafram.append(pd.read_csv(file))
-        raw.append(pd.read_csv(file))
-
-    raw[int(data.value)]['disp'] = raw[int(data.value)]['disp'] * -1
-    dataframe_smooth, peaks, basepoints, frontpoints, ten, fifty, eighty, ninety = analysis.findpoints(raw[int(data.value)]['disp'], datafram[int(data.value)],
-                                                                                                       int(data.buffers), int(data.polynomials), int(
-        data.windows), float(data.thresholds), int(data.minDistances),
-        int(data.xrange[0]), int(data.xrange[1]))
-    glob_data[int(data.value)] = analysis.findpoints(raw[int(data.value)]['disp'], datafram[int(data.value)],
-                                                     int(data.buffers), int(data.polynomials), int(
-        data.windows), float(data.thresholds), int(data.minDistances),
-        int(data.xrange[0]), int(data.xrange[1]))
-    rawx = raw[int(data.value)]['time'].tolist()
-    rawy = raw[int(data.value)]['disp'].tolist()
-    times = dataframe_smooth['time'].to_list()
-    disps = dataframe_smooth['disp'].to_list()
-    peaksx = dataframe_smooth['time'][peaks].to_list()
-    peaksy = dataframe_smooth['disp'][peaks].to_list()
-    basex = dataframe_smooth['time'][basepoints].to_list()
-    basey = dataframe_smooth['disp'][basepoints].to_list()
-    frontx = dataframe_smooth['time'][frontpoints].to_list()
-    fronty = dataframe_smooth['disp'][frontpoints].to_list()
-    tencontx = ten[0]
-    tenconty = ten[1]
-    tenrelx = ninety[2]
-    tenrely = ninety[3]
-
-    fifcontx = fifty[0]
-    fifconty = fifty[1]
-    fifrelx = fifty[2]
-    fifrely = fifty[3]
-
-    ninecontx = ninety[0]
-    nineconty = ninety[1]
-    ninerelx = ten[2]
-    ninerely = ten[3]
-
-    return {'status': 'OK', 'data': {'xs': times, 'ys': disps,
-                                     'peaksx': peaksx, 'peaksy': peaksy,
-                                     'basex': basex, 'basey': basey,
-                                     'frontx': frontx, 'fronty': fronty,
-                                     'tencontx': tencontx, 'tenconty': tenconty,
-                                     'tenrelx': tenrelx, 'tenrely': tenrely,
-                                     'fifcontx': fifcontx, 'fifconty': fifconty,
-                                     'fifrelx': fifrelx, 'fifrely': fifrely,
-                                     'ninecontx': ninecontx, 'nineconty': nineconty,
-                                     'ninerelx': ninerelx, 'ninerely': ninerely,
-                                     'rawx': rawx, 'rawy': rawy
-                                     }}
+    print(tracking_obj.calculated_values)
+    return {'status': 'OK', 'data': {'xs':tracking_obj.time,'ys':tracking_obj.smooth_disp.tolist(),
+        'peaksx': tracking_obj.peaks[0], 'peaksy': tracking_obj.peaks[1],
+        'basex': tracking_obj.basepoints[0], 'basey': tracking_obj.basepoints[1],
+        'frontx': tracking_obj.frontpoints[0], 'fronty': tracking_obj.frontpoints[1],
+        'tencontx':tracking_obj.contract_points[0][0],'tenconty':tracking_obj.contract_points[0][1],
+        'fifcontx':tracking_obj.contract_points[2][0],'fifconty':tracking_obj.contract_points[2][1],
+        'ninecontx':tracking_obj.contract_points[4][0],'nineconty':tracking_obj.contract_points[4][1],
+        'ninerelx': tracking_obj.relax_points[0][0], 'ninerely': tracking_obj.relax_points[0][1],
+        'fifrelx': tracking_obj.relax_points[2][0], 'fifrely': tracking_obj.relax_points[2][1],
+        # TODO: Rename to eighty
+        'tenrelx': tracking_obj.relax_points[1][0], 'tenrely': tracking_obj.relax_points[1][1],
+        }}
 
 
-@ router.post('/call_calcs', tags=["analysis"])
-def call_calcs(files: List[str], db: Session = Depends(get_db)):
-    global glob_data
-    calcs.carry_calcs(db, glob_data, files)
-    return {"ok": 200}
+#@ router.post('/call_calcs/{video_id_value}', tags=["analysis"])
+#def call_calcs(video_id_value: int, db: Session = Depends(get_db)):
+#    global glob_data
+#    calcs.carry_calcs(db, glob_data, video_id_value)
+#    return {"ok": 200}

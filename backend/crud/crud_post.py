@@ -1,3 +1,7 @@
+"""
+CRUD post 
+Database interaction for posts
+"""
 from sqlalchemy.orm import Session
 
 import models

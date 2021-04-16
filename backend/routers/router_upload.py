@@ -115,8 +115,6 @@ async def post_upload(info: str = Form(...), file: UploadFile = File(...),
     else:
         vid_id = save_video_file(vid_info, file, db)
 
-    print("Here")
-
     add_tissues(vid_info.tissues, vid_info.bio_reactor_id, vid_id, db)
 
     return {200: "OK"}
