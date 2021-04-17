@@ -21,9 +21,9 @@ def get_bio_reactors(db: Session = Depends(get_db)):
 @router.post("/addBioReactor", response_model=schema_bio_reactor.BioReactorBase, tags=["Bio_reactor"])
 def add_BioReactor(bio_reactor: schema_bio_reactor.BioReactorCreate, db: Session = Depends(get_db)):
     new_bio_reactor = crud_bio_reactor.create_bio_reactor(db, bio_reactor)
-    [crud_post.create_post(db, post, new_bio_reactor.id)
-     for post in bio_reactor.posts]
 
+    for post in bio_reactor.posts:
+        crud_post.create_post(db, post, new_bio_reactor.id)
     return bio_reactor
 
 

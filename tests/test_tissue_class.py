@@ -34,27 +34,27 @@ def test_find_analysispoints(tissue_object):
 def test_beating_freq(tissue_object):
     """Testing that the beatinf frequency is 1/period"""
     assert (1/(2*np.pi)-.002) <= \
-        tissue_object.calculated_values['beating_freq'][0] <= (1/(2*np.pi)+.002)
+        tissue_object.calculated_values['beating_freq'] <= (1/(2*np.pi)+.002)
 
 def test_t2rel_50(tissue_object):
     """Test that the tissue object properly uses calculation function"""
     assert (np.pi - .002)/2 <= \
-        tissue_object.calculated_values['t2rel50'][0] <= (np.pi + .002)/2
+        tissue_object.calculated_values['t2rel50'] <= (np.pi + .002)/2
 
 def test_t50(tissue_object):
     """test that t50 is half period for sin"""
     assert np.pi - .002 <= \
-        tissue_object.calculated_values['t50'][0] <= np.pi + .002
+        tissue_object.calculated_values['t50'] <= np.pi + .002
 
-    t50 = tissue_object.calculated_values['c50'][0] + tissue_object.calculated_values['r50'][0]
-    assert -.002 <= np.absolute(t50 - tissue_object.calculated_values['t50'][0]) <= .002
-    assert (np.pi - .002)/2 <= tissue_object.calculated_values['c50'][0] <= (np.pi + .002)/2
-    assert (np.pi - .002)/2 <= tissue_object.calculated_values['r50'][0] <= (np.pi + .002)/2
+    t50 = tissue_object.calculated_values['c50'] + tissue_object.calculated_values['r50']
+    assert -.002 <= np.absolute(t50 - tissue_object.calculated_values['t50']) <= .002
+    assert (np.pi - .002)/2 <= tissue_object.calculated_values['c50'] <= (np.pi + .002)/2
+    assert (np.pi - .002)/2 <= tissue_object.calculated_values['r50'] <= (np.pi + .002)/2
 
 def test_dfdt(tissue_object):
     """Checks that dfdt is functioning properly with supplied values"""
-    assert tissue_object.calculated_values['negdfdt'][0] < 0
+    assert tissue_object.calculated_values['negdfdt'] < 0
 
-    slope_diff = tissue_object.calculated_values['negdfdt'][0] + \
-                tissue_object.calculated_values['dfdt'][0]
+    slope_diff = tissue_object.calculated_values['negdfdt'] + \
+                tissue_object.calculated_values['dfdt']
     assert -.001 <= slope_diff <= .001

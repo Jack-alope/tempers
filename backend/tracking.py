@@ -24,7 +24,7 @@ def format_points(old_points):
     return result
 
 
-def start_trackig(db, unformated_points, video_id_passed, calib_factor, video_object, tissues):
+def start_trackig(db, unformated_points, calib_factor, video_object, tissues):
     # getsvidio file path from vid object
     video_file_path = video_object.save_location
     tissue_object_list = video_object.tissues

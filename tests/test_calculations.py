@@ -9,7 +9,7 @@ from backend.analysis import calculations
 def test_beating_freq(tissue_object):
     """Testing that the beatinf frequency is 1/period"""
     assert (1/(2*np.pi)-.001) <= \
-        tissue_object.calculated_values['beating_freq'][0] <= (1/(2*np.pi)+.001)
+        tissue_object.calculated_values['beating_freq'] <= (1/(2*np.pi)+.001)
 
 def test_time_between(tissue_object):
     """Tetsing that time2pk is correct using known values"""

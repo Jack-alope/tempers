@@ -1,3 +1,7 @@
+"""
+Router assisted with tissue tracking
+"""
+
 import threading
 
 from fastapi import APIRouter, Depends
@@ -59,7 +63,6 @@ async def box_coordinates(post_info: schema_video.PostSelection,
     tissues = video_object.tissues
     tracking_thread = threading.Thread(
         target=tracking.start_trackig, args=(database, post_info.boxes,
-                                             post_info.video_id_value,
                                              cal_factor, video_object, tissues))
     tracking_thread.start()
     return {"ok": 200}

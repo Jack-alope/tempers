@@ -7,21 +7,27 @@ from sqlalchemy.orm import Session
 import pandas as pd
 
 import models
-import database
 
 
-def create_tissue_tracking(db: Session, tissue_id: int, dataframe):
-    db = database.SessionLocal()
-    db.query(models.TissueTracking).filter(models.TissueTracking.tissue_id ==
-                                           tissue_id).delete(synchronize_session=False)
-    db.bulk_insert_mappings(models.TissueTracking,
-                            dataframe.to_dict(orient="records"))
-    db.commit()
+def create_tissue_tracking(database_session: Session, tissue_id: int, dataframe):
+    """
+    Accepts the DB Session, tissue_id and a data frame
+    Inserts tissue tracking data to databse
+    """
+    database_session.query(models.TissueTracking).filter(
+        models.TissueTracking.tissue_id ==
+        tissue_id).delete(synchronize_session=False)
+    database_session.bulk_insert_mappings(models.TissueTracking,
+                                          dataframe.to_dict(orient="records"))
+    database_session.commit()
 
 
-def get_tracking_by_id(db: Session, tissue_id: int):
-    query = db.query(models.TissueTracking).filter(
+def get_tracking_by_id(database_session: Session, tissue_id: int):
+    """
+    Gets all the tissue tracking data for a tissue
+    returns the tissue data as a pandas df
+    """
+    query = database_session.query(models.TissueTracking).filter(
         models.TissueTracking.tissue_id == tissue_id).order_by(models.TissueTracking.time.asc())
 
-    print(query.statement)
-    return pd.read_sql_query(query.statement, db.bind)
+    return pd.read_sql_query(query.statement, database_session.bind)

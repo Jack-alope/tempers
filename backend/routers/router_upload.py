@@ -10,10 +10,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from sqlalchemy.orm import Session
 
+import pandas as pd
+
 
 import models
 from database import get_db
-from crud import crud_video, crud_tissue
+from crud import crud_video, crud_tissue, crud_tissue_tracking
 from schemas import schema_video, schema_tissue
 
 
@@ -86,16 +88,17 @@ def save_csv_file(vid_info, file, db):
     return (vid.id, path_to_file)
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate], bio_reactor_id: int,
-                vid_id: int, db: Session):
+def add_tissues(tissue_li: List[schema_tissue.TissueCreate], bio_reactor_id: int, vid_id: int, db: Session):
+
+    tissue_id = 0
 
     for tissue in tissue_li:
         tissue_obj = schema_tissue.TissueCreate.parse_obj(tissue)
         tissue_obj.vid_id = vid_id
         tissue_obj.bio_reactor_id = bio_reactor_id
-        crud_tissue.create_tissue(db, tissue_obj)
+        tissue_id = crud_tissue.create_tissue(db, tissue_obj)
 
-    return True
+    return tissue_id
 
 
 @router.post("/upload", tags=["upload"])
@@ -107,6 +110,8 @@ async def post_upload(info: str = Form(...), file: UploadFile = File(...),
 
     extension = file.filename.split(".")[-1]
 
+    tup = ()
+
     if extension == "csv":
         tup = save_csv_file(vid_info, file, db)
         vid_id = tup[0]
@@ -115,6 +120,13 @@ async def post_upload(info: str = Form(...), file: UploadFile = File(...),
     else:
         vid_id = save_video_file(vid_info, file, db)
 
-    add_tissues(vid_info.tissues, vid_info.bio_reactor_id, vid_id, db)
+    tissue = add_tissues(
+        vid_info.tissues, vid_info.bio_reactor_id, vid_id, db)
+
+    if extension == "csv":
+        dataframe = pd.read_csv(tup[1])
+        dataframe["tissue_id"] = tissue.id
+        crud_tissue_tracking.create_tissue_tracking(
+            db, tissue.id, dataframe)
 
     return {200: "OK"}

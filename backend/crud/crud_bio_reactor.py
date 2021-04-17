@@ -1,35 +1,42 @@
-import logging
+"""
+CRUD for Bio reactor
+"""
+
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 import models
 from schemas import schema_bio_reactor
 
-from sqlalchemy.orm import Session
+
+def get_bio_reactors(database_session: Session):
+    """Returns all bio reactors"""
+    return database_session.query(models.BioReactor).all()
 
 
-def get_bio_reactors(db: Session):
-    return db.query(models.Bio_reactor).all()
-
-
-def create_bio_reactor(db: Session, bio_reactor: schema_bio_reactor.BioReactorBase):
-    db_bio_reactor = models.Bio_reactor(
-        date_added=bio_reactor.date_added, bio_reactor_number=bio_reactor.bio_reactor_number)
-
-    db.add(db_bio_reactor)
-    db.commit()
-    db.refresh(db_bio_reactor)
+def create_bio_reactor(database_session: Session, bio_reactor: schema_bio_reactor.BioReactorBase):
+    """Adds bio reactor to DB"""
+    db_bio_reactor = models.BioReactor(
+        date_added=bio_reactor.date_added,
+        bio_reactor_number=bio_reactor.bio_reactor_number)
+    database_session.add(db_bio_reactor)
+    database_session.commit()
+    database_session.refresh(db_bio_reactor)
 
     return db_bio_reactor
 
 
-def get_bio_reactor(db: Session, bio_id: int):
-    return db.query(models.Bio_reactor).filter(models.Bio_reactor.id == bio_id).first()
+def get_bio_reactor(database_session: Session, bio_id: int):
+    """Returns bio reactor by for id"""
+    return database_session.query(models.BioReactor).filter(models.BioReactor.id == bio_id).first()
 
 
-def delete_bio_reactor(db: Session, bio_id: int):
-    db_bio_reactor = get_bio_reactor(db, bio_id)
-    if db_bio_reactor:
-        db.delete(db_bio_reactor)
-        db.commit()
+def delete_bio_reactor(database_session: Session, bio_id: int):
+    """Deletes bio Reactor"""
+    try:
+        database_session.query(models.BioReactor).filter(
+            models.BioReactor.id == bio_id).delete()
+        database_session.commit()
         return True
-    else:
+    except IntegrityError:
         return False

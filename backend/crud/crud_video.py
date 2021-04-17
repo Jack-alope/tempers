@@ -1,29 +1,39 @@
+"""
+CRUD for Video
+"""
+
 from dataclasses import asdict
 from typing import List
+
+from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 import models
 from schemas import schema_video
 
-from sqlalchemy.orm import Session
 
-
-def create_video(db: Session, video: schema_video.VideoCreate):
+def create_video(database_session: Session, video: schema_video.VideoCreate):
+    """Adds vid to DB"""
     db_video = models.Video()
     [setattr(db_video, i[0], i[1]) for i in video if i[0] != "tissues"]
-    db.add(db_video)
-    db.commit()
-    db.refresh(db_video)
+    database_session.add(db_video)
+    database_session.commit()
+    database_session.refresh(db_video)
     return db_video
 
 
-def get_all_vids(db: Session):
+def get_all_vids(database_session: Session):
+    """Retunrs all vids"""
     result = []
-    all_vids = db.query(models.Video).all()
+    all_vids = database_session.query(models.Video).all()
     [result.append(asdict(row)) for row in all_vids]
     return result
 
 
 def to_vid_show(row_vids: list):
+    """
+    not sure
+    """
     result = []
     for vid in row_vids:
         row_dict = dict(vid)
@@ -35,10 +45,15 @@ def to_vid_show(row_vids: list):
     return result
 
 
-def get_videos(db: Session):
+def get_videos(database_session: Session):
+    """
+    Returns all vids
+    """
     # each vid is retuned as a tuple with the vid object, exp_idenifyer, bio_number
-    result = db.query(models.Video, models.Experiment.experiment_idenifer, models.Bio_reactor.bio_reactor_number).join(
-        models.Experiment).join(models.Bio_reactor).distinct(models.Video.id).all()
+    result = database_session.query(models.Video,
+                                    models.Experiment.experiment_idenifer,
+                                    models.BioReactor.bio_reactor_number).join(
+        models.Experiment).join(models.BioReactor).distinct(models.Video.id).all()
 
     def add_bio_and_exp_to_vid(tup):
         '''
@@ -56,22 +71,27 @@ def get_videos(db: Session):
     return list(map(add_bio_and_exp_to_vid, result))
 
 
-def delete_video(db: Session, vid_id: int):
-    db_vid = get_vid_by_id(db, vid_id)
-    if db_vid:
-        db.delete(db_vid)
-        db.commit()
+def delete_video(database_session: Session, vid_id: int):
+    """Delete vid by id"""
+    try:
+        database_session.query(models.Video).filter(
+            models.Video.id == vid_id
+        ).delete()
         return True
-    else:
+    except IntegrityError:
         return False
 
 
-def get_vid_by_id(db: Session, vid_id: int):
-    return db.query(models.Video).filter(models.Video.id == vid_id).first()
+def get_vid_by_id(database_session: Session, vid_id: int):
+    """retunr vid by id"""
+    return database_session.query(models.Video).filter(models.Video.id == vid_id).first()
 
 
-def update_cal_cross(db: Session, video_id, cal_dist: float, cal_factor: float, cross_dist_passed: List):
-    vid = get_vid_by_id(db, video_id)
+def update_cal_cross(database_session: Session, video_id,
+                     cal_dist: float, cal_factor: float,
+                     cross_dist_passed: List):
+    """update calibration and cross section distance"""
+    vid = get_vid_by_id(database_session, video_id)
     vid.calibration_distance = cal_dist
     vid.calibration_factor = cal_factor
 
@@ -79,5 +99,5 @@ def update_cal_cross(db: Session, video_id, cal_dist: float, cal_factor: float, 
     for i, tissue in enumerate(tissues):
         tissue.cross_section_dist = cross_dist_passed[i]
 
-    db.commit()
-    db.refresh(vid)
+    database_session.commit()
+    database_session.refresh(vid)
