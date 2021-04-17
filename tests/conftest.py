@@ -7,5 +7,5 @@ from backend.analysis.tissues import TissuePoints
 def fixture_tissue_object():
     """Initalize a sine graph based object"""
     time = np.arange(0, 40, 0.001)
-    disp = np.sin(time) + 1
+    disp = np.sin(time) + 4
     return TissuePoints(disp,  time)

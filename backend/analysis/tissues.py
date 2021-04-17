@@ -9,7 +9,6 @@ from scipy.signal import savgol_filter
 from . import calculations
 sys.setrecursionlimit(10000)
 
-
 class TissuePoints:
     """Tissue class for pointfinding"""
 
@@ -22,6 +21,7 @@ class TissuePoints:
         self.min_dist = 5
         self.raw_disp = disp
         self.time = time
+        self.post_dist = 6
 
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
@@ -37,7 +37,10 @@ class TissuePoints:
             self.window = window
         if poly is not None:
             self.poly = poly
-        self.smooth_disp = savgol_filter(self.raw_disp, self.window, self.poly)
+        
+        smoothed = savgol_filter(self.raw_disp, self.window, self.poly)
+        self.smooth_disp = self.post_dist - smoothed
+
         self.find_peaks()
 
     def find_peaks(self, thresh=None, min_dist=None):
@@ -80,19 +83,8 @@ class TissuePoints:
             map(pnts, self.peaks[2], self.basepoints[2], base_disp))
         relax = list(map(pnts, self.peaks[2], self.frontpoints[2], base_disp))
 
-        contract_points = np.transpose(np.array(contract))
-        relax_points = np.transpose(np.array(relax))
-
-        # TODO: Figure out what is happening with int --> string situation
-        # REVIEW: Why dont you use enumerate
-        for i in range(len(contract_points)):
-            contract_points[i] = list(map(int, contract_points[i]))
-            relax_points[i] = list(map(int, relax_points[i]))
-
-        self.contract_points = [self.format_points(
-            point) for point in contract_points]
-        self.relax_points = [self.format_points(
-            point) for point in relax_points]
+        self.contract_points = np.transpose(contract, axes=[1, 2, 0])
+        self.relax_points = np.transpose(relax, axes=[1, 2, 0])
 
         self.calculate_values()
 
@@ -104,16 +96,22 @@ class TissuePoints:
         return self.dfdt_recursive(new_index, incrementor)
 
     def get_points(self, peak_index, base_index, b_disp, percentage):
-        """Returns 90, 50, 10% points between peak and a basepoint"""
+        """
+        Returns 90, 50, 10% points between peak and a basepoint.
+        Using linear approximation.
+        """
         target_val = (
             percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
 
-        # TODO: Linear approximation
         def cycle(step):
             for new_index in range(peak_index, base_index, step):
                 if self.smooth_disp[new_index] < target_val:
-                    return new_index
-            return base_index
+                    y_diff = self.smooth_disp[new_index] - self.smooth_disp[new_index-1]
+                    x_diff = self.time[new_index] - self.time[new_index-1]
+                    slope = y_diff / x_diff
+                    target_x = ((target_val-self.smooth_disp[new_index])/slope)+self.time[new_index]
+                    return [target_x, target_val]
+            return [self.time[base_index], self.smooth_disp[base_index]]
 
         return cycle(-1) if peak_index > base_index else cycle(1)
 

@@ -37,15 +37,16 @@ def time_between(first_times, second_times):
 def dfdt(ten_points, nine_points):
     """Find slope between points"""
     subtract = lambda f_p, s_p: np.absolute(f_p - s_p)
+    # TODO: Implement dfdt
+    # rise_list = list(map(subtract, ten_points[1], nine_points[1]))
+    #run_list = list(map(subtract, ten_points[0], nine_points[0]))
 
-    rise_list = list(map(subtract, ten_points[1], nine_points[1]))
-    run_list = list(map(subtract, ten_points[0], nine_points[0]))
+    #if nine_points[2][0] > ten_points[2][0]:
+    #    slope_list = list(map(lambda x, y: x/y, rise_list, run_list))
+    #else:
+    #    slope_list = list(map(lambda x, y: -1* x/y, rise_list, run_list))
 
-    if nine_points[2][0] > ten_points[2][0]:
-        slope_list = list(map(lambda x, y: x/y, rise_list, run_list))
-    else:
-        slope_list = list(map(lambda x, y: -1* x/y, rise_list, run_list))
-
-    std = np.std(slope_list)
-    avg = sum(slope_list) / len(slope_list)
-    return avg, std
+    #std = np.std(slope_list)
+    #avg = sum(slope_list) / len(slope_list)
+    #return avg, std
+    return 0, 0
