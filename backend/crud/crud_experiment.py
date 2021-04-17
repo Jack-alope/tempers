@@ -1,33 +1,41 @@
-import logging
+
+"""
+CRUD for experiments
+"""
+from sqlalchemy.exc import IntegrityError
+
+from sqlalchemy.orm import Session
 
 import models
 from schemas import schema_experiment
 
-from sqlalchemy.orm import Session
+
+def get_experiments(database_session: Session):
+    """returns all experiments"""
+    return database_session.query(models.Experiment).all()
 
 
+def get_experiment(database_session: Session, exp_id: int):
+    """Retunrs experiment by id"""
+    return database_session.query(models.Experiment).filter(models.Experiment.id == exp_id).first()
 
-def get_experiments(db: Session):
-    return db.query(models.Experiment).all()
 
-def get_experiment(db: Session, exp_id: int):
-    return db.query(models.Experiment).filter(models.Experiment.id == exp_id).first()
-
-def create_experiment(db: Session, experiment: schema_experiment.ExperimentBase):
-
-    db_experiment = models.Experiment()
-    [setattr(db_experiment, i[0], i[1]) for i in experiment]
-    db.add(db_experiment)
-    db.commit()
-    db.refresh(db_experiment)
+def create_experiment(database_session: Session, experiment: schema_experiment.ExperimentBase):
+    """Add Experiment to DB"""
+    db_experiment = models.Experiment(**experiment.dict())
+    database_session.add(db_experiment)
+    database_session.commit()
+    database_session.refresh(db_experiment)
     return db_experiment
 
 
-def delete_experiment(db: Session, exp_id: int):
-    db_experiment = get_experiment(db, exp_id)
-    if db_experiment:
-        db.delete(db_experiment)
-        db.commit()
+def delete_experiment(database_session: Session, exp_id: int):
+    """Deletes expeiments returns false if cannot delete bc has children"""
+    # REVIEW: Smething weird with the delte no exception but does not delete
+    try:
+        database_session.query(models.Experiment).filter(
+            models.Experiment.id == exp_id).delete()
+        database_session.commit()
         return True
-    else:
+    except IntegrityError:
         return False

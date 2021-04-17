@@ -53,9 +53,13 @@
       },
     });
     if (res.ok) {
-      bio_reactors_value = bio_reactors_value.filter(
-        (bio_reactor) => bio_reactor.id !== id
-      );
+      if ((await res.json()) == true) {
+        bio_reactors_value = bio_reactors_value.filter(
+          (bio_reactor) => bio_reactor.id !== id
+        );
+      } else {
+        alert("Cannot delete bio reactor");
+      }
     } else {
       alert("Something went wrong");
     }
@@ -69,9 +73,13 @@
       },
     });
     if (res.ok) {
-      experiments_value = experiments_value.filter(
-        (experiment) => experiment.id !== id
-      );
+      if ((await res.json()) == true) {
+        experiments_value = experiments_value.filter(
+          (experiment) => experiment.id !== id
+        );
+      } else {
+        alert("Cannot delete Experimet");
+      }
     } else {
       alert("Something went wrong");
     }

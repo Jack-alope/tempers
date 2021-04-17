@@ -9,8 +9,10 @@ from scipy.signal import savgol_filter
 from . import calculations
 sys.setrecursionlimit(10000)
 
+
 class TissuePoints:
     """Tissue class for pointfinding"""
+
     def __init__(self, disp, time):
         """Initalize relevant values"""
         # Initialize with defaults
@@ -20,30 +22,33 @@ class TissuePoints:
         self.min_dist = 5
         self.raw_disp = disp
         self.time = time
+
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
-            self.calculated_values = self.contract_points = self.relax_points = None
+            self.contract_points = self.relax_points = None
+            
+        self.calculated_values = {}
 
         self.smooth(self.window, self.poly)
 
-    def smooth(self, window = None, poly = None):
+    def smooth(self, window=None, poly=None):
         """Applies Savitzky–Golay filter to data"""
         if window is not None:
             self.window = window
         if poly is not None:
             self.poly = poly
         self.smooth_disp = savgol_filter(self.raw_disp, self.window, self.poly)
-        
         self.find_peaks()
 
-    def find_peaks(self, thresh = None, min_dist = None):
+    def find_peaks(self, thresh=None, min_dist=None):
         """Finds usable peaks"""
         if thresh is not None:
             self.thresh = thresh
         if min_dist is not None:
             self.min_dist = min_dist
 
-        unformatted = np.array(peakutils.indexes(self.smooth_disp, self.thresh, self.min_dist)[1:-1])
+        unformatted = np.array(peakutils.indexes(
+            self.smooth_disp, self.thresh, self.min_dist)[1:-1])
 
         self.peaks = self.format_points(unformatted)
 
@@ -52,8 +57,10 @@ class TissuePoints:
     def find_basepoints_frontpoints(self):
         """Use the dfdt_recursive func to find basepoints and frontpointspyl"""
         peak_indicies = self.peaks[2]
-        basepoints = [self.dfdt_recursive(peak_index,lambda x:x-1) for peak_index in peak_indicies]
-        frontpoints = [self.dfdt_recursive(peak_index,lambda x:x+1) for peak_index in peak_indicies]
+        basepoints = [self.dfdt_recursive(
+            peak_index, lambda x:x-1) for peak_index in peak_indicies]
+        frontpoints = [self.dfdt_recursive(
+            peak_index, lambda x:x+1) for peak_index in peak_indicies]
 
         self.basepoints = self.format_points(basepoints)
         self.frontpoints = self.format_points(frontpoints)
@@ -64,22 +71,28 @@ class TissuePoints:
         """Finds the points for 10, 50, 90% contracted and relaxed"""
         percents = [.1, .2, .5, .8, .9]
 
-        pnts = lambda p_ind,b_ind,b_disp:[self.get_points(p_ind,b_ind,b_disp,p) for p in percents]
+        def pnts(p_ind, b_ind, b_disp): return [
+            self.get_points(p_ind, b_ind, b_disp, p) for p in percents]
 
-        base_disp = [(basepoint + self.frontpoints[1][i]) / 2 for i, basepoint in enumerate(self.basepoints[1])]
-        contract = list(map(pnts, self.peaks[2], self.basepoints[2], base_disp))
+        base_disp = [(basepoint + self.frontpoints[1][i]) /
+                     2 for i, basepoint in enumerate(self.basepoints[1])]
+        contract = list(
+            map(pnts, self.peaks[2], self.basepoints[2], base_disp))
         relax = list(map(pnts, self.peaks[2], self.frontpoints[2], base_disp))
 
         contract_points = np.transpose(np.array(contract))
         relax_points = np.transpose(np.array(relax))
-        
+
         # TODO: Figure out what is happening with int --> string situation
+        # REVIEW: Why dont you use enumerate
         for i in range(len(contract_points)):
             contract_points[i] = list(map(int, contract_points[i]))
             relax_points[i] = list(map(int, relax_points[i]))
-        
-        self.contract_points = [self.format_points(point) for point in contract_points]
-        self.relax_points = [self.format_points(point) for point in relax_points]
+
+        self.contract_points = [self.format_points(
+            point) for point in contract_points]
+        self.relax_points = [self.format_points(
+            point) for point in relax_points]
 
         self.calculate_values()
 
@@ -92,7 +105,8 @@ class TissuePoints:
 
     def get_points(self, peak_index, base_index, b_disp, percentage):
         """Returns 90, 50, 10% points between peak and a basepoint"""
-        target_val = (percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
+        target_val = (
+            percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
 
         # TODO: Linear approximation
         def cycle(step):
@@ -112,15 +126,41 @@ class TissuePoints:
 
     def calculate_values(self):
         """Creates a dictionary with all calculated values"""
-        self.calculated_values = {
-            'beating_freq': calculations.beating_frequency(self.peaks[0]),
-            't2pk': calculations.time_between(self.peaks[0], self.contract_points[0][0]),
-            't2rel50': calculations.time_between(self.peaks[0], self.relax_points[2][0]),
-            't2rel80': calculations.time_between(self.peaks[0], self.relax_points[1][0]),
-            't2rel90': calculations.time_between(self.peaks[0], self.relax_points[0][0]),
-            't50': calculations.time_between(self.contract_points[2][0], self.relax_points[2][0]),
-            'c50': calculations.time_between(self.contract_points[2][0], self.peaks[0]),
-            'r50': calculations.time_between(self.relax_points[2][0], self.peaks[0]),
-            'dfdt': calculations.dfdt(self.contract_points[0], self.contract_points[4]),
-            'negdfdt': calculations.dfdt(self.relax_points[0], self.relax_points[4])
-        }
+        self.calculated_values["dev_force"], self.calculated_values["dev_force_std"] \
+            = (5, 5)
+
+        self.calculated_values["dias_force"], self.calculated_values["dias_force_std"] \
+            = (5, 5)
+
+        self.calculated_values["beat_rate_COV"], self.calculated_values["beat_rate_COV_std"] \
+            = (5, 5)
+
+        self.calculated_values["beating_freq"], self.calculated_values["beating_freq_std"] \
+            = calculations.beating_frequency(self.peaks[0])
+
+        self.calculated_values["t2pk"], self.calculated_values["t2pk_std"] \
+            = calculations.time_between(self.peaks[0], self.contract_points[0][0])
+
+        self.calculated_values["t2rel50"], self.calculated_values["t2rel50_std"] \
+            = calculations.time_between(self.peaks[0], self.relax_points[2][0])
+
+        self.calculated_values["t2rel80"], self.calculated_values["t2rel80_std"] \
+            = calculations.time_between(self.peaks[0], self.relax_points[1][0])
+
+        self.calculated_values["t2rel90"], self.calculated_values["t2rel90_std"] \
+            = calculations.time_between(self.peaks[0], self.relax_points[0][0])
+
+        self.calculated_values["t50"], self.calculated_values["t50_std"] \
+            = calculations.time_between(self.contract_points[2][0], self.relax_points[2][0])
+
+        self.calculated_values["c50"], self.calculated_values["c50_std"] \
+            = calculations.time_between(self.contract_points[2][0], self.peaks[0])
+
+        self.calculated_values["r50"], self.calculated_values["r50_std"] \
+            = calculations.time_between(self.relax_points[2][0], self.peaks[0])
+
+        self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
+            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
+
+        self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
+            = calculations.dfdt(self.relax_points[0], self.relax_points[4])

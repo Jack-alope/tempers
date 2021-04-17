@@ -24,6 +24,7 @@ UPLOAD_FOLDER = "static/uploads"
 
 @dataclass
 class Experiment(Base):
+    """Experiment model for DB"""
     __tablename__ = "experiment"
 
     id: int = Column(Integer, primary_key=True)
@@ -36,6 +37,7 @@ class Experiment(Base):
 
 @dataclass
 class Video(Base):
+    """Video model for DB"""
     __tablename__ = "video"
 
     id: int = Column(Integer, primary_key=True)
@@ -55,7 +57,7 @@ class Video(Base):
     experiment = relationship("Experiment", back_populates="vids")
 
     bio_reactor_id: int = Column(Integer, ForeignKey('bio_reactor.id'))
-    bio_reactor = relationship("Bio_reactor", back_populates="vids")
+    bio_reactor = relationship("BioReactor", back_populates="vids")
 
     tissues = relationship("Tissue", back_populates="video",
                            cascade="all, delete-orphan")
@@ -63,6 +65,7 @@ class Video(Base):
 
 @dataclass
 class Tissue(Base):
+    """Tissie model for DB"""
     __tablename__ = "tissue"
 
     id: int = Column(
@@ -80,18 +83,23 @@ class Tissue(Base):
     vid_id = Column(Integer, ForeignKey('video.id'))
     video = relationship("Video", back_populates="tissues")
 
-    tissues = relationship(
-        "TissueTracking", back_populates="tissue", cascade="all, delete-orphan", passive_deletes=True)
+    tissue_tracking = relationship(
+        "TissueTracking", back_populates="tissue",
+        cascade="all, delete-orphan", passive_deletes=True)
+    tissue_caculated_data = relationship(
+        "TissueCalculatedData", back_populates="tissue",
+        cascade="all, delete-orphan", passive_deletes=True)
 
 
 class TissueTracking(Base):
+    """Tissue Tracking model for DB"""
     __tablename__ = "tissue_tracking"
 
     id: int = Column(Integer, primary_key=True, autoincrement=True)
 
     tissue_id: int = Column(Integer, ForeignKey(
         "tissue.id", ondelete="CASCADE"))
-    tissue = relationship("Tissue", back_populates="tissues")
+    tissue = relationship("Tissue", back_populates="tissue_tracking")
 
     time: float = Column(Float)
     displacment: float = Column(Float)
@@ -101,8 +109,47 @@ class TissueTracking(Base):
     even_y: float = Column(Float)
 
 
+class TissueCalculatedData(Base):
+    """Tissue Cacualtion data model for DB"""
+    __tablename__ = "tissue_calculated_data"
+
+    id: int = Column(Integer, primary_key=True, autoincrement=True)
+
+    tissue_id: int = Column(Integer, ForeignKey(
+        "tissue.id", ondelete="CASCADE"))
+    tissue = relationship("Tissue", back_populates="tissue_caculated_data")
+
+    dev_force: float = Column(Float)
+    dev_force_std: float = Column(Float)
+    dias_force: float = Column(Float)
+    dias_force_std: float = Column(Float)
+    beat_rate_COV: float = Column(Float)
+    beat_rate_COV_std = Column(Float)
+    beating_freq: float = Column(Float)
+    beating_freq_std: float = Column(Float)
+    t2pk: float = Column(Float)
+    t2pk_std: float = Column(Float)
+    t2rel50: float = Column(Float)
+    t2rel50_std: float = Column(Float)
+    t2rel80: float = Column(Float)
+    t2rel80_std: float = Column(Float)
+    t2rel90: float = Column(Float)
+    t2rel90_std: float = Column(Float)
+    t50: float = Column(Float)
+    t50_std: float = Column(Float)
+    c50: float = Column(Float)
+    c50_std: float = Column(Float)
+    r50: float = Column(Float)
+    r50_std: float = Column(Float)
+    dfdt: float = Column(Float)
+    dfdt_std: float = Column(Float)
+    negdfdt: float = Column(Float)
+    negdfdt_std: float = Column(Float)
+
+
 @dataclass
-class Bio_reactor(Base):
+class BioReactor(Base):
+    """Bio Reactor model for DB"""
     __tablename__ = "bio_reactor"
 
     id: int = Column(
@@ -119,6 +166,7 @@ class Bio_reactor(Base):
 
 @dataclass
 class Post(Base):
+    """Post model for DB"""
     __tablename__ = "post"
 
     id: int = Column(
@@ -132,12 +180,13 @@ class Post(Base):
     radius: float = Column(Float, nullable=True)
 
     bio_reactor_id = Column(Integer, ForeignKey("bio_reactor.id"))
-    bio_reactor = relationship("Bio_reactor", back_populates="posts")
+    bio_reactor = relationship("BioReactor", back_populates="posts")
 
     tissues = relationship("Tissue", back_populates="post")
 
 
 def check_path_exisits(file_path_passed):
+    """Make sure tha file path exisits"""
     # TODO: move this to diffrent file
     if not os.path.exists(file_path_passed):
         os.makedirs(file_path_passed)
