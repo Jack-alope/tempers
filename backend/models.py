@@ -102,7 +102,7 @@ class TissueTracking(Base):
     tissue = relationship("Tissue", back_populates="tissue_tracking")
 
     time: float = Column(Float)
-    displacment: float = Column(Float)
+    displacement: float = Column(Float)
     odd_x: float = Column(Float)
     odd_y: float = Column(Float)
     even_x: float = Column(Float)

@@ -127,7 +127,7 @@ def start_trackig(db, unformated_points, calib_factor, video_object, tissues):
 
     for i, tissue_tracking_info in enumerate(displacement):
         dataframe = pd.DataFrame(tissue_tracking_info, columns=[
-            "time", "displacment", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
+            "time", "displacement", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
         crud_tissue_tracking.create_tissue_tracking(
             db, tissue_ids[i], dataframe)
 
