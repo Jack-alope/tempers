@@ -14,7 +14,6 @@ class TissuePoints:
 
     def __init__(self, disp, time):
         """Initalize relevant values"""
-        # Initialize with defaults
         self.window = 13
         self.poly = 3
         self.thresh = .5
@@ -26,7 +25,7 @@ class TissuePoints:
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
             self.contract_points = self.relax_points = None
-            
+
         self.calculated_values = {}
 
         self.smooth(self.window, self.poly)
@@ -37,7 +36,7 @@ class TissuePoints:
             self.window = window
         if poly is not None:
             self.poly = poly
-        
+
         smoothed = savgol_filter(self.raw_disp, self.window, self.poly)
         self.smooth_disp = self.post_dist - smoothed
 
@@ -74,17 +73,16 @@ class TissuePoints:
         """Finds the points for 10, 50, 90% contracted and relaxed"""
         percents = [.1, .2, .5, .8, .9]
 
-        def pnts(p_ind, b_ind, b_disp): return [
-            self.get_points(p_ind, b_ind, b_disp, p) for p in percents]
+        pnt = lambda p_i, b_i, b_d: [self.get_points(p_i, b_i, b_d, p) for p in percents]
 
         base_disp = [(basepoint + self.frontpoints[1][i]) /
                      2 for i, basepoint in enumerate(self.basepoints[1])]
-        contract = list(
-            map(pnts, self.peaks[2], self.basepoints[2], base_disp))
-        relax = list(map(pnts, self.peaks[2], self.frontpoints[2], base_disp))
 
-        self.contract_points = np.transpose(contract, axes=[1, 2, 0])
-        self.relax_points = np.transpose(relax, axes=[1, 2, 0])
+        contract = map(pnt, self.peaks[2], self.basepoints[2], base_disp)
+        relax = map(pnt, self.peaks[2], self.frontpoints[2], base_disp)
+
+        self.contract_points = np.transpose(list(contract), axes=[1, 2, 0])
+        self.relax_points = np.transpose(list(relax), axes=[1, 2, 0])
 
         self.calculate_values()
 
@@ -100,15 +98,14 @@ class TissuePoints:
         Returns 90, 50, 10% points between peak and a basepoint.
         Using linear approximation.
         """
-        target_val = (
-            percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
+        target_val = (percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
 
         def cycle(step):
             for new_index in range(peak_index, base_index, step):
                 if self.smooth_disp[new_index] < target_val:
-                    y_diff = self.smooth_disp[new_index] - self.smooth_disp[new_index-1]
-                    x_diff = self.time[new_index] - self.time[new_index-1]
-                    slope = y_diff / x_diff
+                    y_diff=np.absolute(self.smooth_disp[new_index]-self.smooth_disp[new_index-step])
+                    x_diff=np.absolute(self.time[new_index]-self.time[new_index-step])
+                    slope = (y_diff / x_diff) * -1 * step
                     target_x = ((target_val-self.smooth_disp[new_index])/slope)+self.time[new_index]
                     return [target_x, target_val]
             return [self.time[base_index], self.smooth_disp[base_index]]
@@ -158,7 +155,7 @@ class TissuePoints:
             = calculations.time_between(self.relax_points[2][0], self.peaks[0])
 
         self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
-            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
+            = (5, 5) # calculations.dfdt(self.contract_points[0], self.contract_points[4])
 
         self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
-            = calculations.dfdt(self.relax_points[0], self.relax_points[4])
+            = (5, 5) # calculations.dfdt(self.relax_points[0], self.relax_points[4])
