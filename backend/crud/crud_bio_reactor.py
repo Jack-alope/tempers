@@ -34,8 +34,7 @@ def get_bio_reactor(database_session: Session, bio_id: int):
 def delete_bio_reactor(database_session: Session, bio_id: int):
     """Deletes bio Reactor"""
     try:
-        database_session.query(models.BioReactor).filter(
-            models.BioReactor.id == bio_id).delete()
+        database_session.delete(get_bio_reactor(database_session, bio_id))
         database_session.commit()
         return True
     except IntegrityError:

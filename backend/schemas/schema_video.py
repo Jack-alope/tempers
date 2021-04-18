@@ -1,10 +1,10 @@
+"""Schema for video"""
 from typing import List, Optional
 from datetime import date
 
+from pydantic import BaseModel
 
 from . import schema_tissue
-
-from pydantic import BaseModel
 
 
 class VideoBase(BaseModel):

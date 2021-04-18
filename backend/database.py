@@ -1,4 +1,6 @@
-import logging
+"""
+Database connection
+"""
 import os
 
 
@@ -20,8 +22,9 @@ Base = declarative_base()
 
 
 def get_db():
-    db = SessionLocal()
+    """Yeilds databse session then closes session when done"""
+    database_session = SessionLocal()
     try:
-        yield db
+        yield database_session
     finally:
-        db.close()
+        database_session.close()

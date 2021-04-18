@@ -37,10 +37,11 @@ async def analyze(video_id: int = Query(...), database: Session = Depends(get_db
         tiss_types.append(tissue_object.tissue_type)
         tiss_nums.append(tissue_object.tissue_number)
 
-        data = crud_tissue_tracking.get_tracking_by_id(database, tissue_object.id)
+        data = crud_tissue_tracking.get_tracking_by_id(
+            database, tissue_object.id)
 
         # TODO: Change this is js not here
-        data['disp'] = data['displacment']
+        data['disp'] = data['displacement']
         json_list.append(data.to_json(orient='columns'))
 
     json_list = json.dumps(json_list)
@@ -58,12 +59,15 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     video_object = crud_video.get_vid_by_id(database, data.video_id_value)
 
     tissue_obj = video_object.tissues[data.value]
-    dataframe = crud_tissue_tracking.get_tracking_by_id(database, tissue_obj.id)
-    tracking_obj = TissuePoints(dataframe['displacment'].to_list(), dataframe['time'].to_list())
+    dataframe = crud_tissue_tracking.get_tracking_by_id(
+        database, tissue_obj.id)
+    tracking_obj = TissuePoints(
+        dataframe['displacement'].to_list(), dataframe['time'].to_list())
     tracking_obj.smooth(int(data.windows), int(data.polynomials))
     tracking_obj.find_peaks(int(data.thresholds), int(data.minDistances))
 
-    crud_tissue_caculations.create(database, tracking_obj.calculated_values, tissue_obj.id)
+    crud_tissue_caculations.create(
+        database, tracking_obj.calculated_values, tissue_obj.id)
 
     return {'status': 'OK', 'data': {
         'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),
@@ -83,4 +87,4 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
         # TODO: Rename to eighty
         'tenrelx': tracking_obj.relax_points[1][0].tolist(),
         'tenrely': tracking_obj.relax_points[1][1].tolist(),
-        }}
+    }}

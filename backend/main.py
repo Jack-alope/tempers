@@ -1,19 +1,14 @@
-import logging
-
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+"""
+Fastapi Main
+"""
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 
 import models
-from database import engine, get_db
-from routers import router_upload, router_tracking, router_analysis, router_experiment, router_bio_reactor, router_video
-
-
-logging.basicConfig(filename='main.log',
-                    format='[%(filename)s:%(lineno)d] %(message)s', level=logging.DEBUG)
-logging.warning("New Run Starts Here")
+from database import engine
+from routers import router_upload, router_tracking, router_analysis, \
+    router_experiment, router_bio_reactor, router_video
 
 models.Base.metadata.create_all(bind=engine)
 
