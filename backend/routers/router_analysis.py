@@ -10,8 +10,6 @@ from fastapi.responses import JSONResponse
 
 from sqlalchemy.orm import Session
 
-from scipy.signal import savgol_filter
-
 from database import get_db
 from schemas import schema_analysis
 from crud import crud_video, crud_tissue_tracking, crud_tissue_caculations
@@ -22,23 +20,24 @@ router = APIRouter()
 
 
 @router.get('/analyze', tags=["analysis"])
-async def analyze(video_id: int = Query(...), db: Session = Depends(get_db)):
+async def analyze(video_id: int = Query(...), database: Session = Depends(get_db)):
+    """Sets up the graphing areas and initally plots raw data"""
     video = video_id
 
     json_list = []
-    video_object = crud_video.get_vid_by_id(db, video)
+    video_object = crud_video.get_vid_by_id(database, video)
 
     tiss_nums = []
     tiss_freq = []
     tiss_types = []
     tissues = video_object.tissues
-    for i, tissue_object in enumerate(tissues):
+    for tissue_object in tissues:
         # Reads each file in as a dataframe
         tiss_freq.append(video_object.frequency)
         tiss_types.append(tissue_object.tissue_type)
         tiss_nums.append(tissue_object.tissue_number)
 
-        data = crud_tissue_tracking.get_tracking_by_id(db, tissue_object.id)
+        data = crud_tissue_tracking.get_tracking_by_id(database, tissue_object.id)
 
         # TODO: Change this is js not here
         data['disp'] = data['displacment']
@@ -53,30 +52,35 @@ async def analyze(video_id: int = Query(...), db: Session = Depends(get_db)):
 
 
 @ router.post("/graphUpdate", tags=["analysis"])
-def graph_update(data: schema_analysis.AnalysisBase, db: Session = Depends(get_db)):
-    """Function gets called to uodate graph with new parameters"""
+def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends(get_db)):
+    """Function gets called to update graph with new parameters"""
 
-    video_object = crud_video.get_vid_by_id(db, data.video_id_value)
+    video_object = crud_video.get_vid_by_id(database, data.video_id_value)
 
     tissue_obj = video_object.tissues[data.value]
-    dataframe = crud_tissue_tracking.get_tracking_by_id(db, tissue_obj.id)
-    tracking_obj = TissuePoints(
-        dataframe['displacment'].to_list(), dataframe['time'].to_list())
+    dataframe = crud_tissue_tracking.get_tracking_by_id(database, tissue_obj.id)
+    tracking_obj = TissuePoints(dataframe['displacment'].to_list(), dataframe['time'].to_list())
     tracking_obj.smooth(int(data.windows), int(data.polynomials))
     tracking_obj.find_peaks(int(data.thresholds), int(data.minDistances))
 
-    crud_tissue_caculations.create(db,
-                                   tracking_obj.calculated_values, tissue_obj.id)
+    crud_tissue_caculations.create(database, tracking_obj.calculated_values, tissue_obj.id)
 
-    return {'status': 'OK', 'data': {'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),
-                                     'peaksx': tracking_obj.peaks[0], 'peaksy': tracking_obj.peaks[1],
-                                     'basex': tracking_obj.basepoints[0], 'basey': tracking_obj.basepoints[1],
-                                     'frontx': tracking_obj.frontpoints[0], 'fronty': tracking_obj.frontpoints[1],
-                                     'tencontx': tracking_obj.contract_points[0][0].tolist(), 'tenconty': tracking_obj.contract_points[0][1].tolist(),
-                                     'fifcontx': tracking_obj.contract_points[2][0].tolist(), 'fifconty': tracking_obj.contract_points[2][1].tolist(),
-                                     'ninecontx': tracking_obj.contract_points[4][0].tolist(), 'nineconty': tracking_obj.contract_points[4][1].tolist(),
-                                     'ninerelx': tracking_obj.relax_points[0][0].tolist(), 'ninerely': tracking_obj.relax_points[0][1].tolist(),
-                                     'fifrelx': tracking_obj.relax_points[2][0].tolist(), 'fifrely': tracking_obj.relax_points[2][1].tolist(),
-                                     # TODO: Rename to eighty
-                                     'tenrelx': tracking_obj.relax_points[1][0].tolist(), 'tenrely': tracking_obj.relax_points[1][1].tolist(),
-                                     }}
+    return {'status': 'OK', 'data': {
+        'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),
+        'peaksx': tracking_obj.peaks[0], 'peaksy': tracking_obj.peaks[1],
+        'basex': tracking_obj.basepoints[0], 'basey': tracking_obj.basepoints[1],
+        'frontx': tracking_obj.frontpoints[0], 'fronty': tracking_obj.frontpoints[1],
+        'tencontx': tracking_obj.contract_points[0][0].tolist(),
+        'tenconty': tracking_obj.contract_points[0][1].tolist(),
+        'fifcontx': tracking_obj.contract_points[2][0].tolist(),
+        'fifconty': tracking_obj.contract_points[2][1].tolist(),
+        'ninecontx': tracking_obj.contract_points[4][0].tolist(),
+        'nineconty': tracking_obj.contract_points[4][1].tolist(),
+        'ninerelx': tracking_obj.relax_points[0][0].tolist(),
+        'ninerely': tracking_obj.relax_points[0][1].tolist(),
+        'fifrelx': tracking_obj.relax_points[2][0].tolist(),
+        'fifrely': tracking_obj.relax_points[2][1].tolist(),
+        # TODO: Rename to eighty
+        'tenrelx': tracking_obj.relax_points[1][0].tolist(),
+        'tenrely': tracking_obj.relax_points[1][1].tolist(),
+        }}
