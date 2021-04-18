@@ -1,4 +1,8 @@
-from typing import List, Optional
+"""
+Schema for Bio Reactor
+"""
+
+from typing import List
 from datetime import date
 
 from pydantic import BaseModel

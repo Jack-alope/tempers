@@ -1,3 +1,6 @@
+"""
+Router for upload
+"""
 import os
 from typing import List
 import shutil
@@ -5,8 +8,7 @@ import json
 
 from werkzeug.utils import secure_filename
 
-from fastapi import APIRouter, Request, Form, File, UploadFile, Depends, Body
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, Form, File, UploadFile, Depends
 
 from sqlalchemy.orm import Session
 
@@ -24,10 +26,11 @@ router = APIRouter()
 UPLOAD_FOLDER = models.UPLOAD_FOLDER
 
 
-def save_video_file(vid_info, vid_file, db):
+def save_video_file(vid_info, vid_file, database_session):
+    """Saves vid file to disk and adds to db"""
     date_string = vid_info.date_recorded.strftime('%m_%d_%Y')
     # gets saves in experment folder
-    experiment_num = str(vid_info.experiment_id)
+    # experiment_num = str(vid_info.experiment_id)
 
     # bio_reactor_num = models.get_bio_reactor_number(bio_reactor_id)
 
@@ -59,12 +62,13 @@ def save_video_file(vid_info, vid_file, db):
     with open(path_to_file, "wb") as buffer:
         shutil.copyfileobj(vid_file.file, buffer)
 
-    vid = crud_video.create_video(db, vid_info)
+    vid = crud_video.create_video(database_session, vid_info)
 
     return vid.id
 
 
-def save_csv_file(vid_info, file, db):
+def save_csv_file(vid_info, file, database_session):
+    """Saves csv to disk and addes to db with fake vid"""
     date_string = vid_info.date_recorded.strftime('%m_%d_%Y')
     where_to_save = os.path.join(
         UPLOAD_FOLDER, vid_info.experiment_id, date_string, 'csvfiles')
@@ -84,11 +88,13 @@ def save_csv_file(vid_info, file, db):
     with open(path_to_file, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    vid = crud_video.create_video(db, vid_info)
+    vid = crud_video.create_video(database_session, vid_info)
     return (vid.id, path_to_file)
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate], bio_reactor_id: int, vid_id: int, db: Session):
+def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
+                bio_reactor_id: int, vid_id: int, database_session: Session):
+    """Adds tissues to databse"""
 
     tissue_id = 0
 
@@ -96,14 +102,15 @@ def add_tissues(tissue_li: List[schema_tissue.TissueCreate], bio_reactor_id: int
         tissue_obj = schema_tissue.TissueCreate.parse_obj(tissue)
         tissue_obj.vid_id = vid_id
         tissue_obj.bio_reactor_id = bio_reactor_id
-        tissue_id = crud_tissue.create_tissue(db, tissue_obj)
+        tissue_id = crud_tissue.create_tissue(database_session, tissue_obj)
 
     return tissue_id
 
 
 @router.post("/upload", tags=["upload"])
-async def post_upload(info: str = Form(...), file: UploadFile = File(...),
-                      db: Session = Depends(get_db)):
+async def upload(info: str = Form(...), file: UploadFile = File(...),
+                 database_session: Session = Depends(get_db)):
+    """Upload csv or vid"""
     # TODO Add schema to this form and file make it weird
     vid_json: schema_video.VideoCreate = json.loads(info)
     vid_info = schema_video.VideoCreate.parse_obj(vid_json)
@@ -113,20 +120,20 @@ async def post_upload(info: str = Form(...), file: UploadFile = File(...),
     tup = ()
 
     if extension == "csv":
-        tup = save_csv_file(vid_info, file, db)
+        tup = save_csv_file(vid_info, file, database_session)
         vid_id = tup[0]
         setattr(vid_info.tissues[0], "csv_path", tup[1])
 
     else:
-        vid_id = save_video_file(vid_info, file, db)
+        vid_id = save_video_file(vid_info, file, database_session)
 
     tissue = add_tissues(
-        vid_info.tissues, vid_info.bio_reactor_id, vid_id, db)
+        vid_info.tissues, vid_info.bio_reactor_id, vid_id, database_session)
 
     if extension == "csv":
         dataframe = pd.read_csv(tup[1])
         dataframe["tissue_id"] = tissue.id
         crud_tissue_tracking.create_tissue_tracking(
-            db, tissue.id, dataframe)
+            database_session, tissue.id, dataframe)
 
     return {200: "OK"}

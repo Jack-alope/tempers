@@ -1,3 +1,6 @@
+"""
+Router for Video
+"""
 import os
 from typing import List
 
