@@ -14,7 +14,6 @@ class TissuePoints:
 
     def __init__(self, disp, time):
         """Initalize relevant values"""
-        # Initialize with defaults
         self.window = 13
         self.poly = 3
         self.thresh = .5
@@ -99,8 +98,7 @@ class TissuePoints:
         Returns 90, 50, 10% points between peak and a basepoint.
         Using linear approximation.
         """
-        target_val = (
-            percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
+        target_val = (percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
 
         def cycle(step):
             for new_index in range(peak_index, base_index, step):
