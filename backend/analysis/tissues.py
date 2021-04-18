@@ -26,7 +26,7 @@ class TissuePoints:
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
             self.contract_points = self.relax_points = None
- 
+
         self.calculated_values = {}
 
         self.smooth(self.window, self.poly)

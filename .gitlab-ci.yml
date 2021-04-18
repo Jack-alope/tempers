@@ -26,7 +26,7 @@ pylint:
   before_script:
     - mkdir -p public/badges public/lint
     - echo undefined > public/badges/$CI_JOB_NAME.score
-    - pip install pylint-gitlab pipenv
+    - pip install pylint-gitlab pipenv pytest
     - cd backend && pipenv install --system --deploy --ignore-pipfile && cd ..
   script:
     - pylint --exit-zero --output-format=text $(find -type f -name "*.py" ! -path "**/.venv/**") | tee /tmp/pylint.txt
