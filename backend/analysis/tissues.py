@@ -85,7 +85,7 @@ class TissuePoints:
 
         self.contract_points = np.transpose(contract, axes=[1, 2, 0])
         self.relax_points = np.transpose(relax, axes=[1, 2, 0])
-
+        
         self.calculate_values()
 
     def dfdt_recursive(self, peak_index, incrementor):
@@ -106,9 +106,9 @@ class TissuePoints:
         def cycle(step):
             for new_index in range(peak_index, base_index, step):
                 if self.smooth_disp[new_index] < target_val:
-                    y_diff = self.smooth_disp[new_index] - self.smooth_disp[new_index-1]
-                    x_diff = self.time[new_index] - self.time[new_index-1]
-                    slope = y_diff / x_diff
+                    y_diff = np.absolute(self.smooth_disp[new_index] - self.smooth_disp[new_index-step])
+                    x_diff = np.absolute(self.time[new_index] - self.time[new_index-step])
+                    slope = (y_diff / x_diff) * -1 * step
                     target_x = ((target_val-self.smooth_disp[new_index])/slope)+self.time[new_index]
                     return [target_x, target_val]
             return [self.time[base_index], self.smooth_disp[base_index]]
