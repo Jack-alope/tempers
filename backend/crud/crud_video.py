@@ -74,9 +74,7 @@ def get_videos(database_session: Session):
 def delete_video(database_session: Session, vid_id: int):
     """Delete vid by id"""
     try:
-        database_session.query(models.Video).filter(
-            models.Video.id == vid_id
-        ).delete()
+        database_session.delete(get_vid_by_id(database_session, vid_id))
         database_session.commit()
         return True
     except IntegrityError:

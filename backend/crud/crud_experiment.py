@@ -33,8 +33,7 @@ def delete_experiment(database_session: Session, exp_id: int):
     """Deletes expeiments returns false if cannot delete bc has children"""
     # REVIEW: Smething weird with the delte no exception but does not delete
     try:
-        database_session.query(models.Experiment).filter(
-            models.Experiment.id == exp_id).delete()
+        database_session.delete(get_experiment(database_session, exp_id))
         database_session.commit()
         return True
     except IntegrityError:
