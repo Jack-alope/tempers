@@ -186,6 +186,25 @@ class Post(Base):
 
 def check_path_exisits(file_path_passed):
     """Make sure tha file path exisits"""
-    # TODO: move this to diffrent file
     if not os.path.exists(file_path_passed):
         os.makedirs(file_path_passed)
+
+
+def delete_empties():
+    """Deletes empty folders within the upload folder"""
+    for (root, dirs, files) in os.walk('static/uploads/', topdown=False):
+        if root == 'static/uploads/':
+            break
+        if not os.listdir(root):
+            os.rmdir(root)
+
+
+def delete_file(path):
+    """Deletes path if exists"""
+
+    if path is not None:
+        if os.path.exists(path):
+            os.remove(path)
+            delete_empties()
+        else:
+            print("The file does not exist")
