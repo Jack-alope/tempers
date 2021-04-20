@@ -17,7 +17,7 @@ import pandas as pd
 
 import models
 from database import get_db
-from crud import crud_video, crud_tissue, crud_tissue_tracking
+from crud import crud_video, crud_tissue, crud_tissue_tracking, crud_experiment, crud_bio_reactor
 from schemas import schema_video, schema_tissue
 
 
@@ -29,14 +29,13 @@ UPLOAD_FOLDER = models.UPLOAD_FOLDER
 def save_video_file(vid_info, vid_file, database_session):
     """Saves vid file to disk and adds to db"""
     date_string = vid_info.date_recorded.strftime('%m_%d_%Y')
-    # gets saves in experment folder
-    # experiment_num = str(vid_info.experiment_id)
 
-    # bio_reactor_num = models.get_bio_reactor_number(bio_reactor_id)
+    experiment_info = crud_experiment.get_experiment(
+        database_session, vid_info.experiment_id)
 
     # gets save loaction uploadfolder/expermentnum/date/vid
     where_to_save = os.path.join(
-        UPLOAD_FOLDER, vid_info.experiment_id, date_string, 'videoFiles')
+        UPLOAD_FOLDER, experiment_info.experiment_idenifer, date_string, 'videoFiles')
 
     # cheacks to make sure the save location exists if not exists
     models.check_path_exisits(where_to_save)
@@ -44,11 +43,11 @@ def save_video_file(vid_info, vid_file, database_session):
     orginal_filename = vid_file.filename
     extenstion = orginal_filename.rsplit('.', 1)[1].lower()
 
+    bio_reactor_info = crud_bio_reactor.get_bio_reactor(
+        database_session, vid_info.bio_reactor_id)
     # makes new file name for the vid format date_frewnum_bionum.ext
-    # REVIEW: bio id or number?
-    new_filename = date_string + "_" + \
-        "Freq" + str(vid_info.frequency) + "_" + \
-        "Bio" + str(vid_info.bio_reactor_id) + "." + extenstion
+    new_filename = f"{date_string}_Freq{str(vid_info.frequency)}_Bio\
+        {str(bio_reactor_info.bio_reactor_number)}.{extenstion}"
 
     # makes sure file name is correct formats
     safe_filename = secure_filename(new_filename)
@@ -122,7 +121,6 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
     if extension == "csv":
         tup = save_csv_file(vid_info, file, database_session)
         vid_id = tup[0]
-        setattr(vid_info.tissues[0], "csv_path", tup[1])
 
     else:
         vid_id = save_video_file(vid_info, file, database_session)
@@ -135,5 +133,9 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
         dataframe["tissue_id"] = tissue.id
         crud_tissue_tracking.create_tissue_tracking(
             database_session, tissue.id, dataframe)
+        if os.path.exists(tup[1]):
+            os.remove(tup[1])
+        else:
+            print("The file does not exist")
 
     return {200: "OK"}
