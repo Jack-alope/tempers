@@ -1,0 +1,1 @@
+This directory is where uploaded videos will be saved.
