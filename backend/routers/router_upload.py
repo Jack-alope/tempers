@@ -135,6 +135,7 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
             database_session, tissue.id, dataframe)
         if os.path.exists(tup[1]):
             os.remove(tup[1])
+            models.delete_empties()
         else:
             print("The file does not exist")
 
