@@ -133,10 +133,6 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
         dataframe["tissue_id"] = tissue.id
         crud_tissue_tracking.create_tissue_tracking(
             database_session, tissue.id, dataframe)
-        if os.path.exists(tup[1]):
-            os.remove(tup[1])
-            models.delete_empties()
-        else:
-            print("The file does not exist")
+        models.delete_file(tup[1])
 
     return {200: "OK"}
