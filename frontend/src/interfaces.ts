@@ -20,3 +20,8 @@ export interface video_interface {
   experiment_idenifer: string;
   bio_reactor_number: number;
 }
+
+export interface post_interface {
+  id: number;
+  post_number: number;
+}

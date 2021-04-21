@@ -19,7 +19,7 @@ class BioReactorBase(BaseModel):
 
 
 class BioReactorCreate(BioReactorBase):
-    posts: List[schema_post.PostBase]
+    posts: List[schema_post.PostCreate]
 
 
 class BioReactor(BioReactorBase):

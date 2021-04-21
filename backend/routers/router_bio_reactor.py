@@ -3,13 +3,13 @@ Router for bio reactor
 """
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from sqlalchemy.orm import Session
 
 from database import get_db
 from crud import crud_bio_reactor, crud_post
-from schemas import schema_bio_reactor
+from schemas import schema_bio_reactor, schema_post
 
 
 router = APIRouter()
@@ -26,8 +26,17 @@ def read_bio_reactors(database_session: Session = Depends(get_db)):
     return bio_reactors
 
 
+@router.get("/posts", response_model=List[schema_post.PostUpload])
+def read_post_options(bio_id: int = Query(...), database_session=Depends(get_db)):
+    """returns posts in bio reactor"""
+    posts = crud_post.get_posts_by_bio_id(database_session, bio_id)
+    if not posts:
+        return None
+    return posts
+
+
 @router.post("/addBioReactor",
-             response_model=schema_bio_reactor.BioReactorBase,
+             response_model=schema_bio_reactor.BioReactor,
              tags=["Bio_reactor"])
 def add_bio_reactor(bio_reactor: schema_bio_reactor.BioReactorCreate,
                     database_session: Session = Depends(get_db)):
@@ -37,7 +46,7 @@ def add_bio_reactor(bio_reactor: schema_bio_reactor.BioReactorCreate,
 
     for post in bio_reactor.posts:
         crud_post.create_post(database_session, post, new_bio_reactor.id)
-    return bio_reactor
+    return new_bio_reactor
 
 
 @router.delete("/bio_reactor/{bio_id}", tags=["Bio_reactor"])

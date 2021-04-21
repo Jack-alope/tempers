@@ -57,6 +57,7 @@
         bio_reactors_value = bio_reactors_value.filter(
           (bio_reactor) => bio_reactor.id !== id
         );
+        $bio_reactors = bio_reactors_value;
       } else {
         alert("Cannot delete bio reactor");
       }
@@ -77,6 +78,7 @@
         experiments_value = experiments_value.filter(
           (experiment) => experiment.id !== id
         );
+        $experiments = experiments_value;
       } else {
         alert("Cannot delete Experimet");
       }
@@ -94,6 +96,7 @@
     });
     if (res.ok) {
       videos_value = videos_value.filter((video) => video.id !== id);
+      $videos = videos_value;
     } else {
       alert("Something went wrong");
     }

@@ -2,7 +2,11 @@
   import { onDestroy } from "svelte";
 
   import { createForm } from "svelte-forms-lib";
-  import { showExperiment, experiments } from "../components/Stores.js";
+  import {
+    showExperiment,
+    experiments,
+    bio_reactors,
+  } from "../components/Stores.js";
 
   import type { experiment_interface } from "../interfaces";
 
@@ -17,6 +21,10 @@
 
     if (res.ok) {
       showExperiment.set(false);
+      if ($experiments) {
+        $experiments.push(await res.json());
+        $experiments = $experiments;
+      }
     } else {
       alert("Something went wrong");
     }

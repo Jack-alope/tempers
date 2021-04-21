@@ -2,16 +2,22 @@
   import { onDestroy, onMount } from "svelte";
   import { createForm } from "svelte-forms-lib";
   // import * as yup from "yup";
-  import { getBioReactors, getExperiments } from "../apiCalls.js";
+  import {
+    getBioReactors,
+    getExperiments,
+    getPostOptions,
+  } from "../apiCalls.js";
   import { bio_reactors, experiments } from "../components/Stores.js";
   import type {
     bio_reactor_interface,
     experiment_interface,
+    post_interface,
   } from "../interfaces";
 
   let files;
   let experiments_value: experiment_interface[];
   let bio_reactors_value: bio_reactor_interface[];
+  let post_options: post_interface[];
 
   const unsubscribe = bio_reactors.subscribe((value) => {
     bio_reactors_value = value;
@@ -51,7 +57,7 @@
 
       tissues: [
         {
-          post_number: "",
+          post_id: "",
           tissue_number: "",
           tissue_type: "",
         },
@@ -68,13 +74,14 @@
     }),
     */
     onSubmit: (values) => {
+      console.log(values);
       addVid(values);
     },
   });
 
   const add = () => {
     $form.tissues = $form.tissues.concat({
-      post_number: "",
+      post_id: "",
       tissue_number: "",
       tissue_type: "",
     });
@@ -85,6 +92,10 @@
     $form.tissues = $form.tissues.filter((u, j) => j !== i);
     // $errors.tissues = $errors.tissues.filter((u, j) => j !== i);
   };
+
+  async function handleBioChange() {
+    post_options = await getPostOptions($form.bio_reactor_id);
+  }
 
   onDestroy(unsubscribe);
   onDestroy(expunsubscribe);
@@ -104,6 +115,7 @@
         name="date_recorded"
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
         bind:value={$form.date_recorded}
+        on:change={handleBioChange}
       />
     </div>
 
@@ -117,6 +129,7 @@
         name="bio_reactor_id"
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
         bind:value={$form.bio_reactor_id}
+        on:blur={handleBioChange}
       >
         <option />
         {#if bio_reactors_value == undefined}
@@ -164,14 +177,23 @@
       {#each $form.tissues as tissue, j}
         <div class="flex flex-wrap py-3">
           <div class="w-full md:w-1/4 px-3">
-            <input
-              name={`tissues[${j}].post_number`}
+            <select
+              name={`tissues[${j}].post_id`}
               placeholder="Post Number"
               on:change={handleChange}
               on:blur={handleChange}
               class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-              bind:value={$form.tissues[j].post_number}
-            />
+              bind:value={$form.tissues[j].post_id}
+            >
+              <option />
+              {#if post_options == undefined}
+                <option>NA</option>
+              {:else}
+                {#each post_options as post}
+                  <option value={post.id}>{post.post_number}</option>
+                {/each}
+              {/if}
+            </select>
           </div>
 
           <div class="w-full md:w-1/4 px-3">

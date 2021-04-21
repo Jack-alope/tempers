@@ -1,8 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  export let video_id;
   export let image_path;
-  export let num_tissues;
+  export let tissue_count;
 
   const dispatch = createEventDispatcher();
   let calibration_distance;
@@ -15,8 +14,7 @@
   // TODO: re write all this in TS also its just gross
   function getPostCount() {
     // TODO: fix naming here
-    var tissue_count = num_tissues;
-    var id_vid = document.getElementById("videoId").value;
+    // var id_vid = document.getElementById("videoId").value;
     initDraw(
       document.getElementById("canvas"),
       tissue_count,
@@ -182,10 +180,10 @@
 </script>
 
 <h1>Multi Tissue Tracking</h1>
-<h5>Please select posts for {num_tissues} tissues</h5>
+<h5>Please select posts for {tissue_count} tissues</h5>
 <!-- TODO: use session instead of hidden forms -->
 <form id="number_of_posts">
-  <input type="hidden" id="videoId" name="videoId" value={video_id} />
+  <!-- <input type="hidden" id="videoId" name="videoId" value={video_id} /> -->
   <label for="calDist">Enter the calibration Disttance (mm)</label>
   <!-- TODO: Make this look better -->
   <input

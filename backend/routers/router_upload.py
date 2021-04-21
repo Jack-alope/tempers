@@ -112,6 +112,7 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
     """Upload csv or vid"""
     # TODO Add schema to this form and file make it weird
     vid_json: schema_video.VideoCreate = json.loads(info)
+    print(vid_json)
     vid_info = schema_video.VideoCreate.parse_obj(vid_json)
 
     extension = file.filename.split(".")[-1]
