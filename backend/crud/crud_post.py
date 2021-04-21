@@ -25,3 +25,9 @@ def get_post_by_num_and_bio(database_session: Session, bio_reactor_id: int, post
     return database_session.query(models.Post).filter(
         models.Post.bio_reactor_id == bio_reactor_id,
         models.Post.post_number == post_number).first()
+
+
+def get_posts_by_bio_id(database_session: Session, bio_reactor_id: int):
+    """Returns posts in a bio reactor"""
+    return database_session.query(models.Post).filter(
+        models.Post.bio_reactor_id == bio_reactor_id).all()

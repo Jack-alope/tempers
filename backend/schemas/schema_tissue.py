@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class TissueBase(BaseModel):
     tissue_number: str
     tissue_type: str
-    post_number: int
+    post_id: int
     csv_path: Optional[str]
 
     class Config:

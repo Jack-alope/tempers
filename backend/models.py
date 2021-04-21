@@ -72,8 +72,6 @@ class Tissue(Base):
         Integer, primary_key=True, autoincrement=True)
     tissue_number: int = Column(Integer, nullable=False)
     tissue_type: str = Column(String(120), nullable=False)
-    # REVIEW: maybe this should be a relationship
-    post_number: int = Column(Integer, nullable=False)
     cross_section_dist: float = Column(Float, nullable=True)
 
     post_id = Column(Integer, ForeignKey('post.id'))

@@ -15,7 +15,10 @@
 
     if (res.ok) {
       showBioReactor.set(false);
-      console.log(await res.json());
+      if ($bio_reactors) {
+        $bio_reactors.push(await res.json());
+        $bio_reactors = $bio_reactors;
+      }
     } else {
       alert("Something went wrong");
     }

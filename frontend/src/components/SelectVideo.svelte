@@ -6,6 +6,8 @@
 
   const dispatch = createEventDispatcher();
 
+  export let analysis_bool: boolean = true;
+
   let videos = [];
   let videoGroup = -1;
 
@@ -26,19 +28,21 @@
 
 <form class="w-full" on:submit={handleSubmit}>
   {#each videos as video}
-    <div>
-      <input
-        type="radio"
-        name="video"
-        bind:group={videoGroup}
-        value={video.id}
-      />
-      <!-- TODO: Make this selct form better show exp idenifiyer and bio num not ids -->
-      <label for={video.id}
-        >ID: {video.id}, Date Recored: {video.date_recorded}, Frequency: {video.frequency},
-        Experiment_id: {video.experiment_id}, Bio Reactor_id: {video.bio_reactor_id}</label
-      >
-    </div>
+    {#if analysis_bool || video.save_location}
+      <div>
+        <input
+          type="radio"
+          name="video"
+          bind:group={videoGroup}
+          value={video.id}
+        />
+        <!-- TODO: Make this selct form better show exp idenifiyer and bio num not ids -->
+        <label for={video.id}
+          >ID: {video.id}, Date Recored: {video.date_recorded}, Frequency: {video.frequency},
+          Experiment_id: {video.experiment_id}, Bio Reactor_id: {video.bio_reactor_id}</label
+        >
+      </div>
+    {/if}
   {/each}
 
   <div class="w-1/2 px-3 py-3">

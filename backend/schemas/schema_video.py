@@ -28,6 +28,7 @@ class VideoInfo(VideoBase):
     id: int
     bio_reactor_id: int
     experiment_id: int
+    save_location: Optional[str]
 
 
 class Video(VideoBase):

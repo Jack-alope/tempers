@@ -41,3 +41,17 @@ export async function getVideos() {
     return undefined;
   }
 }
+
+export async function getPostOptions(bio_id: string) {
+  const res = await fetch(process.env.API_URL + `/posts?bio_id=${bio_id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return await res.json();
+  } else {
+    return undefined;
+  }
+}
