@@ -1,12 +1,9 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  // import * as yup from "yup";
 
   import { createForm } from "svelte-forms-lib";
-  import {
-    showExperiment,
-    experiments,
-    bio_reactors,
-  } from "../components/Stores.js";
+  import { showExperiment, experiments } from "../components/Stores.js";
 
   import type { experiment_interface } from "../interfaces";
 
@@ -28,6 +25,12 @@
     } else {
       alert("Something went wrong");
     }
+  }
+
+  function get_exp_ident(): [] {
+    return $experiments.map(function (val) {
+      return val.experiment_idenifer;
+    });
   }
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
