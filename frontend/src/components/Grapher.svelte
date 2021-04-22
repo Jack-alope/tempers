@@ -22,7 +22,7 @@
 
   async function caculate() {
     const res = await fetch(
-      process.env.API_URL + `/call_calcs?video_id={video_id_value}`,
+      process.env.API_URL + `/caculate?video_id=${video_id_value}`,
       {
         method: "POST",
         headers: {
@@ -658,11 +658,13 @@
   }
 </script>
 
-<button
-  id="Caculate"
-  class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-  on:click={caculate}>Calculate</button
->
+<a href={caculate} download="export.csv">
+  <button
+    id="Caculate"
+    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    >Download Analysis summary</button
+  >
+</a>
 
 {#each nums as num, i}
   <div class="row">

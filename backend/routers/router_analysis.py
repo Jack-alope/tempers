@@ -2,11 +2,12 @@
 Router for analysis
 """
 import json
+import io
 
 
 from fastapi import APIRouter,  Depends, Query
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 
 from sqlalchemy.orm import Session
 
@@ -89,3 +90,21 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
         'tenrelx': tracking_obj.relax_points[1][0].tolist(),
         'tenrely': tracking_obj.relax_points[1][1].tolist(),
     }}
+
+
+@router.post("/caculate", tags=["analysis"])
+def download_summary(video_id=Query(...), database_session=Depends(get_db)):
+    """Download summary of vid caculatios"""
+    print(video_id)
+
+    tissues = crud_video.get_vid_by_id(database_session, video_id).tissues
+
+    tissue_ids = [tissue.id for tissue in tissues]
+
+    caculations_df = crud_tissue_caculations.get_calculations(
+        database_session, tissue_ids)
+
+    response = StreamingResponse(io.StringIO(
+        caculations_df.to_csv(index=False)), media_type="text/csv")
+    response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    return response
