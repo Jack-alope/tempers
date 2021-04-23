@@ -43,11 +43,8 @@ def get_video_info(database, vid_id):
 
 @router.get('/videos', response_model=List[schema_video.VideoInfo], tags=["Videos"])
 async def get_videos(database: Session = Depends(get_database)):
-    """
-    returns all vids
-    """
-    all_vids = crud_video.get_all_vids(database)
-    return all_vids
+    """returns all vids"""
+    return crud_video.get_all_vids(database)
 
 
 @router.get('/selectedVideo/', tags=["Videos"])

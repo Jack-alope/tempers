@@ -12,7 +12,8 @@ def create_post(database_session: Session, post: schema_post.PostCreate, bio_rea
     """Create Post"""
 
     db_post = models.Post()
-    [setattr(db_post, i[0], i[1]) for i in post]
+    for i in post:
+        setattr(db_post, i[0], i[1])
     db_post.bio_reactor_id = bio_reactor_id
     database_session.add(db_post)
     database_session.commit()

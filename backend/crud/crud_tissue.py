@@ -11,7 +11,8 @@ from schemas import schema_tissue
 def create_tissue(database_session: Session, tissue: schema_tissue.TissueCreate):
     """Create Tissue"""
     db_tissue = models.Tissue()
-    [setattr(db_tissue, i[0], i[1]) for i in tissue]
+    for i in tissue:
+        setattr(db_tissue, i[0], i[1])
     database_session.add(db_tissue)
     database_session.commit()
     database_session.refresh(db_tissue)

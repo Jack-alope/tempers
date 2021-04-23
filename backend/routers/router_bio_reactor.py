@@ -3,7 +3,7 @@ Router for bio reactor
 """
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from sqlalchemy.orm import Session
 
@@ -41,6 +41,9 @@ def read_post_options(bio_id: int = Query(...), database_session=Depends(get_db)
 def add_bio_reactor(bio_reactor: schema_bio_reactor.BioReactorCreate,
                     database_session: Session = Depends(get_db)):
     """Add a new BioReactor"""
+    if crud_bio_reactor.check_bio_reactor_number_exsits(
+            database_session, bio_reactor.bio_reactor_number):
+        raise HTTPException(status.HTTP_409_CONFLICT)
     new_bio_reactor = crud_bio_reactor.create_bio_reactor(
         database_session, bio_reactor)
 
