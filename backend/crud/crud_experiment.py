@@ -3,8 +3,8 @@
 CRUD for experiments
 """
 from sqlalchemy.exc import IntegrityError
-
 from sqlalchemy.orm import Session
+from sqlalchemy import exists
 
 import models
 from schemas import schema_experiment
@@ -38,3 +38,9 @@ def delete_experiment(database_session: Session, exp_id: int):
         return True
     except IntegrityError:
         return False
+
+
+def check_experiment_idetifyer_exsits(database_session: Session, experiment_idenifer: str):
+    """Returns true if experiment_idenifier is in DB"""
+    return database_session.query(exists().where(
+        models.Experiment.experiment_idenifer == experiment_idenifer)).scalar()

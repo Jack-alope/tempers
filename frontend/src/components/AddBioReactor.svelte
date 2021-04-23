@@ -20,7 +20,11 @@
         $bio_reactors = $bio_reactors;
       }
     } else {
-      alert("Something went wrong");
+      if (res.status == 409) {
+        alert("Bio Number is taken");
+      } else {
+        alert("Something went wrong");
+      }
     }
   }
 

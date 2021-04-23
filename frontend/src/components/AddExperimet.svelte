@@ -23,7 +23,11 @@
         $experiments = $experiments;
       }
     } else {
-      alert("Something went wrong");
+      if (res.status == 409) {
+        alert("Experiment Idenifier is taken");
+      } else {
+        alert("Something went wrong");
+      }
     }
   }
 

@@ -4,6 +4,7 @@ CRUD for Bio reactor
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import exists
 
 import models
 from schemas import schema_bio_reactor
@@ -28,7 +29,8 @@ def create_bio_reactor(database_session: Session, bio_reactor: schema_bio_reacto
 
 def get_bio_reactor(database_session: Session, bio_id: int):
     """Returns bio reactor by for id"""
-    return database_session.query(models.BioReactor).filter(models.BioReactor.id == bio_id).first()
+    return database_session.query(models.BioReactor).filter(
+        models.BioReactor.id == bio_id).first()
 
 
 def delete_bio_reactor(database_session: Session, bio_id: int):
@@ -39,3 +41,10 @@ def delete_bio_reactor(database_session: Session, bio_id: int):
         return True
     except IntegrityError:
         return False
+
+
+def check_bio_reactor_number_exsits(database_session: Session,
+                                    bio_reactor_number: int):
+    """Retuns true if bio number exsits"""
+    return database_session.query(exists().where(
+        models.BioReactor.bio_reactor_number == bio_reactor_number)).scalar()

@@ -15,7 +15,10 @@ from schemas import schema_video
 def create_video(database_session: Session, video: schema_video.VideoCreate):
     """Adds vid to DB"""
     db_video = models.Video()
-    [setattr(db_video, i[0], i[1]) for i in video if i[0] != "tissues"]
+    for i in video:
+        if i[0] != "tissues":
+            setattr(db_video, i[0], i[1])
+
     database_session.add(db_video)
     database_session.commit()
     database_session.refresh(db_video)
@@ -23,11 +26,8 @@ def create_video(database_session: Session, video: schema_video.VideoCreate):
 
 
 def get_all_vids(database_session: Session):
-    """Retunrs all vids"""
-    result = []
-    all_vids = database_session.query(models.Video).all()
-    [result.append(asdict(row)) for row in all_vids]
-    return result
+    """Returns all vids"""
+    return [asdict(row) for row in database_session.query(models.Video).all()]
 
 
 def to_vid_show(row_vids: list):
