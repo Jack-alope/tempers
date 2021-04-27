@@ -1,4 +1,7 @@
-# MTT Analysis
+# Rianú
+
+This project is called `rianú`, which aptly means tracking in Irish.  
+If you are a fan of recursive acronyms `rianú is absolutely not useless`.
 
 [![pylint](https://costa-lab.gitlab.io/rianu/badges/pylint.svg)](https://costa-lab.gitlab.io/rianu/lint/)
 
