@@ -1,5 +1,5 @@
 <script>
-  import { createEventDispatcher } from "svelte";
+  import { createEventDispatcher, onMount } from "svelte";
   export let image_path;
   export let tissue_count;
 
@@ -198,7 +198,10 @@
 </form>
 
 <div id="canvas">
-  <img id="pic" src="{process.env.API_URL}/{image_path}" alt="Heart Tissue" />
+  {#if image_path}
+    <img id="pic" src="{process.env.API_URL}/{image_path}" alt="Heart Tissue" />
+    }
+  {/if}
 </div>
 
 <div id="container" />

@@ -14,11 +14,13 @@ from sqlalchemy.orm import relationship
 
 from database import Base
 
+from schemas import schema_tissue, schema_tissue_calculated_data, schema_video, \
+    schema_tissue_tracking, schema_post
 
 tz = timezone('EST')
 
 
-# TODP: Move this to diffent file
+# TODO: Move this to diffent file
 UPLOAD_FOLDER = "static/uploads"
 
 
@@ -32,7 +34,9 @@ class Experiment(Base):
         String(120), nullable=False, unique=True)
     start_date: Date = Column(Date, nullable=True, default=datetime.now(tz))
 
-    vids: List = relationship("Video", back_populates="experiment")
+    # TODO: make this Videos
+    vids: List[schema_video.Video] = relationship(
+        "Video", back_populates="experiment")
 
 
 @dataclass
@@ -59,8 +63,9 @@ class Video(Base):
     bio_reactor_id: int = Column(Integer, ForeignKey('bio_reactor.id'))
     bio_reactor = relationship("BioReactor", back_populates="vids")
 
-    tissues = relationship("Tissue", back_populates="video",
-                           cascade="all, delete-orphan")
+    tissues: List[schema_tissue.Tissue] = relationship(
+        "Tissue", back_populates="video",
+        cascade="all, delete-orphan")
 
 
 @dataclass
@@ -74,20 +79,23 @@ class Tissue(Base):
     tissue_type: str = Column(String(120), nullable=False)
     cross_section_dist: float = Column(Float, nullable=True)
 
-    post_id = Column(Integer, ForeignKey('post.id'))
+    post_id: int = Column(Integer, ForeignKey('post.id'))
     post = relationship("Post", back_populates="tissues")
 
     vid_id = Column(Integer, ForeignKey('video.id'))
     video = relationship("Video", back_populates="tissues")
 
     tissue_tracking = relationship(
-        "TissueTracking", back_populates="tissue",
+        "TissueTracking", back_populates="tissue", uselist=False,
         cascade="all, delete-orphan", passive_deletes=True)
-    tissue_caculated_data = relationship(
-        "TissueCalculatedData", back_populates="tissue",
-        cascade="all, delete-orphan", passive_deletes=True)
+    tissue_caculated_data: \
+        schema_tissue_calculated_data.TissueCalculatedDataBase = \
+        relationship(
+            "TissueCalculatedData", back_populates="tissue", uselist=False,
+            cascade="all, delete-orphan", passive_deletes=True)
 
 
+@dataclass
 class TissueTracking(Base):
     """Tissue Tracking model for DB"""
     __tablename__ = "tissue_tracking"
@@ -106,6 +114,7 @@ class TissueTracking(Base):
     even_y: float = Column(Float)
 
 
+@dataclass
 class TissueCalculatedData(Base):
     """Tissue Cacualtion data model for DB"""
     __tablename__ = "tissue_calculated_data"
@@ -121,7 +130,7 @@ class TissueCalculatedData(Base):
     dias_force: float = Column(Float)
     dias_force_std: float = Column(Float)
     beat_rate_COV: float = Column(Float)
-    beat_rate_COV_std = Column(Float)
+    beat_rate_COV_std: float = Column(Float)
     beating_freq: float = Column(Float)
     beating_freq_std: float = Column(Float)
     t2pk: float = Column(Float)
@@ -153,12 +162,14 @@ class BioReactor(Base):
         Integer, primary_key=True, autoincrement=True)
     bio_reactor_number: int = Column(Integer, nullable=False)
 
-    date_added: datetime.date = Column(Date, nullable=False)
+    date_added: Date = Column(Date, nullable=False)
 
-    vids = relationship("Video", back_populates="bio_reactor")
+    vids: List[schema_video.Video] = relationship(
+        "Video", back_populates="bio_reactor")
 
-    posts = relationship("Post", back_populates="bio_reactor",
-                         cascade="all, delete-orphan")
+    posts: List[schema_post.Post] = relationship(
+        "Post", back_populates="bio_reactor",
+        cascade="all, delete-orphan")
 
 
 @dataclass
@@ -176,10 +187,11 @@ class Post(Base):
     right_tissue_height: float = Column(Float, nullable=False)
     radius: float = Column(Float, nullable=True)
 
-    bio_reactor_id = Column(Integer, ForeignKey("bio_reactor.id"))
+    bio_reactor_id: int = Column(Integer, ForeignKey("bio_reactor.id"))
     bio_reactor = relationship("BioReactor", back_populates="posts")
 
-    tissues = relationship("Tissue", back_populates="post")
+    tissues: List[schema_tissue.Tissue] = relationship(
+        "Tissue", lazy='noload', back_populates="post")
 
 
 def check_path_exisits(file_path_passed):

@@ -1,14 +1,15 @@
 """Schema for tissue"""
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel
+
+from . import schema_tissue_calculated_data, schema_tissue_tracking
 
 
 class TissueBase(BaseModel):
     tissue_number: str
     tissue_type: str
     post_id: int
-    csv_path: Optional[str]
 
     class Config:
         orm_mode = True
@@ -16,13 +17,20 @@ class TissueBase(BaseModel):
 
 class TissueCreate(TissueBase):
     vid_id: Optional[int]
-    bio_reactor_id: Optional[int]
 
 
 class TissueLater(TissueBase):
-    csv_path: str
     cross_section_dist: float
 
 
 class Tissue(TissueBase):
     id: int
+    cross_section_dist: Optional[float]
+    # tissue_tracking: List[schema_tissue_tracking.TissueTrackingBase]
+    tissue_caculated_data: Optional[schema_tissue_calculated_data.TissueCalculatedDataBase]
+
+
+class TissueFull(Tissue):
+    """Schema for to JSON"""
+    id: int
+    vid_id: int

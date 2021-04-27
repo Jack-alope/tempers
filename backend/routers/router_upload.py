@@ -91,8 +91,7 @@ def save_csv_file(vid_info, file, database_session):
     return (vid.id, path_to_file)
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
-                bio_reactor_id: int, vid_id: int, database_session: Session):
+def add_tissues(tissue_li: List[schema_tissue.TissueCreate], vid_id: int, database_session: Session):
     """Adds tissues to databse"""
 
     tissue_id = 0
@@ -100,7 +99,6 @@ def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
     for tissue in tissue_li:
         tissue_obj = schema_tissue.TissueCreate.parse_obj(tissue)
         tissue_obj.vid_id = vid_id
-        tissue_obj.bio_reactor_id = bio_reactor_id
         tissue_id = crud_tissue.create_tissue(database_session, tissue_obj)
 
     return tissue_id
@@ -112,7 +110,6 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
     """Upload csv or vid"""
     # TODO Add schema to this form and file make it weird
     vid_json: schema_video.VideoCreate = json.loads(info)
-    print(vid_json)
     vid_info = schema_video.VideoCreate.parse_obj(vid_json)
 
     extension = file.filename.split(".")[-1]
@@ -127,7 +124,7 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
         vid_id = save_video_file(vid_info, file, database_session)
 
     tissue = add_tissues(
-        vid_info.tissues, vid_info.bio_reactor_id, vid_id, database_session)
+        vid_info.tissues, vid_id, database_session)
 
     if extension == "csv":
         dataframe = pd.read_csv(tup[1])

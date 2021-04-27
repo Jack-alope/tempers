@@ -1,8 +1,9 @@
 """
 CRUD for Bio reactor
 """
+from typing import List
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import exists
 
@@ -15,7 +16,19 @@ def get_bio_reactors(database_session: Session):
     return database_session.query(models.BioReactor).all()
 
 
-def create_bio_reactor(database_session: Session, bio_reactor: schema_bio_reactor.BioReactorBase):
+def get_bio_reactor(database_session: Session, bio_id: int):
+    """Returns bio reactor by for id"""
+    return database_session.query(models.BioReactor).filter(
+        models.BioReactor.id == bio_id).first()
+
+
+def get_bio_reactors_by_li_id(database_session: Session, bio_ids: List[int]):
+    return database_session.query(models.BioReactor).options(noload(models.BioReactor.vids)).filter(
+        models.BioReactor.id.in_(bio_ids)).all()
+
+
+def create_bio_reactor(database_session: Session,
+                       bio_reactor: schema_bio_reactor.BioReactorBase):
     """Adds bio reactor to DB"""
     db_bio_reactor = models.BioReactor(
         date_added=bio_reactor.date_added,
@@ -25,12 +38,6 @@ def create_bio_reactor(database_session: Session, bio_reactor: schema_bio_reacto
     database_session.refresh(db_bio_reactor)
 
     return db_bio_reactor
-
-
-def get_bio_reactor(database_session: Session, bio_id: int):
-    """Returns bio reactor by for id"""
-    return database_session.query(models.BioReactor).filter(
-        models.BioReactor.id == bio_id).first()
 
 
 def delete_bio_reactor(database_session: Session, bio_id: int):
