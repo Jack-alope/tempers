@@ -63,10 +63,11 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     dataframe = crud_tissue_tracking.get_tracking_by_id(
         database, tissue_obj.id)
 
+
     tracking_obj = TissuePoints(
         dataframe['displacement'].to_list(), dataframe['time'].to_list())
     tracking_obj.smooth(int(data.windows), int(data.polynomials))
-    tracking_obj.find_peaks(data.thresholds, int(data.minDistances))
+    tracking_obj.find_peaks(data.thresholds, int(data.minDistances), data.xrange)
 
     crud_tissue_caculations.create(
         database, tracking_obj.calculated_values, tissue_obj.id)
