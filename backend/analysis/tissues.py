@@ -42,7 +42,7 @@ class TissuePoints:
 
         self.find_peaks()
 
-    def find_peaks(self, thresh=None, min_dist=None):
+    def find_peaks(self, thresh=None, min_dist=None, x_range=None):
         """Finds usable peaks"""
         if thresh is not None:
             self.thresh = thresh
@@ -50,11 +50,23 @@ class TissuePoints:
             self.min_dist = min_dist
 
         unformatted = np.array(peakutils.indexes(
-            self.smooth_disp, self.thresh, self.min_dist)[1:-1])
+                self.smooth_disp, self.thresh, self.min_dist)[1:-1])
+
+        if not ((x_range is None) | (x_range == [0, 0])):
+            unformatted = self.crop_peaks(unformatted, x_range[0], x_range[1])
 
         self.peaks = self.format_points(unformatted)
 
         self.find_basepoints_frontpoints()
+
+    def crop_peaks(self, peak_list, start, end):
+        """crops peaks to allow for time region selection"""
+        mins = lambda lists, ind: np.abs(np.array(lists) - ind).argmin()
+        start_ind = mins(self.time, start)
+        end_ind = mins(self.time, end)
+        peak_start = mins(peak_list, start_ind) + 2
+        peak_end = mins(peak_list, end_ind) - 1
+        return peak_list[peak_start:peak_end]
 
     def find_basepoints_frontpoints(self):
         """Use the dfdt_recursive func to find basepoints and frontpointspyl"""
