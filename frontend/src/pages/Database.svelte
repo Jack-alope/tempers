@@ -19,10 +19,14 @@
     experiment_interface,
     video_interface,
   } from "../interfaces";
+  import { bubble } from "svelte/internal";
 
   let experiments_value: experiment_interface[];
   let bio_reactors_value: bio_reactor_interface[];
   let videos_value: video_interface[];
+
+  let downloadPath: string;
+  let downloadModal: boolean = false;
 
   showExperiment.set(false);
   showBioReactor.set(false);
@@ -102,6 +106,25 @@
     }
   }
 
+  async function handleExperimentDownload(id: number) {
+    const res = await fetch(process.env.API_URL + `/experimentsJSON/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (res.ok) {
+      async function download(path) {
+        downloadModal = true;
+        downloadPath = process.env.API_URL + "/" + path;
+      }
+
+      download(await res.json());
+    } else {
+      alert("Something went wrong");
+    }
+  }
+
   onDestroy(unsubscribe);
   onDestroy(expunsubscribe);
   onDestroy(vidspunsubscribe);
@@ -115,6 +138,7 @@
           <th>ID</th>
           <th>Experiment Idenifiyer</th>
           <th>Start Date</th>
+          <th>Download</th>
           <th>Delete</th>
         </tr>
       </thead>
@@ -127,6 +151,13 @@
               <td>{experiment.id}</td>
               <td>{experiment.experiment_idenifer}</td>
               <td>{experiment.start_date}</td>
+              <td>
+                <button
+                  class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  on:click={() => handleExperimentDownload(experiment.id)}
+                  >Download</button
+                >
+              </td>
               <td
                 ><button
                   class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
@@ -243,6 +274,18 @@
     <h1 slot="header">Add a Bio Reactor</h1>
     <p slot="content">
       <AddBioReactor />
+    </p>
+  </Modal>
+{:else if downloadModal}
+  <Modal on:close={() => (downloadModal = false)}>
+    <h1 slot="header">Download experiment</h1>
+    <p slot="content">
+      <a href={downloadPath} download>
+        <button
+          class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          >Download</button
+        >
+      </a>
     </p>
   </Modal>
 {/if}

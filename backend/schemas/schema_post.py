@@ -17,9 +17,12 @@ class PostCreate(PostBase):
 
 
 class Post(PostBase):
-    id: int
     bio_reactor_id: int
 
 
 class PostUpload(PostBase):
+    id: int
+
+
+class PostFull(PostCreate):
     id: int

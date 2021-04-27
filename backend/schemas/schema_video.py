@@ -26,13 +26,15 @@ class VideoCreate(VideoBase):
 
 class VideoInfo(VideoBase):
     id: int
-    bio_reactor_id: int
+
     experiment_id: int
     save_location: Optional[str]
 
 
 class Video(VideoBase):
-    id: int
+    bio_reactor_id: int
+    tissues: List[schema_tissue.Tissue]
+    save_location: Optional[str]
 
 
 class VideoShow(VideoBase):
@@ -50,3 +52,7 @@ class PostSelection(BaseModel):
     cal_points: List[List[float]]
     video_id_value: int
     calibration_distance: int
+
+
+class VideoFull(VideoShow):
+    pass

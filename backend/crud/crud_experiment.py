@@ -20,6 +20,11 @@ def get_experiment(database_session: Session, exp_id: int):
     return database_session.query(models.Experiment).filter(models.Experiment.id == exp_id).first()
 
 
+def get_experiment_vid(database_session: Session, exp_id: int):
+    """Retunrs experiment by id"""
+    return database_session.query(models.Experiment, models.Video.id).join(models.Video).filter(models.Experiment.id == exp_id).first()
+
+
 def create_experiment(database_session: Session, experiment: schema_experiment.ExperimentBase):
     """Add Experiment to DB"""
     db_experiment = models.Experiment(**experiment.dict())

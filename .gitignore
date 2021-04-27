@@ -1,5 +1,6 @@
 #ignore uploads folder
 uploads/
+archive/
 
 *.DS_Store
 *.csv

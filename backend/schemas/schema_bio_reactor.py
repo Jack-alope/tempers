@@ -24,3 +24,8 @@ class BioReactorCreate(BioReactorBase):
 
 class BioReactor(BioReactorBase):
     id: int
+
+
+class BioReactorFull(BioReactorBase):
+    id: int
+    posts: List[schema_post.PostFull]

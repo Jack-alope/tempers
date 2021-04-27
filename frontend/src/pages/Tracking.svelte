@@ -9,10 +9,11 @@
   let image_path: string;
   let video_id_value: number;
 
+  console.log(image_path);
+
   const unsubscribe = video_id.subscribe((value) => {
     video_id_value = value;
   });
-
   async function handleVideoSelected() {
     vidSelected = true;
     const res = await fetch(

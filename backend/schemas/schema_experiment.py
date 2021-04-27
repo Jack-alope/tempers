@@ -4,7 +4,7 @@ from datetime import date
 
 from pydantic import BaseModel
 
-from . import schema_video
+from . import schema_video, schema_bio_reactor
 
 
 class ExperimentBase(BaseModel):
@@ -16,8 +16,17 @@ class ExperimentBase(BaseModel):
 
 
 class Experiment(ExperimentBase):
+    vids: List[schema_video.Video]
+
+
+class ExperimentFull(Experiment):
     id: int
 
 
-class ExperimentWithVids(Experiment):
-    videos: List[schema_video.Video] = []
+class ExperimentShow(ExperimentBase):
+    id: int
+
+
+class ExperimentDownload(BaseModel):
+    experiment: Experiment
+    bio_reactors: List[schema_bio_reactor.BioReactorFull]
