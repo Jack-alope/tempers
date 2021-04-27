@@ -2,13 +2,10 @@
 Router assisted with tissue tracking
 """
 
-import threading
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from scipy.spatial import distance
 
-import tracking
 from database import get_db
 from crud import crud_video
 from schemas import schema_video
