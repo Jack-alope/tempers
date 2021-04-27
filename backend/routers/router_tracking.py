@@ -13,9 +13,8 @@ from database import get_db
 from crud import crud_video
 from schemas import schema_video
 
-
+from trackings.trackers import TissueTracker
 router = APIRouter()
-
 
 def coord_distance(coords_list):
     '''
@@ -60,9 +59,6 @@ async def box_coordinates(post_info: schema_video.PostSelection,
 
     video_object = crud_video.get_vid_by_id(database, post_info.video_id_value)
 
-    tissues = video_object.tissues
-    tracking_thread = threading.Thread(
-        target=tracking.start_trackig, args=(database, post_info.boxes,
-                                             cal_factor, video_object, tissues))
-    tracking_thread.start()
+    TissueTracker(database, post_info.boxes, cal_factor, video_object)
+
     return {"ok": 200}
