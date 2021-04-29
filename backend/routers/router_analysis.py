@@ -4,11 +4,9 @@ Router for analysis
 import json
 import io
 
-
-from fastapi import APIRouter,  Depends, Query, BackgroundTasks
+from fastapi import APIRouter,  Depends, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
-
 
 from sqlalchemy.orm import Session
 
@@ -18,7 +16,6 @@ from crud import crud_video, crud_tissue_tracking, crud_tissue_caculations
 from analysis.tissues import TissuePoints
 
 import models
-
 
 router = APIRouter()
 

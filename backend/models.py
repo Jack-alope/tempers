@@ -14,8 +14,8 @@ from sqlalchemy.orm import relationship
 
 from database import Base
 
-from schemas import schema_tissue, schema_tissue_calculated_data, schema_video, \
-    schema_tissue_tracking, schema_post
+from schemas import schema_tissue, schema_tissue_calculated_data,\
+    schema_video, schema_post
 
 tz = timezone('EST')
 
@@ -129,6 +129,7 @@ class TissueCalculatedData(Base):
     dev_force_std: float = Column(Float)
     dias_force: float = Column(Float)
     dias_force_std: float = Column(Float)
+    # TODO: Fix naming linting error
     beat_rate_COV: float = Column(Float)
     beat_rate_COV_std: float = Column(Float)
     beating_freq: float = Column(Float)

@@ -26,7 +26,6 @@
   let bio_reactors_value: bio_reactor_interface[];
   let videos_value: video_interface[];
 
-  let downloadPath: string;
   let downloadModal: boolean = false;
 
   showExperiment.set(false);
@@ -108,6 +107,7 @@
   }
 
   async function handleExperimentDownload(id: number) {
+    downloadModal = true;
     const res = await fetch(process.env.API_URL + `/experimentsJSON/${id}`, {
       method: "GET",
       headers: {
@@ -116,10 +116,10 @@
     });
     if (res.ok) {
       const file = await res.blob();
-      console.log(file);
       if (file) {
         const blob = new Blob([file]);
         saveAs(blob, `${id}.zip`);
+        downloadModal = false;
       }
     } else {
       alert("Something went wrong");
@@ -154,7 +154,7 @@
               <td>{experiment.start_date}</td>
               <td>
                 <button
-                  class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                  class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   on:click={() => handleExperimentDownload(experiment.id)}
                   >Download</button
                 >
@@ -278,15 +278,9 @@
     </p>
   </Modal>
 {:else if downloadModal}
+  <!-- REVIEW: this is ugly -->
   <Modal on:close={() => (downloadModal = false)}>
     <h1 slot="header">Download experiment</h1>
-    <p slot="content">
-      <a href={downloadPath} download>
-        <button
-          class="bg-blue-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-          >Download</button
-        >
-      </a>
-    </p>
+    <p slot="content">Downloading....</p>
   </Modal>
 {/if}

@@ -91,7 +91,8 @@ def save_csv_file(vid_info, file, database_session):
     return (vid.id, path_to_file)
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate], vid_id: int, database_session: Session):
+def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
+                vid_id: int, database_session: Session):
     """Adds tissues to databse"""
 
     tissue_id = 0
