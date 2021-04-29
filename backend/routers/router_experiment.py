@@ -5,10 +5,12 @@ import json
 from typing import List
 from dataclasses import asdict
 import shutil
+import os
 
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 
@@ -53,9 +55,6 @@ def add_experiment(experiment: schema_experiment.ExperimentBase,
 @router.get("/experimentsJSON/{experiment_id}", tags=["Experiment"])
 def json_experiment(experiment_id: int, database_session=Depends(get_db)):
 
-    experiment_info = crud_experiment.get_experiment(
-        database_session, experiment_id)
-
     def vid_json(vid):
         save_location = vid.save_location
         vid.save_location = "videos/" + vid.save_location.split("/")[-1]
@@ -68,6 +67,9 @@ def json_experiment(experiment_id: int, database_session=Depends(get_db)):
                 database_session, tissue.id)
             if not dataframe.empty:
                 dataframe.to_csv(outfile)
+
+    experiment_info = crud_experiment.get_experiment(
+        database_session, experiment_id)
 
     vid_info = [vid_json(x) for x in experiment_info.vids]
 
@@ -92,30 +94,28 @@ def json_experiment(experiment_id: int, database_session=Depends(get_db)):
     save_info = schema_experiment.ExperimentDownload(
         experiment=experiment, bio_reactors=bio_reactors)
 
-    file_path = f"static/archive/{experiment_info.experiment_idenifer}/"
+    file_path = f"{models.UPLOAD_FOLDER}/{experiment_info.experiment_idenifer}/"
     csv_path = f"{file_path}csvs/"
     video_path = f"{file_path}videos/"
-    zips = "static/archive/zips/"
     models.check_path_exisits(file_path)
     models.check_path_exisits(csv_path)
     models.check_path_exisits(video_path)
-    models.check_path_exisits(zips)
 
-    with open(f"{file_path}{experiment_info.experiment_idenifer}_\
-        {experiment_info.start_date}.json", "w") as outfile:
+    experiment_info_file_path = f"{file_path}{experiment_info.experiment_idenifer}_{experiment_info.start_date}.json"
+
+    with open(experiment_info_file_path, "w") as outfile:
         json.dump(jsonable_encoder(save_info), outfile, indent=1)
 
     for tissue in tissues:
         tissue_tracking_to_csv(database_session, tissue, csv_path)
 
-    for vid_path in save_locations:
-        src = vid_path
-        dst = f"{video_path}{vid_path.split('/')[-1]}"
-        shutil.copyfile(src, dst)
+    zip_file = f"{file_path}{experiment_info.experiment_idenifer}_{experiment_info.start_date}"
 
-    shutil.make_archive(
-        f"{zips}{experiment_info.experiment_idenifer}_{experiment_info.start_date}", 'zip', file_path)
+    shutil.make_archive(zip_file, 'zip', file_path)
 
-    shutil.rmtree(file_path)
+    shutil.rmtree(csv_path)
+    os.remove(experiment_info_file_path)
 
-    return {f"{zips}{experiment_info.experiment_idenifer}_{experiment_info.start_date}.zip"}
+    no_static = zip_file.replace("/static", "")
+
+    return {f"{no_static}.zip"}
