@@ -5,9 +5,10 @@ import json
 import io
 
 
-from fastapi import APIRouter,  Depends, Query
+from fastapi import APIRouter,  Depends, Query, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, StreamingResponse
+
 
 from sqlalchemy.orm import Session
 
@@ -15,6 +16,8 @@ from database import get_db
 from schemas import schema_analysis
 from crud import crud_video, crud_tissue_tracking, crud_tissue_caculations
 from analysis.tissues import TissuePoints
+
+import models
 
 
 router = APIRouter()
@@ -63,11 +66,11 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     dataframe = crud_tissue_tracking.get_tracking_by_id(
         database, tissue_obj.id)
 
-
     tracking_obj = TissuePoints(
         dataframe['displacement'].to_list(), dataframe['time'].to_list())
     tracking_obj.smooth(int(data.windows), int(data.polynomials))
-    tracking_obj.find_peaks(data.thresholds, int(data.minDistances), data.xrange)
+    tracking_obj.find_peaks(data.thresholds, int(
+        data.minDistances), data.xrange)
 
     crud_tissue_caculations.create(
         database, tracking_obj.calculated_values, tissue_obj.id)
@@ -93,10 +96,9 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     }}
 
 
-@router.post("/caculate", tags=["analysis"])
+@router.get("/caculate", tags=["analysis"])
 def download_summary(video_id=Query(...), database_session=Depends(get_db)):
     """Download summary of vid caculatios"""
-    print(video_id)
 
     tissues = crud_video.get_vid_by_id(database_session, video_id).tissues
 
@@ -105,7 +107,11 @@ def download_summary(video_id=Query(...), database_session=Depends(get_db)):
     caculations_df = crud_tissue_caculations.get_calculations(
         database_session, tissue_ids)
 
-    response = StreamingResponse(io.StringIO(
-        caculations_df.to_csv(index=False)), media_type="text/csv")
+    models.check_path_exisits(f"{models.UPLOAD_FOLDER}/temp/")
+
+    response = StreamingResponse(io.StringIO(caculations_df.to_csv(index=False)),
+                                 media_type="text/csv")
+
     response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+
     return response

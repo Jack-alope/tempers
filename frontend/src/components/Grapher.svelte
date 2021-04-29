@@ -1,7 +1,9 @@
 <script>
-  import { json_data_list, video_id } from "../components/Stores.js";
-
   import { onMount } from "svelte";
+  import { saveAs } from "file-saver";
+
+  import { json_data_list, video_id } from "../components/Stores.js";
+  import { compute_slots } from "svelte/internal";
 
   export let nums, freqs, types;
 
@@ -24,12 +26,19 @@
     const res = await fetch(
       process.env.API_URL + `/caculate?video_id=${video_id_value}`,
       {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       }
     );
+    if (res.ok) {
+      const file = await res.blob();
+      if (file) {
+        var blob = new Blob([file]);
+        saveAs(blob, `${video_id_value}_calculations.csv`);
+      }
+    }
   }
 
   function grapherFunc() {
@@ -658,13 +667,11 @@
   }
 </script>
 
-<a href={caculate()} download="export.csv">
-  <button
-    id="Caculate"
-    class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-    >Download Analysis summary</button
-  >
-</a>
+<button
+  id="Caculate"
+  class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+  on:click={() => caculate()}>Download Analysis summary</button
+>
 
 {#each nums as num, i}
   <div class="row">
