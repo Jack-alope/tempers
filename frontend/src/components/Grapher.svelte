@@ -35,7 +35,7 @@
     if (res.ok) {
       const file = await res.blob();
       if (file) {
-        var blob = new Blob([file]);
+        const blob = new Blob([file]);
         saveAs(blob, `${video_id_value}_calculations.csv`);
       }
     }

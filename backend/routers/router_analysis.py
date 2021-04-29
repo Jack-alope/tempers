@@ -112,6 +112,6 @@ def download_summary(video_id=Query(...), database_session=Depends(get_db)):
     response = StreamingResponse(io.StringIO(caculations_df.to_csv(index=False)),
                                  media_type="text/csv")
 
-    response.headers["Content-Disposition"] = "attachment; filename=export.csv"
+    response.headers["Content-Disposition"] = "attachment; filename=caculations.csv"
 
     return response

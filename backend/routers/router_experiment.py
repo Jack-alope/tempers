@@ -8,9 +8,9 @@ import shutil
 import os
 
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, FileResponse
 from sqlalchemy.orm import Session
 
 
@@ -53,7 +53,7 @@ def add_experiment(experiment: schema_experiment.ExperimentBase,
 
 
 @router.get("/experimentsJSON/{experiment_id}", tags=["Experiment"])
-def json_experiment(experiment_id: int, database_session=Depends(get_db)):
+def json_experiment(background_tasks: BackgroundTasks, experiment_id: int, database_session=Depends(get_db)):
 
     def vid_json(vid):
         save_location = vid.save_location
@@ -116,6 +116,6 @@ def json_experiment(experiment_id: int, database_session=Depends(get_db)):
     shutil.rmtree(csv_path)
     os.remove(experiment_info_file_path)
 
-    no_static = zip_file.replace("/static", "")
+    background_tasks.add_task(models.delete_file, f"{zip_file}.zip")
 
-    return {f"{no_static}.zip"}
+    return FileResponse(f"{zip_file}.zip")

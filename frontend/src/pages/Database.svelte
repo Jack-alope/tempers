@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import { saveAs } from "file-saver";
   import AddExperimet from "../components/AddExperimet.svelte";
   import AddBioReactor from "../components/AddBioReactor.svelte";
   import Modal from "../components/Modal.svelte";
@@ -114,12 +115,12 @@
       },
     });
     if (res.ok) {
-      async function download(path) {
-        downloadModal = true;
-        downloadPath = process.env.API_URL + "/" + path;
+      const file = await res.blob();
+      console.log(file);
+      if (file) {
+        const blob = new Blob([file]);
+        saveAs(blob, `${id}.zip`);
       }
-
-      download(await res.json());
     } else {
       alert("Something went wrong");
     }
