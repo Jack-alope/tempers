@@ -3,7 +3,6 @@
   import { saveAs } from "file-saver";
 
   import { json_data_list, video_id } from "../components/Stores.js";
-  import { compute_slots } from "svelte/internal";
 
   export let nums, freqs, types;
 

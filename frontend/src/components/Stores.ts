@@ -12,3 +12,4 @@ export const videos = writable(undefined);
 
 export const showExperiment = writable(false);
 export const showBioReactor = writable(false);
+export const downloadModal = writable(false);
