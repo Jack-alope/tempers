@@ -33,6 +33,8 @@ class VideoInfo(VideoBase):
 
 class Video(VideoBase):
     bio_reactor_id: int
+    calibration_distance: Optional[float]
+    calibration_factor: Optional[float]
     tissues: List[schema_tissue.Tissue]
     save_location: Optional[str]
 

@@ -7,7 +7,7 @@ from dataclasses import asdict
 import shutil
 import os
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
@@ -16,6 +16,7 @@ from database import get_db
 from crud import crud_experiment, crud_bio_reactor, crud_tissue_tracking
 from schemas import schema_experiment, schema_bio_reactor
 import models
+
 
 router = APIRouter()
 
@@ -49,23 +50,16 @@ def add_experiment(experiment: schema_experiment.ExperimentBase,
     return new_experiment
 
 
-@router.get("/experimentsJSON/{experiment_id}", tags=["Experiment"])
-def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
-                    database_session=Depends(get_db)):
-    """
-    Genrates a JSON of experiment data and csv for tissue tracking database
-    zips that with the vid files and sends the zip as a file response
-    REVIEW: it isnt very quick
-    REVIEW: Use steam file instead of saving then deleting
-    """
+@router.post("/experiment_exist/",
+             tags=["experiment", "upload"])
+def check_experiment_exists(experiment_identifier: str = Query(...),
+                            database_session: Session = Depends(get_db)):
+    return crud_experiment.check_experiment_idetifyer_exsits(
+        database_session, experiment_identifier)
 
-    def vid_json(vid):
-        save_location = vid.save_location
-        vid.save_location = "videos/" + vid.save_location.split("/")[-1]
-        tissues = [x for x in vid.tissues]
-        return (vid.bio_reactor_id, save_location, tissues)
 
-    def tissue_tracking_to_csv(database_session: Session, tissue: int, file_path: str):
+def _tissue_tracking_to_csv(database_session: Session, tissues, file_path: str):
+    for tissue in tissues:
         with open(f"{file_path}{tissue.tissue_number}_{tissue.tissue_type}_{tissue.id}.csv",
                   "w") as outfile:
             dataframe = crud_tissue_tracking.get_tracking_by_id(
@@ -73,57 +67,57 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
             if not dataframe.empty:
                 dataframe.to_csv(outfile)
 
+
+@router.get("/experimentsJSON/{experiment_id}", tags=["Experiment"])
+def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
+                    database_session=Depends(get_db)):
+    """
+    Genrates a JSON of experiment data and csv for tissue tracking database
+    zips that with the vid files and sends the zip as a file response
+    REVIEW: it isnt very quick, its the ziping that is slow, file response also slow
+    REVIEW: Use steam file instead of saving then deleting
+    """
+
     experiment_info = crud_experiment.get_experiment(
         database_session, experiment_id)
 
-    vid_info = [vid_json(x) for x in experiment_info.vids]
-
-    bio_reactor_ids = set()
-    save_locations = []
-    tissues = []
-
-    for x in vid_info:
-        bio_reactor_ids.add(x[0])
-        save_locations.append(x[1])
-        for j in x[2]:
-            tissues.append(j)
-
-    experiment = schema_experiment.Experiment(**asdict(experiment_info))
-
-    bio_reactors = crud_bio_reactor.get_bio_reactors_by_li_id(
-        database_session, bio_reactor_ids)
-
-    bio_reactors = [schema_bio_reactor.BioReactorFull(
-        **asdict(i)) for i in bio_reactors]
-
-    save_info = schema_experiment.ExperimentDownload(
-        experiment=experiment, bio_reactors=bio_reactors)
-
     file_path = f"{models.UPLOAD_FOLDER}/{experiment_info.experiment_idenifer}/"
     csv_path = f"{file_path}csvs/"
-    video_path = f"{file_path}videos/"
-    models.check_path_exisits(file_path)
-    models.check_path_exisits(csv_path)
-    models.check_path_exisits(video_path)
-
     experiment_info_file_path = \
-        f"{file_path}{experiment_info.experiment_idenifer}_{experiment_info.start_date}.json"
-
-    with open(experiment_info_file_path, "w") as outfile:
-        json.dump(jsonable_encoder(save_info), outfile, indent=1)
-
-    for tissue in tissues:
-        tissue_tracking_to_csv(database_session, tissue, csv_path)
-
-    zip_file = \
         f"{file_path}{experiment_info.experiment_idenifer}_{experiment_info.start_date}"
 
-    shutil.make_archive(zip_file,
+    models.check_path_exisits(file_path)
+    models.check_path_exisits(csv_path)
+
+    bio_reactor_ids: {int} = set()
+    tissues = []
+
+    for x in [(vid.bio_reactor_id, vid.tissues)
+              for vid in experiment_info.vids]:
+        bio_reactor_ids.add(x[0])
+        for j in x[1]:
+            tissues.append(j)
+
+    bio_reactors = [schema_bio_reactor.BioReactorFull(
+        **asdict(i)) for i in crud_bio_reactor.get_bio_reactors_by_li_id(
+        database_session, bio_reactor_ids)]
+
+    with open(f"{experiment_info_file_path}.json", "w") as outfile:
+        json.dump(jsonable_encoder(
+            schema_experiment.ExperimentDownload(
+                experiment=schema_experiment.Experiment(
+                    **asdict(experiment_info)),
+                bio_reactors=bio_reactors)), outfile, indent=1)
+
+    _tissue_tracking_to_csv(database_session, tissues, csv_path)
+
+    shutil.make_archive(experiment_info_file_path,
                         "zip", file_path)
 
     shutil.rmtree(csv_path)
-    os.remove(experiment_info_file_path)
+    os.remove(f"{experiment_info_file_path}.json")
 
-    background_tasks.add_task(models.delete_file, f"{zip_file}.zip")
+    background_tasks.add_task(
+        models.delete_file, f"{experiment_info_file_path}.zip")
 
-    return FileResponse(f"{zip_file}.zip")
+    return FileResponse(f"{experiment_info_file_path}.zip")

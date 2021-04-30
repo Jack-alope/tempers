@@ -135,3 +135,9 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
         models.delete_file(tup[1])
 
     return {200: "OK"}
+
+
+@router.post("/upload/experiment_archive", tags=["upload", "experiment"])
+async def upload_experiment(file: UploadFile = File(...),
+                            database_session: Session = Depends(get_db)):
+    pass
