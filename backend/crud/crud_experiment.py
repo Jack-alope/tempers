@@ -2,6 +2,8 @@
 """
 CRUD for experiments
 """
+import shutil
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from sqlalchemy import exists
@@ -39,11 +41,17 @@ def create_experiment(database_session: Session, experiment: schema_experiment.E
 def delete_experiment(database_session: Session, exp_id: int):
     """Deletes expeiments returns false if cannot delete bc has children"""
     try:
-        database_session.delete(get_experiment(database_session, exp_id))
+        experiment = get_experiment(database_session, exp_id)
+        database_session.delete(experiment)
         database_session.commit()
+        shutil.rmtree(
+            f"{models.UPLOAD_FOLDER}/{experiment.experiment_idenifer}")
         return True
     except IntegrityError:
         return False
+    except FileNotFoundError:
+        print("file doesnt not exsit")
+        return True
 
 
 def check_experiment_idetifyer_exsits(database_session: Session, experiment_idenifer: str):

@@ -84,7 +84,7 @@ def delete_video(database_session: Session, vid_id: int):
 
 
 def get_vid_by_id(database_session: Session, vid_id: int):
-    """retunr vid by id"""
+    """return vid by id"""
     return database_session.query(models.Video).filter(models.Video.id == vid_id).first()
 
 
