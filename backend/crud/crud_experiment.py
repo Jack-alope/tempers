@@ -17,12 +17,14 @@ def get_experiments(database_session: Session):
 
 def get_experiment(database_session: Session, exp_id: int):
     """Retunrs experiment by id"""
-    return database_session.query(models.Experiment).filter(models.Experiment.id == exp_id).first()
+    return database_session.query(models.Experiment).filter(
+        models.Experiment.id == exp_id).first()
 
 
 def get_experiment_vid(database_session: Session, exp_id: int):
     """Retunrs experiment by id"""
-    return database_session.query(models.Experiment, models.Video.id).join(models.Video).filter(models.Experiment.id == exp_id).first()
+    return database_session.query(models.Experiment, models.Video.id).join(
+        models.Video).filter(models.Experiment.id == exp_id).first()
 
 
 def create_experiment(database_session: Session, experiment: schema_experiment.ExperimentBase):
@@ -36,7 +38,6 @@ def create_experiment(database_session: Session, experiment: schema_experiment.E
 
 def delete_experiment(database_session: Session, exp_id: int):
     """Deletes expeiments returns false if cannot delete bc has children"""
-    # REVIEW: Smething weird with the delte no exception but does not delete
     try:
         database_session.delete(get_experiment(database_session, exp_id))
         database_session.commit()

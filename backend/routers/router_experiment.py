@@ -54,11 +54,16 @@ def add_experiment(experiment: schema_experiment.ExperimentBase,
              tags=["experiment", "upload"])
 def check_experiment_exists(experiment_identifier: str = Query(...),
                             database_session: Session = Depends(get_db)):
+    """Router to check if the experiment identiyer is used retunes true if it exsits"""
     return crud_experiment.check_experiment_idetifyer_exsits(
         database_session, experiment_identifier)
 
 
 def _tissue_tracking_to_csv(database_session: Session, tissues, file_path: str):
+    """
+    Accepts list of tissues objests opens and saves a CVS file with the
+    tracking data from that file
+    """
     for tissue in tissues:
         with open(f"{file_path}{tissue.tissue_number}_{tissue.tissue_type}_{tissue.id}.csv",
                   "w") as outfile:
@@ -80,7 +85,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
 
     experiment_info = crud_experiment.get_experiment(
         database_session, experiment_id)
-
+    # Path to the base of the experiment folder
     file_path = f"{models.UPLOAD_FOLDER}/{experiment_info.experiment_idenifer}/"
     csv_path = f"{file_path}csvs/"
     experiment_info_file_path = \
@@ -92,31 +97,47 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
     bio_reactor_ids: {int} = set()
     tissues = []
 
+    # List comp goes creats list of tup (bio_ids, tissues) used in expetiment
+    # REVIEW: Would like to cut out the nested for lo0ps
     for x in [(vid.bio_reactor_id, vid.tissues)
               for vid in experiment_info.vids]:
+        # Adds bio id to set
         bio_reactor_ids.add(x[0])
         for j in x[1]:
+            # iterrates over tissues in vid
+            # Appends tissue to list of tissue
             tissues.append(j)
 
+    # Querys database with list of bio_reactor ids list of bio_reactors is returned
+    # Converts that list of bio ractors to BioReactor schema
     bio_reactors = [schema_bio_reactor.BioReactorFull(
         **asdict(i)) for i in crud_bio_reactor.get_bio_reactors_by_li_id(
         database_session, bio_reactor_ids)]
 
     with open(f"{experiment_info_file_path}.json", "w") as outfile:
+        # Saves json file with the experiemtn data by using the experiment download schema
+
         json.dump(jsonable_encoder(
             schema_experiment.ExperimentDownload(
                 experiment=schema_experiment.Experiment(
                     **asdict(experiment_info)),
                 bio_reactors=bio_reactors)), outfile, indent=1)
 
+    # Pass in list of tissues and path to csv folder
+    # saves csv of tracking data for each tissue
     _tissue_tracking_to_csv(database_session, tissues, csv_path)
 
+    # Zips the experimet folder
+    # Including experiment info json, vidfolder and csv folder
     shutil.make_archive(experiment_info_file_path,
                         "zip", file_path)
 
+    # removes the csv files and folder
     shutil.rmtree(csv_path)
+    # deletes experiment info file
     os.remove(f"{experiment_info_file_path}.json")
 
+    # Adds backgroud task to delete zip archive after the file is returned
     background_tasks.add_task(
         models.delete_file, f"{experiment_info_file_path}.zip")
 
