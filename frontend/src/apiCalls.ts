@@ -55,3 +55,21 @@ export async function getPostOptions(bio_id: string) {
     return undefined;
   }
 }
+
+export async function checkExpExist(exp_idenifer: string) {
+  const res = await fetch(
+    process.env.API_URL +
+      `/experiment_exist?experiment_identifier=${exp_idenifer}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  if (res.ok) {
+    return await res.json();
+  } else {
+    return undefined;
+  }
+}

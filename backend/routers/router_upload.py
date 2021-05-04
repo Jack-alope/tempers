@@ -140,4 +140,7 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
 @router.post("/upload/experiment_archive", tags=["upload", "experiment"])
 async def upload_experiment(file: UploadFile = File(...),
                             database_session: Session = Depends(get_db)):
-    pass
+    #where_to_save = os.path.join(UPLOAD_FOLDER, "temp")
+    #shutil.unpack_archive(file, where_to_save)
+
+    return {200: "OK"}

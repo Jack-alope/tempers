@@ -1,14 +1,16 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import { getExperiments } from "../../apiCalls.js";
-  import {
-    showExperiment,
-    experiments,
-    downloadModal,
-  } from "../../components/Stores.js";
+  import Modal from "../../components/Modal.svelte";
+  import AddExperimet from "../../components/AddExperimet.svelte";
+  import UploadExperimentArchive from "../../components/UploadExperimentArchive.svelte";
+  import { showExperiment, experiments } from "../../components/Stores.js";
 
   import type { experiment_interface } from "../../interfaces";
 
+  let uploadArchive: boolean = false;
+  let downloadModal: boolean = false;
+  // let showExperiment: boolean = false;
   let experiments_value: experiment_interface[];
 
   const expunsubscribe = experiments.subscribe((value) => {
@@ -20,7 +22,7 @@
   });
 
   async function handleExperimentDownload(id: number) {
-    $downloadModal = true;
+    downloadModal = true;
     const res = await fetch(process.env.API_URL + `/experimentsJSON/${id}`, {
       method: "GET",
       headers: {
@@ -32,7 +34,7 @@
       if (file) {
         const blob = new Blob([file]);
         saveAs(blob, `${id}.zip`);
-        $downloadModal = false;
+        downloadModal = false;
       }
     } else {
       alert("Something went wrong");
@@ -123,10 +125,42 @@
   </tbody>
 </table>
 
-<button
-  class="appearance-none block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-  on:click={() => showExperiment.set(true)}>Add Experiment</button
->
+<div class="flex flex-wrap overflow-hidden">
+  <div class="w-1/2 overflow-hidden">
+    <button
+      class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      on:click={() => ($showExperiment = true)}>Add Experiment</button
+    >
+  </div>
+  <div class="w-1/2 overflow-hidden">
+    <button
+      class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      on:click={() => (uploadArchive = true)}>Upload Archive</button
+    >
+  </div>
+</div>
+
+{#if uploadArchive}
+  <Modal on:close={() => (uploadArchive = false)}>
+    <h1 slot="header">Upload Archive</h1>
+    <p slot="content">
+      <UploadExperimentArchive on:message={() => (uploadArchive = false)} />
+    </p>
+  </Modal>
+{:else if downloadModal}
+  <!-- REVIEW: this is ugly -->
+  <Modal on:close={() => (downloadModal = false)}>
+    <h1 slot="header">Download experiment</h1>
+    <p slot="content">Downloading....</p>
+  </Modal>
+{:else if $showExperiment}
+  <Modal on:close={() => ($showExperiment = false)}>
+    <h1 slot="header">Add a Experiment</h1>
+    <p slot="content">
+      <AddExperimet />
+    </p>
+  </Modal>
+{/if}
 
 <style>
 </style>

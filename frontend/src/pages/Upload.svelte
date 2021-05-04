@@ -74,7 +74,6 @@
     }),
     */
     onSubmit: (values) => {
-      console.log(values);
       addVid(values);
     },
   });

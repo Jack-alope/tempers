@@ -50,7 +50,7 @@ def add_experiment(experiment: schema_experiment.ExperimentBase,
     return new_experiment
 
 
-@router.post("/experiment_exist/",
+@router.post("/experiment_exist",
              tags=["experiment", "upload"])
 def check_experiment_exists(experiment_identifier: str = Query(...),
                             database_session: Session = Depends(get_db)):

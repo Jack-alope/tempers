@@ -1,10 +1,13 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
+  import Modal from "../../components/Modal.svelte";
   import { getBioReactors } from "../../apiCalls.js";
   import { showBioReactor, bio_reactors } from "../../components/Stores.js";
+  import AddBioReactor from "../../components/AddBioReactor.svelte";
 
   import type { bio_reactor_interface } from "../../interfaces";
 
+  // let showBioReactor: boolean = false;
   let bio_reactors_value: bio_reactor_interface[];
 
   onMount(async () => {
@@ -90,5 +93,14 @@
 
 <button
   class="appearance-none justify-center block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-  on:click={() => showBioReactor.set(true)}>Add Bio Reactor</button
+  on:click={() => ($showBioReactor = true)}>Add Bio Reactor</button
 >
+
+{#if $showBioReactor}
+  <Modal on:close={() => ($showBioReactor = false)}>
+    <h1 slot="header">Add a Bio Reactor</h1>
+    <p slot="content">
+      <AddBioReactor />
+    </p>
+  </Modal>
+{/if}
