@@ -65,7 +65,7 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
 
     tracking_obj = TissuePoints(
-        dataframe['displacement'].to_list(), dataframe['time'].to_list())
+        dataframe['displacement'].to_list(), dataframe['time'].to_list(), tissue_obj)
     tracking_obj.smooth(int(data.windows), int(data.polynomials))
     tracking_obj.find_peaks(data.thresholds, int(data.minDistances), data.xrange)
 
@@ -96,7 +96,6 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 @router.post("/caculate", tags=["analysis"])
 def download_summary(video_id=Query(...), database_session=Depends(get_db)):
     """Download summary of vid caculatios"""
-    print(video_id)
 
     tissues = crud_video.get_vid_by_id(database_session, video_id).tissues
 

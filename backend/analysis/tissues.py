@@ -12,7 +12,7 @@ sys.setrecursionlimit(10000)
 class TissuePoints:
     """Tissue class for pointfinding"""
 
-    def __init__(self, disp, time):
+    def __init__(self, disp, time, tissue_object):
         """Initalize relevant values"""
         self.window = 13
         self.poly = 3
@@ -21,6 +21,8 @@ class TissuePoints:
         self.raw_disp = disp
         self.time = time
         self.post_dist = 6
+        self.youngs = 1.33
+        self.tissue = tissue_object
 
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
@@ -96,7 +98,7 @@ class TissuePoints:
         self.contract_points = np.transpose(list(contract), axes=[1, 2, 0])
         self.relax_points = np.transpose(list(relax), axes=[1, 2, 0])
 
-        self.calculate_values()
+        self.calculate_values(base_disp)
 
     def dfdt_recursive(self, peak_index, incrementor):
         """Recursively moves along graph until it changes direction"""
@@ -131,19 +133,31 @@ class TissuePoints:
         y_axis = [self.smooth_disp[index] for index in indicies]
         return (x_axis, y_axis, indicies)
 
-    def calculate_values(self):
+    def calculate_values(self, base_disp):
         """Creates a dictionary with all calculated values"""
         self.calculated_values["dev_force"], self.calculated_values["dev_force_std"] \
-            = (5, 5)
+            = calculations.dev_force(self.youngs, self.tissue.post.radius,
+                self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                self.smooth_disp[self.peaks[2]], base_disp)
+
+        self.calculated_values["sys_force"], self.calculated_values["sys_force_std"] \
+            = calculations.force(self.youngs, self.tissue.post.radius,
+                self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                base_disp)
 
         self.calculated_values["dias_force"], self.calculated_values["dias_force_std"] \
-            = (5, 5)
-
-        self.calculated_values["beat_rate_COV"], self.calculated_values["beat_rate_COV_std"] \
-            = (5, 5)
+            = calculations.force(self.youngs, self.tissue.post.radius,
+                self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                self.smooth_disp[self.peaks[2]])
 
         self.calculated_values["beating_freq"], self.calculated_values["beating_freq_std"] \
             = calculations.beating_frequency(self.peaks[0])
+
+        self.calculated_values["beat_rate_cov"] \
+            = self.calculated_values["beating_freq_std"] / self.calculated_values["beating_freq"]
 
         self.calculated_values["t2pk"], self.calculated_values["t2pk_std"] \
             = calculations.time_between(self.peaks[0], self.contract_points[0][0])
@@ -167,7 +181,7 @@ class TissuePoints:
             = calculations.time_between(self.relax_points[2][0], self.peaks[0])
 
         self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
-            = (5, 5) # calculations.dfdt(self.contract_points[0], self.contract_points[4])
+            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
 
         self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
-            = (5, 5) # calculations.dfdt(self.relax_points[0], self.relax_points[4])
+            = calculations.dfdt(self.relax_points[0], self.relax_points[4])

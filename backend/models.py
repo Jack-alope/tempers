@@ -127,10 +127,11 @@ class TissueCalculatedData(Base):
 
     dev_force: float = Column(Float)
     dev_force_std: float = Column(Float)
+    sys_force: float = Column(Float)
+    sys_force_std: float = Column(Float)
     dias_force: float = Column(Float)
     dias_force_std: float = Column(Float)
-    beat_rate_COV: float = Column(Float)
-    beat_rate_COV_std: float = Column(Float)
+    beat_rate_cov: float = Column(Float)
     beating_freq: float = Column(Float)
     beating_freq_std: float = Column(Float)
     t2pk: float = Column(Float)
