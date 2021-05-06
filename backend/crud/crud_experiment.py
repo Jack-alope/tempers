@@ -23,6 +23,12 @@ def get_experiment(database_session: Session, exp_id: int):
         models.Experiment.id == exp_id).first()
 
 
+def get_experiment_by_idenifier(database_session: Session, experiment_idenifer: str):
+    """Retunrs experiment by idenifer"""
+    return database_session.query(models.Experiment).filter(
+        models.Experiment.experiment_idenifer == experiment_idenifer).first()
+
+
 def get_experiment_vid(database_session: Session, exp_id: int):
     """Retunrs experiment by id"""
     return database_session.query(models.Experiment, models.Video.id).join(
@@ -52,6 +58,15 @@ def delete_experiment(database_session: Session, exp_id: int):
     except FileNotFoundError:
         print("file doesnt not exsit")
         return True
+    except Exception as e:
+        print(e)
+
+
+def delete_experiment_by_identifer(database_session: Session, experiment_idenifer: str):
+    exp = get_experiment_by_idenifier(database_session, experiment_idenifer)
+
+    if exp:
+        delete_experiment(database_session, exp.id)
 
 
 def check_experiment_idetifyer_exsits(database_session: Session, experiment_idenifer: str):

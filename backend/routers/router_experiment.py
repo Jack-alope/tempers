@@ -119,7 +119,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
 
         json.dump(jsonable_encoder(
             schema_experiment.ExperimentDownload(
-                experiment=schema_experiment.Experiment(
+                experiment=schema_experiment.ExperimentFull(
                     **asdict(experiment_info)),
                 bio_reactors=bio_reactors)), outfile, indent=1)
 

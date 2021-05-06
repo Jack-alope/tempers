@@ -24,7 +24,7 @@ class TissueLater(TissueBase):
 
 
 class Tissue(TissueBase):
-    id: int
+    id: Optional[int]
     cross_section_dist: Optional[float]
     # tissue_tracking: List[schema_tissue_tracking.TissueTrackingBase]
     tissue_caculated_data: Optional[schema_tissue_calculated_data.TissueCalculatedDataBase]

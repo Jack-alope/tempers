@@ -5,6 +5,7 @@ from typing import List
 
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy import exists
 
 import models
@@ -48,6 +49,8 @@ def delete_bio_reactor(database_session: Session, bio_id: int):
         return True
     except IntegrityError:
         return False
+    except UnmappedInstanceError:
+        print("bio does not exsists")
 
 
 def check_bio_reactor_number_exsits(database_session: Session,
