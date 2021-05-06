@@ -16,23 +16,25 @@
   });
   async function handleVideoSelected() {
     vidSelected = true;
-    const res = await fetch(
-      process.env.API_URL + `/selectedVideo?video_id=${video_id_value}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    if (video_id_value) {
+      const res = await fetch(
+        process.env.API_URL + `/selectedVideo?video_id=${video_id_value}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    if (res.ok) {
-      const response_json = await res.json();
-      console.log(response_json);
-      image_path = response_json.image_path;
-      tissue_count = response_json.number_tissues;
-    } else {
-      alert("Something went wrong");
+      if (res.ok) {
+        const response_json = await res.json();
+        console.log(response_json);
+        image_path = response_json.image_path;
+        tissue_count = response_json.number_tissues;
+      } else {
+        alert("Something went wrong");
+      }
     }
   }
 

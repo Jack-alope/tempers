@@ -14,8 +14,8 @@ from sqlalchemy.orm import relationship
 
 from database import Base
 
-from schemas import schema_tissue, schema_tissue_calculated_data, schema_video, \
-    schema_tissue_tracking, schema_post
+from schemas import schema_tissue, schema_tissue_calculated_data,\
+    schema_video, schema_post
 
 tz = timezone('EST')
 

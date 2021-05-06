@@ -5,6 +5,7 @@ import os
 from typing import List
 import shutil
 import json
+from dataclasses import asdict
 
 from werkzeug.utils import secure_filename
 
@@ -17,13 +18,19 @@ import pandas as pd
 
 import models
 from database import get_db
-from crud import crud_video, crud_tissue, crud_tissue_tracking, crud_experiment, crud_bio_reactor
-from schemas import schema_video, schema_tissue
+from crud import crud_video, crud_tissue, crud_tissue_tracking, \
+    crud_experiment, crud_bio_reactor, crud_post, crud_tissue_caculations
+from schemas import schema_video, schema_tissue, schema_experiment
 
 
 router = APIRouter()
 
 UPLOAD_FOLDER = models.UPLOAD_FOLDER
+
+
+def _save_file(file, path: str):
+    with open(path, "wb") as buffer:
+        shutil.copyfileobj(file, buffer)
 
 
 def save_video_file(vid_info, vid_file, database_session):
@@ -35,7 +42,7 @@ def save_video_file(vid_info, vid_file, database_session):
 
     # gets save loaction uploadfolder/expermentnum/date/vid
     where_to_save = os.path.join(
-        UPLOAD_FOLDER, experiment_info.experiment_idenifer, date_string, 'videoFiles')
+        UPLOAD_FOLDER, experiment_info.experiment_idenifer, 'videos')
 
     # cheacks to make sure the save location exists if not exists
     models.check_path_exisits(where_to_save)
@@ -58,8 +65,7 @@ def save_video_file(vid_info, vid_file, database_session):
     vid_info.save_location = path_to_file
 
     # saves file
-    with open(path_to_file, "wb") as buffer:
-        shutil.copyfileobj(vid_file.file, buffer)
+    _save_file(vid_file.file, path_to_file)
 
     vid = crud_video.create_video(database_session, vid_info)
 
@@ -84,14 +90,14 @@ def save_csv_file(vid_info, file, database_session):
     # creates path to file
     path_to_file = os.path.join(where_to_save, safe_filename)
 
-    with open(path_to_file, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    _save_file(file.file, path_to_file)
 
     vid = crud_video.create_video(database_session, vid_info)
     return (vid.id, path_to_file)
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate], vid_id: int, database_session: Session):
+def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
+                vid_id: int, database_session: Session):
     """Adds tissues to databse"""
 
     tissue_id = 0
@@ -132,5 +138,136 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
         crud_tissue_tracking.create_tissue_tracking(
             database_session, tissue.id, dataframe)
         models.delete_file(tup[1])
+
+    return {200: "OK"}
+
+
+def _unzip_and_delete(archive_path, where_to_save):
+    shutil.unpack_archive(archive_path, where_to_save)
+    os.remove(archive_path)
+
+
+def _add_experiment_to_db(database_session, experiment_info, bio_ids, post_ids):
+
+    # REVIEW: Proablly dont want to just delete
+    crud_experiment.delete_experiment(database_session, experiment_info.id)
+    crud_experiment.delete_experiment_by_identifer(
+        database_session, experiment_info.experiment_idenifer)
+
+    delattr(experiment_info, "id")
+    delattr(experiment_info, "vids")
+
+    experiment = crud_experiment.create_experiment(
+        database_session, experiment_info)
+
+    return (experiment.id, experiment.experiment_idenifer)
+
+
+def _add_bio_reactos_to_db(database_session, bio_reactors_info):
+    bio_ids = {}
+    post_ids = {}
+    for bio in bio_reactors_info:
+        print("hiii")
+        print(bio.id)
+        old_id = bio.id
+        # REVIEW: Probally dont want to just delete
+        crud_bio_reactor.delete_bio_reactor(database_session, old_id)
+        posts = bio.posts
+        delattr(bio, "id")
+        delattr(bio, "posts")
+        new_bio = crud_bio_reactor.create_bio_reactor(database_session, bio)
+        bio_ids[old_id] = new_bio.id
+        for post in posts:
+            old_post_id = post.id
+            delattr(post, "id")
+            new_post = crud_post.create_post(
+                database_session, post, new_bio.id)
+            post_ids[old_post_id] = new_post.id
+
+    return (bio_ids, post_ids)
+
+
+def _add_vids_to_db(database_session: Session, vids,
+                    experiment_id: int, bio_ids: dict, post_ids: dict):
+    for vid in vids:
+        #old_id = vid.id
+        # REVIEW: Probally dont want to just delete
+        #crud_video.delete_video(database_session, old_id)
+        tissues = vid.tissues
+        # delattr(vid, "id")
+        # delattr(vid, "tissues")
+        bio_id = bio_ids[vid.bio_reactor_id]
+        print(bio_id)
+        delattr(vid, "bio_reactor_id")
+        vid = schema_video.VideoCreate(
+            **dict(vid), experiment_id=experiment_id,
+            bio_reactor_id=bio_id,)
+        # setattr(vid, "experiment_id", experiment_id)
+        # setattr(vid, "bio_reactor_id", bio_ids[vid.bio_reactor_id])
+        new_vid_id = crud_video.create_video(database_session, vid).id
+
+        for tissue in tissues:
+            post_id = post_ids[tissue.post_id]
+            delattr(tissue, "post_id")
+            tissue_caculated = dict(tissue.tissue_caculated_data)
+            delattr(tissue, "tissue_caculated_data")
+
+            tissue = schema_tissue.Tissue(
+                **dict(tissue), vid_id=new_vid_id, post_id=post_id)
+            new_tissue_id = crud_tissue.create_tissue(
+                database_session, tissue).id
+
+            crud_tissue_caculations.create(
+                database_session, tissue_caculated, new_tissue_id)
+
+
+def _expirment_file_unpack(database_session,  dir_path):
+    print("here")
+    print(dir_path)
+
+    json_file, = [os.path.join(dir_path, f) for f in os.listdir(
+        dir_path) if f.endswith('.json')]
+
+    with open(json_file) as f:
+        data: schema_experiment.ExperimentDownload = schema_experiment.ExperimentDownload(
+            **json.load(f))
+
+    vids = data.experiment.vids
+
+    bio_ids, post_ids = _add_bio_reactos_to_db(
+        database_session, data.bio_reactors)
+    experiment_id, experiment_idenifer = _add_experiment_to_db(
+        database_session, data.experiment, bio_ids, post_ids)
+
+    _add_vids_to_db(database_session, vids,
+                    experiment_id, bio_ids, post_ids)
+
+    return experiment_idenifer
+
+
+@router.post("/upload/experiment_archive", tags=["upload", "experiment"])
+async def upload_experiment(file: UploadFile = File(...),
+                            database_session: Session = Depends(get_db)):
+
+    # TODO: add Tracking data
+
+    where_to_save = os.path.join(UPLOAD_FOLDER, "temp")
+    models.check_path_exisits(where_to_save)
+
+    safe_filename = secure_filename(file.filename)
+
+    archive_path = os.path.join(where_to_save, safe_filename)
+
+    _save_file(file.file, archive_path)
+
+    _unzip_and_delete(archive_path, where_to_save)
+
+    experiment_idenifer = _expirment_file_unpack(
+        database_session, where_to_save)
+
+    shutil.move(os.path.join(where_to_save, "videos"), os.path.join(
+        UPLOAD_FOLDER, experiment_idenifer, "videos"))
+
+    shutil.rmtree(where_to_save)
 
     return {200: "OK"}

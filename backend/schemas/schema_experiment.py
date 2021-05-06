@@ -16,6 +16,7 @@ class ExperimentBase(BaseModel):
 
 
 class Experiment(ExperimentBase):
+    id: int
     vids: List[schema_video.Video]
 
 

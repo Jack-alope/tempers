@@ -1,5 +1,5 @@
 /* 
-TODO: make this not gloable 
+TODO: make this not gloabl 
 */
 
 #canvas {
@@ -25,36 +25,7 @@ TODO: make this not gloable
 }
 
 #pic {
+  /* FIXME: this shouldnt be hard coded */
   height: 540px;
   width: 960px;
-}
-
-/* table cs for show html */
-table {
-  width: 95%;
-  margin: 40px auto;
-  table-layout: auto;
-}
-
-table,
-th,
-td {
-  border: 1px solid black;
-}
-
-td {
-  text-align: center;
-}
-
-th {
-  background-color: blue;
-  color: white;
-}
-
-tr:nth-child(even) {
-  background-color: #d4ebf2;
-}
-
-tr:hover {
-  background-color: #f2d4eb;
 }
