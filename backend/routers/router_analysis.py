@@ -72,24 +72,22 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     crud_tissue_caculations.create(
         database, tracking_obj.calculated_values, tissue_obj.id)
 
+    contractx = tracking_obj.contract_points[0][0].tolist() + \
+        tracking_obj.contract_points[2][0].tolist() + tracking_obj.contract_points[4][0].tolist()
+    contracty = tracking_obj.contract_points[0][1].tolist() + \
+        tracking_obj.contract_points[2][1].tolist() + tracking_obj.contract_points[4][1].tolist()
+    relaxx = tracking_obj.relax_points[0][0].tolist() + tracking_obj.relax_points[1][0].tolist() + \
+        tracking_obj.relax_points[2][0].tolist() + tracking_obj.relax_points[4][0].tolist()
+    relaxy = tracking_obj.relax_points[0][1].tolist() + tracking_obj.relax_points[1][1].tolist() + \
+        tracking_obj.relax_points[2][1].tolist() + tracking_obj.relax_points[4][1].tolist()
     return {'status': 'OK', 'data': {
         'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),
         'peaksx': tracking_obj.peaks[0], 'peaksy': tracking_obj.peaks[1],
         'basex': tracking_obj.basepoints[0], 'basey': tracking_obj.basepoints[1],
         'frontx': tracking_obj.frontpoints[0], 'fronty': tracking_obj.frontpoints[1],
-        'tencontx': tracking_obj.contract_points[0][0].tolist(),
-        'tenconty': tracking_obj.contract_points[0][1].tolist(),
-        'fifcontx': tracking_obj.contract_points[2][0].tolist(),
-        'fifconty': tracking_obj.contract_points[2][1].tolist(),
-        'ninecontx': tracking_obj.contract_points[4][0].tolist(),
-        'nineconty': tracking_obj.contract_points[4][1].tolist(),
-        'ninerelx': tracking_obj.relax_points[0][0].tolist(),
-        'ninerely': tracking_obj.relax_points[0][1].tolist(),
-        'fifrelx': tracking_obj.relax_points[2][0].tolist(),
-        'fifrely': tracking_obj.relax_points[2][1].tolist(),
-        # TODO: Rename to eighty
-        'tenrelx': tracking_obj.relax_points[1][0].tolist(),
-        'tenrely': tracking_obj.relax_points[1][1].tolist(),
+        'contractx': contractx, 'contracty': contracty,
+        'relaxx': relaxx, 'relaxy': relaxy,
+        'rawx': tracking_obj.time, 'rawy': tracking_obj.raw_disp_norm.tolist()
     }}
 
 

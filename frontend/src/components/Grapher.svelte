@@ -49,7 +49,6 @@
     var thresholds = [];
     var polynomials = [];
     var windows = [];
-    var buffers = [];
     var minDistances = [];
     /* -----------------------------------------------------------------------------------*/
 
@@ -77,14 +76,15 @@
         temp,
         temp,
         temp,
-        temp,
-        temp,
-        temp,
+        temp, 
+        temp, 
+        temp
       ];
       /* ------------------------------------------------------------------------------------*/
 
       /* ---------------Define Sliders Start------------------------------------------------*/
       var threshSlider = {
+        active: 6,
         len: 0.5,
         pad: {
           t: 100,
@@ -149,84 +149,14 @@
             args: ["thresh", ".9"],
           },
           {
-            label: "1",
+            label: ".99",
             method: "restyle",
-            args: ["thresh", "1"],
-          },
-        ],
-      };
-      var buffSlider = {
-        len: 0.5,
-        pad: {
-          t: 160,
-        },
-        currentvalue: {
-          xanchor: "right",
-          prefix: "Buff: ",
-          font: {
-            color: "#888",
-            size: 10,
-          },
-        },
-        steps: [
-          {
-            label: "0",
-            method: "restyle",
-            args: ["buff", "0"],
-          },
-          {
-            label: "1",
-            method: "restyle",
-            args: ["buff", "1"],
-          },
-          {
-            label: "2",
-            method: "restyle",
-            args: ["buff", "2"],
-          },
-          {
-            label: "3",
-            method: "restyle",
-            args: ["buff", "3"],
-          },
-          {
-            label: "4",
-            method: "restyle",
-            args: ["buff", "4"],
-          },
-          {
-            label: "5",
-            method: "restyle",
-            args: ["buff", "5"],
-          },
-          {
-            label: "6",
-            method: "restyle",
-            args: ["buff", "6"],
-          },
-          {
-            label: "7",
-            method: "restyle",
-            args: ["buff", "7"],
-          },
-          {
-            label: "8",
-            method: "restyle",
-            args: ["buff", "8"],
-          },
-          {
-            label: "9",
-            method: "restyle",
-            args: ["buff", "9"],
-          },
-          {
-            label: "10",
-            method: "restyle",
-            args: ["buff", "10"],
+            args: ["thresh", ".99"],
           },
         ],
       };
       var minDistSlider = {
+        active: 0,
         len: 0.5,
         x: 0.5,
         pad: {
@@ -247,59 +177,110 @@
             args: ["mdist", "0"],
           },
           {
-            label: "1",
-            method: "restyle",
-            args: ["mdist", "1"],
-          },
-          {
-            label: "2",
-            method: "restyle",
-            args: ["mdist", "2"],
-          },
-          {
-            label: "3",
-            method: "restyle",
-            args: ["mdist", "3"],
-          },
-          {
-            label: "4",
-            method: "restyle",
-            args: ["mdist", "4"],
-          },
-          {
             label: "5",
             method: "restyle",
             args: ["mdist", "5"],
-          },
-          {
-            label: "6",
-            method: "restyle",
-            args: ["mdist", "6"],
-          },
-          {
-            label: "7",
-            method: "restyle",
-            args: ["buff", "7"],
-          },
-          {
-            label: "8",
-            method: "restyle",
-            args: ["mdist", "8"],
-          },
-          {
-            label: "9",
-            method: "restyle",
-            args: ["mdist", "9"],
           },
           {
             label: "10",
             method: "restyle",
             args: ["mdist", "10"],
           },
+          {
+            label: "15",
+            method: "restyle",
+            args: ["mdist", "15"],
+          },
+          {
+            label: "20",
+            method: "restyle",
+            args: ["mdist", "20"],
+          },
+          {
+            label: "25",
+            method: "restyle",
+            args: ["mdist", "25"],
+          },
+          {
+            label: "30",
+            method: "restyle",
+            args: ["mdist", "30"],
+          },
+          {
+            label: "35",
+            method: "restyle",
+            args: ["mdist", "35"],
+          },
+          {
+            label: "40",
+            method: "restyle",
+            args: ["mdist", "40"],
+          },
+          {
+            label: "45",
+            method: "restyle",
+            args: ["mdist", "45"],
+          },
+          {
+            label: "50",
+            method: "restyle",
+            args: ["mdist", "50"],
+          },
+          {
+            label: "55",
+            method: "restyle",
+            args: ["mdist", "55"],
+          },
+          {
+            label: "60",
+            method: "restyle",
+            args: ["mdist", "60"],
+          },
+          {
+            label: "65",
+            method: "restyle",
+            args: ["mdist", "65"],
+          },
+          {
+            label: "70",
+            method: "restyle",
+            args: ["mdist", "70"],
+          },
+          {
+            label: "75",
+            method: "restyle",
+            args: ["mdist", "75"],
+          },
+          {
+            label: "80",
+            method: "restyle",
+            args: ["mdist", "80"],
+          },
+          {
+            label: "85",
+            method: "restyle",
+            args: ["mdist", "85"],
+          },
+          {
+            label: "90",
+            method: "restyle",
+            args: ["mdist", "90"],
+          },
+          {
+            label: "95",
+            method: "restyle",
+            args: ["mdist", "9555"],
+          },
+          {
+            label: "100",
+            method: "restyle",
+            args: ["mdist", "100"],
+          },
         ],
       };
       var polySlider = {
         len: 0.5,
+        active: 0,
         pad: {
           t: 220,
         },
@@ -355,6 +336,7 @@
         ],
       };
       var windSlider = {
+        active: 1,
         len: 0.5,
         x: 0.5,
         currentvalue: {
@@ -421,7 +403,6 @@
         sliders: [
           threshSlider,
           minDistSlider,
-          buffSlider,
           polySlider,
           windSlider,
         ],
@@ -436,15 +417,13 @@
       thresholds.push(".6");
       polynomials.push("3");
       windows.push("13");
-      buffers.push("3");
-      minDistances.push("5");
+      minDistances.push("0");
       /* ---------------------------------------------------------------------------------*/
       /* --------------------------Call Graphing Once with Defaults ---------------------------------*/
       let Div = document.getElementById(istring);
       toPython(
         xranges[Div.valueOf().id],
         thresholds[Div.valueOf().id],
-        buffers[Div.valueOf().id],
         polynomials[Div.valueOf().id],
         windows[Div.valueOf().id],
         minDistances[Div.valueOf().id],
@@ -460,7 +439,6 @@
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
@@ -472,7 +450,6 @@
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
@@ -490,7 +467,6 @@
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
@@ -501,7 +477,6 @@
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
@@ -512,18 +487,6 @@
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
-            polynomials[Div.valueOf().id],
-            windows[Div.valueOf().id],
-            minDistances[Div.valueOf().id],
-            Div
-          );
-        } else if (typeof eventData[0].buff != "undefined") {
-          buffers[Div.valueOf().id] = eventData[0].buff;
-          toPython(
-            xranges[Div.valueOf().id],
-            thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
@@ -535,7 +498,6 @@
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
-            buffers[Div.valueOf().id],
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
@@ -550,28 +512,23 @@
   async function toPython(
     xrange,
     thresholds,
-    buffers,
     polynomials,
     windows,
     minDistances,
     Div
   ) {
-    console.log("TO Python");
-    console.log(Div);
-    console.log(Div.valueOf().id);
+
     let value = Div.valueOf().id;
     const graph_params = {
       xrange,
       value,
       thresholds,
-      buffers,
       polynomials,
       windows,
       minDistances,
       video_id_value,
     };
     let graph_paramsJson = JSON.stringify(graph_params);
-    console.log(graph_paramsJson);
 
     const res = await fetch(process.env.API_URL + "/graphUpdate", {
       method: "POST",
@@ -584,9 +541,6 @@
     if (res.ok) {
       const response = await res.json();
       Plotly.deleteTraces(Div.valueOf().id, [
-        -9,
-        -8,
-        -7,
         -6,
         -5,
         -4,
@@ -596,10 +550,8 @@
       ]);
       Plotly.restyle(
         Div.valueOf().id,
-        "y",
-        [response.data.ys],
-        "x",
-        [response.data.xs],
+        "y", [response.data.ys],
+        "x", [response.data.xs], 
         [0]
       );
       Plotly.addTraces(Div.valueOf().id, {
@@ -607,53 +559,70 @@
         y: response.data.peaksy,
         mode: "markers",
         name: "Peaks",
+        marker: {
+          color: 'rgb(255, 179, 0)',
+          symbol: "triangle-up-dot",
+          size: 10, 
+          line: {
+            width: 1.5
+          }
+        }
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.basex,
         y: response.data.basey,
         mode: "markers",
         name: "Base",
-      });
-      /*Plotly.addTraces(Div.valueOf().id, {x: response.data.frontx,
-                                            y: response.data.fronty,
-                                            mode: 'markers', name: 'Front'})
-  
-         */
-      Plotly.addTraces(Div.valueOf().id, {
-        x: response.data.tencontx,
-        y: response.data.tenconty,
-        mode: "markers",
-        name: "Ten % Contracted",
+        marker: {
+          color: 'rgba(17, 157, 255,0.5)',
+          symbol: "triangle-right-dot",
+          size: 10, 
+          line: {
+            width: 1.5
+          }
+        }
       });
       Plotly.addTraces(Div.valueOf().id, {
-        x: response.data.fifcontx,
-        y: response.data.fifconty,
-        mode: "markers",
-        name: "Fifty % Contracted",
+        x: response.data.frontx,
+        y: response.data.fronty,
+        mode: 'markers', 
+        name: 'Front',
+        marker: {
+          symbol: "triangle-left-dot",
+          size: 10, 
+          line: {
+            width: 1.5
+          }
+        },
+        visible: "legendonly"
       });
       Plotly.addTraces(Div.valueOf().id, {
-        x: response.data.ninecontx,
-        y: response.data.nineconty,
+        x: response.data.contractx,
+        y: response.data.contracty,
         mode: "markers",
-        name: "Ninety % Contracted",
+        name: "Contractpoints (10, 50, 90%)",
+        marker: {
+          color: 'rgb(0, 131, 87)',
+          symbol: "circle-open-dot",
+          size: 7, 
+          line: {
+            width: 1.5
+          }
+        }
       });
       Plotly.addTraces(Div.valueOf().id, {
-        x: response.data.tenrelx,
-        y: response.data.tenrely,
+        x: response.data.relaxx,
+        y: response.data.relaxy,
         mode: "markers",
-        name: "Ten % Relaxed",
-      });
-      Plotly.addTraces(Div.valueOf().id, {
-        x: response.data.fifrelx,
-        y: response.data.fifrely,
-        mode: "markers",
-        name: "Fifty % Relaxed",
-      });
-      Plotly.addTraces(Div.valueOf().id, {
-        x: response.data.ninerelx,
-        y: response.data.ninerely,
-        mode: "markers",
-        name: "Ninety % Relaxed",
+        name: "Relaxpoints (10, 50, 80, 90%)",
+        marker: {
+          color: 'rgb(233, 0, 0)',
+          symbol: "circle-open-dot",
+          size: 7, 
+          line: {
+            width: 1.5
+          }
+        }
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.rawx,

@@ -23,6 +23,7 @@ class TissuePoints:
         self.post_dist = 6
         self.youngs = 1.33
         self.tissue = tissue_object
+        self.raw_disp_norm = self.post_dist - np.array(disp)
 
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
