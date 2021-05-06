@@ -8,10 +8,11 @@ class TissueCalculatedDataBase(BaseModel):
 
     dev_force: float
     dev_force_std: float
+    sys_force: float
+    sys_force_std: float
     dias_force: float
     dias_force_std: float
-    beat_rate_COV: float
-    beat_rate_COV_std: float
+    beat_rate_cov: float
     beating_freq: float
     beating_freq_std: float
     t2pk: float

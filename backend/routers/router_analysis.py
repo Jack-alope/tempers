@@ -64,7 +64,7 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
         database, tissue_obj.id)
 
     tracking_obj = TissuePoints(
-        dataframe['displacement'].to_list(), dataframe['time'].to_list())
+        dataframe['displacement'].to_list(), dataframe['time'].to_list(), tissue_obj)
     tracking_obj.smooth(int(data.windows), int(data.polynomials))
     tracking_obj.find_peaks(data.thresholds, int(
         data.minDistances), data.xrange)
