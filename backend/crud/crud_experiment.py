@@ -3,6 +3,7 @@
 CRUD for experiments
 """
 import shutil
+import logging
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -57,10 +58,10 @@ def delete_experiment(database_session: Session, exp_id: int):
     except IntegrityError:
         return False
     except FileNotFoundError:
-        print("file doesnt not exsit")
+        logging.info("file doesnt not exsit")
         return True
     except UnmappedInstanceError:
-        print("Print experiment does not exist")
+        logging.info("experiment does not exist")
 
 
 def delete_experiment_by_identifer(database_session: Session, experiment_idenifer: str):

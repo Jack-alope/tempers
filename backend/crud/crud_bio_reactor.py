@@ -2,6 +2,7 @@
 CRUD for Bio reactor
 """
 from typing import List
+import logging
 
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
@@ -50,7 +51,7 @@ def delete_bio_reactor(database_session: Session, bio_id: int):
     except IntegrityError:
         return False
     except UnmappedInstanceError:
-        print("bio does not exsists")
+        logging.info("bio does not exsists")
 
 
 def check_bio_reactor_number_exsits(database_session: Session,

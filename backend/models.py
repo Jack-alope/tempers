@@ -6,6 +6,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import List
 import os
+import logging
 
 from pytz import timezone
 from sqlalchemy import (Column, Date, ForeignKey, Integer,
@@ -217,4 +218,4 @@ def delete_file(path):
             os.remove(path)
             delete_empties()
         else:
-            print("The file does not exist")
+            logging.info("The file does not exist")
