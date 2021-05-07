@@ -1,9 +1,9 @@
 """Schema for tissue"""
-from typing import Optional, List
+from typing import Optional
 
 from pydantic import BaseModel
 
-from . import schema_tissue_calculated_data, schema_tissue_tracking
+from . import schema_tissue_calculated_data
 
 
 class TissueBase(BaseModel):
@@ -25,6 +25,7 @@ class TissueLater(TissueBase):
 
 class Tissue(TissueBase):
     id: Optional[int]
+    vid_id: Optional[int]
     cross_section_dist: Optional[float]
     # tissue_tracking: List[schema_tissue_tracking.TissueTrackingBase]
     tissue_caculated_data: Optional[schema_tissue_calculated_data.TissueCalculatedDataBase]

@@ -6,6 +6,7 @@ import shutil
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import UnmappedInstanceError
 from sqlalchemy import exists
 
 import models
@@ -58,8 +59,8 @@ def delete_experiment(database_session: Session, exp_id: int):
     except FileNotFoundError:
         print("file doesnt not exsit")
         return True
-    except Exception as e:
-        print(e)
+    except UnmappedInstanceError:
+        print("Print experiment does not exist")
 
 
 def delete_experiment_by_identifer(database_session: Session, experiment_idenifer: str):

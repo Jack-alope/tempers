@@ -36,7 +36,7 @@ class Experiment(Base):
 
     # TODO: make this Videos
     vids: List[schema_video.Video] = relationship(
-        "Video", back_populates="experiment")
+        "Video", back_populates="experiment", cascade="all, delete-orphan")
 
 
 @dataclass
@@ -64,8 +64,7 @@ class Video(Base):
     bio_reactor = relationship("BioReactor", back_populates="vids")
 
     tissues: List[schema_tissue.Tissue] = relationship(
-        "Tissue", back_populates="video",
-        cascade="all, delete-orphan")
+        "Tissue", back_populates="video", cascade="all, delete-orphan")
 
 
 @dataclass
