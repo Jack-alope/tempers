@@ -37,6 +37,7 @@ class Video(VideoBase):
     calibration_factor: Optional[float]
     tissues: List[schema_tissue.Tissue]
     save_location: Optional[str]
+    experiment_id: Optional[str]
 
 
 class VideoShow(VideoBase):

@@ -9,14 +9,18 @@ import pandas as pd
 import models
 
 
+def delete(database_session: Session, tissue_id: int):
+    database_session.query(models.TissueTracking).filter(
+        models.TissueTracking.tissue_id ==
+        tissue_id).delete(synchronize_session=False)
+
+
 def create_tissue_tracking(database_session: Session, tissue_id: int, dataframe):
     """
     Accepts the DB Session, tissue_id and a data frame
     Inserts tissue tracking data to databse
     """
-    database_session.query(models.TissueTracking).filter(
-        models.TissueTracking.tissue_id ==
-        tissue_id).delete(synchronize_session=False)
+    delete(database_session, tissue_id)
     database_session.bulk_insert_mappings(models.TissueTracking,
                                           dataframe.to_dict(orient="records"))
     database_session.commit()
