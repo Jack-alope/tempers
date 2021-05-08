@@ -5,6 +5,7 @@ import os
 from typing import List
 import shutil
 import json
+import logging
 
 from werkzeug.utils import secure_filename
 
@@ -203,7 +204,7 @@ def _tissue_tracking_csv_to_db(database_session: Session, new_tissue_id: int, ol
                 crud_tissue_tracking.create_tissue_tracking(
                     database_session, new_tissue_id, tracking_df)
             except pd.errors.EmptyDataError:
-                print("Tracking CSV Empty")
+                logging.info("Tracking CSV Empty")
 
 
 def _add_vids_to_db(database_session: Session, vids,
