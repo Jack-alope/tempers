@@ -47,13 +47,16 @@ class VideoShow(VideoBase):
     calibration_factor: Optional[float]
     bio_reactor_number: int
     experiment_idenifer: str
+    tracked: Optional[bool]
+    anaylized: Optional[bool]
+    save_location: Optional[str]
 
 
 class PostSelection(BaseModel):
     boxes: List[List[float]]
     cross_points: List[List[float]]
     cal_points: List[List[float]]
-    video_id_value: int
+    video_id: int
     calibration_distance: int
 
 

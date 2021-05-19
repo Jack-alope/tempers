@@ -8,7 +8,7 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('tailwind-hamburgers'), require('@tailwindcss/forms')],
   purge: {
     content: [
       "./src/**/*.svelte",

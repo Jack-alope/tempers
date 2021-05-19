@@ -1,24 +1,15 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import SelectPosts from "../components/SelectPosts.svelte";
-  import SelectVideo from "../components/SelectVideo.svelte";
 
-  import { video_id } from "../components/Stores.js";
-
-  let vidSelected = false;
+  let video_id: number;
   let tissue_count: number;
   let image_path: string;
-  let video_id_value: number;
 
-  console.log(image_path);
-
-  const unsubscribe = video_id.subscribe((value) => {
-    video_id_value = value;
-  });
-  async function handleVideoSelected() {
-    vidSelected = true;
-    if (video_id_value) {
+  async function handleVideoSelected(video_id) {
+    if (video_id) {
       const res = await fetch(
-        process.env.API_URL + `/selectedVideo?video_id=${video_id_value}`,
+        process.env.API_URL + `/selectedVideo?video_id=${video_id}`,
         {
           method: "GET",
           headers: {
@@ -26,10 +17,8 @@
           },
         }
       );
-
       if (res.ok) {
         const response_json = await res.json();
-        console.log(response_json);
         image_path = response_json.image_path;
         tissue_count = response_json.number_tissues;
       } else {
@@ -37,6 +26,12 @@
       }
     }
   }
+
+  onMount(async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    video_id = parseInt(urlParams.get("video_id"));
+    await handleVideoSelected(video_id);
+  });
 
   async function handlePostsSelected(event) {
     const boxes = event.detail.boxes;
@@ -47,7 +42,7 @@
       boxes,
       cal_points,
       cross_points,
-      video_id_value,
+      video_id,
       calibration_distance,
     };
 
@@ -67,12 +62,8 @@
   }
 </script>
 
-{#if !vidSelected}
-  <SelectVideo on:video_selected={handleVideoSelected} analysis_bool={false} />
-{:else}
-  <SelectPosts
-    on:posts_selected={handlePostsSelected}
-    {image_path}
-    {tissue_count}
-  />
-{/if}
+<SelectPosts
+  on:posts_selected={handlePostsSelected}
+  {image_path}
+  {tissue_count}
+/>

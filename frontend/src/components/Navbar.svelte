@@ -14,16 +14,6 @@
           <a href="/upload" class="p-3 text-white hover:text-black">Upload</a>
         </li>
         <li class="sm:inline-block">
-          <a href="/tracking" class="p-3 text-white hover:text-black"
-            >Tracking</a
-          >
-        </li>
-        <li class="sm:inline-block">
-          <a href="/analysis" class="p-3 text-white hover:text-black"
-            >Analysis</a
-          >
-        </li>
-        <li class="sm:inline-block">
           <a href="/database" class="p-3 text-white hover:text-black"
             >Database</a
           >

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import Modal from "../../components/Modal.svelte";
   import { getBioReactors } from "../../apiCalls.js";
   import { showBioReactor, bio_reactors } from "../../components/Stores.js";
@@ -7,15 +7,10 @@
 
   import type { bio_reactor_interface } from "../../interfaces";
 
-  // let showBioReactor: boolean = false;
   let bio_reactors_value: bio_reactor_interface[];
 
   onMount(async () => {
     await getBioReactors();
-  });
-
-  const unsubscribe = bio_reactors.subscribe((value) => {
-    bio_reactors_value = value;
   });
 
   async function handleBioReactorDel(id: number) {
@@ -27,7 +22,7 @@
     });
     if (res.ok) {
       if ((await res.json()) == true) {
-        bio_reactors_value = bio_reactors_value.filter(
+        $bio_reactors = $bio_reactors.filter(
           (bio_reactor) => bio_reactor.id !== id
         );
         $bio_reactors = bio_reactors_value;
@@ -38,8 +33,6 @@
       alert("Something went wrong");
     }
   }
-
-  onDestroy(unsubscribe);
 </script>
 
 <table class="table-auto min-w-full divide-y divide-grey-200">
@@ -68,10 +61,10 @@
     </tr>
   </thead>
   <tbody class="bg-white divide-y divide-gray-200">
-    {#if !bio_reactors_value}
+    {#if !$bio_reactors}
       No Bio Reactors
     {:else}
-      {#each bio_reactors_value as bio_reactor}
+      {#each $bio_reactors as bio_reactor}
         <tr>
           <td class="px-6 py-4 whitespace-nowrap">{bio_reactor.id}</td>
           <td class="px-6 py-4 whitespace-nowrap"
