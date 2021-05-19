@@ -16,7 +16,7 @@ class AnalysisBase(BaseModel):
     polynomials: int
     windows: int
     minDistances: int
-    video_id_value: int
+    video_id: int
 
     class Config:
         orm_mode = True

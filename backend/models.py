@@ -12,6 +12,7 @@ from pytz import timezone
 from sqlalchemy import (Column, Date, ForeignKey, Integer,
                         String, Float)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import Boolean
 
 from database import Base
 
@@ -57,6 +58,9 @@ class Video(Base):
     calibration_factor: float = Column(Float, nullable=True)
 
     save_location: String = Column(String(120), nullable=True)
+
+    tracked: bool = Column(Boolean, nullable=True, default=False)
+    anaylized: bool = Column(Boolean, nullable=True, default=False)
 
     experiment_id: int = Column(Integer, ForeignKey('experiment.id'))
     experiment = relationship("Experiment", back_populates="vids")

@@ -57,7 +57,7 @@ async def analyze(video_id: int = Query(...), database: Session = Depends(get_db
 def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends(get_db)):
     """Function gets called to update graph with new parameters"""
 
-    video_object = crud_video.get_vid_by_id(database, data.video_id_value)
+    video_object = crud_video.get_vid_by_id(database, data.video_id)
 
     tissue_obj = video_object.tissues[data.value]
     dataframe = crud_tissue_tracking.get_tracking_by_id(
@@ -71,6 +71,7 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
     crud_tissue_caculations.create(
         database, tracking_obj.calculated_values, tissue_obj.id)
+    crud_video.video_anaylized(database, data.video_id)
 
     return {'status': 'OK', 'data': {
         'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),

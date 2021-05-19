@@ -95,10 +95,18 @@ def update_cal_cross(database_session: Session, video_id,
     vid = get_vid_by_id(database_session, video_id)
     vid.calibration_distance = cal_dist
     vid.calibration_factor = cal_factor
+    vid.tracked = True
 
     tissues = vid.tissues
     for i, tissue in enumerate(tissues):
         tissue.cross_section_dist = cross_dist_passed[i]
 
+    database_session.commit()
+    database_session.refresh(vid)
+
+
+def video_anaylized(database_session: Session, vid_id: int):
+    vid = get_vid_by_id(database_session, vid_id)
+    vid.anaylized = True
     database_session.commit()
     database_session.refresh(vid)

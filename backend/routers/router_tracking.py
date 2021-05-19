@@ -13,6 +13,7 @@ from schemas import schema_video
 from trackings.trackers import TissueTracker
 router = APIRouter()
 
+
 def coord_distance(coords_list):
     '''
     Accepts a list of coords
@@ -50,11 +51,11 @@ async def box_coordinates(post_info: schema_video.PostSelection,
     cross_dist_mm = list(map(lambda x: x * cal_factor, cross_dist_pix))
 
     crud_video.update_cal_cross(
-        database, post_info.video_id_value,
+        database, post_info.video_id,
         post_info.calibration_distance,
         cal_factor, cross_dist_mm)
 
-    video_object = crud_video.get_vid_by_id(database, post_info.video_id_value)
+    video_object = crud_video.get_vid_by_id(database, post_info.video_id)
 
     TissueTracker(database, post_info.boxes, cal_factor, video_object)
 

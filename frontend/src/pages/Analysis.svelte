@@ -1,21 +1,16 @@
 <script lang="ts">
-  import SelectVideo from "../components/SelectVideo.svelte";
+  import { onMount } from "svelte";
   import Grapher from "../components/Grapher.svelte";
 
-  import { video_id, json_data_list } from "../components/Stores.js";
+  import { json_data_list } from "../components/Stores.js";
 
-  let vidSelected = false;
+  let video_id: number;
 
-  let video_id_value: number;
   let nums, freqs, types;
 
-  video_id.subscribe((value) => {
-    video_id_value = value;
-  });
-
-  async function handleVideoSelected() {
+  async function handleVideoSelected(video_id: number) {
     const res = await fetch(
-      process.env.API_URL + `/analyze?video_id=${video_id_value}`,
+      process.env.API_URL + `/analyze?video_id=${video_id}`,
       {
         method: "GET",
         headers: {
@@ -30,12 +25,16 @@
       nums = response_json.nums;
       freqs = response_json.freqs;
       types = response_json.types;
-
-      vidSelected = true;
     } else {
       alert("Something went wrong");
     }
   }
+
+  onMount(async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    video_id = parseInt(urlParams.get("video_id"));
+    await handleVideoSelected(video_id);
+  });
 </script>
 
 <svelte:head>
@@ -48,8 +47,6 @@
 
 <h1>Analysis</h1>
 
-{#if !vidSelected}
-  <SelectVideo on:video_selected={handleVideoSelected} />
-{:else}
-  <Grapher {nums} {freqs} {types} />
+{#if nums && freqs && types && video_id}
+  <Grapher {nums} {freqs} {types} {video_id} />
 {/if}
