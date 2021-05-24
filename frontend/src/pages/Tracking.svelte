@@ -55,7 +55,7 @@
     });
 
     if (res.ok) {
-      window.location.replace(`analysis?video_id=${video_id}`);
+      window.location.replace(`/database`);
     } else {
       alert("Something went wrong");
     }
