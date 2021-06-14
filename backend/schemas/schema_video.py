@@ -9,7 +9,7 @@ from . import schema_tissue
 
 class VideoBase(BaseModel):
     date_recorded: Optional[date]
-    frequency: Optional[int]
+    frequency: Optional[float]
 
     # bio_reactor_number: int
 
