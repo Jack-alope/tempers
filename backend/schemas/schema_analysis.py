@@ -12,7 +12,6 @@ class AnalysisBase(BaseModel):
     xrange: List
     value: int
     thresholds: float
-    buffers: int
     polynomials: int
     windows: int
     minDistances: int
