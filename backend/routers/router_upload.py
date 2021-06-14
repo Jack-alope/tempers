@@ -86,6 +86,7 @@ def save_csv_file(vid_info, file, database_session):
     safe_filename = secure_filename(new_filename)
 
     vid_info.save_location = None
+    vid_info.tracked = True
 
     # creates path to file
     path_to_file = os.path.join(where_to_save, safe_filename)

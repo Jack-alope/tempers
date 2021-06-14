@@ -22,6 +22,7 @@ class VideoCreate(VideoBase):
     bio_reactor_id: int
     save_location: Optional[str]
     experiment_id: Optional[str]
+    tracked: Optional[bool]
 
 
 class VideoInfo(VideoBase):
