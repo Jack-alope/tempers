@@ -9,6 +9,7 @@ from scipy.signal import savgol_filter
 from . import calculations
 sys.setrecursionlimit(10000)
 
+
 class TissuePoints:
     """Tissue class for pointfinding"""
 
@@ -53,7 +54,7 @@ class TissuePoints:
             self.min_dist = min_dist
 
         unformatted = np.array(peakutils.indexes(
-                self.smooth_disp, self.thresh, self.min_dist)[1:-1])
+            self.smooth_disp, self.thresh, self.min_dist)[1:-1])
 
         if not ((x_range is None) | (x_range == [0, 0])):
             unformatted = self.crop_peaks(unformatted, x_range[0], x_range[1])
@@ -64,7 +65,7 @@ class TissuePoints:
 
     def crop_peaks(self, peak_list, start, end):
         """crops peaks to allow for time region selection"""
-        mins = lambda lists, ind: np.abs(np.array(lists) - ind).argmin()
+        def mins(lists, ind): return np.abs(np.array(lists) - ind).argmin()
         start_ind = mins(self.time, start)
         end_ind = mins(self.time, end)
         peak_start = mins(peak_list, start_ind) + 2
@@ -88,7 +89,8 @@ class TissuePoints:
         """Finds the points for 10, 50, 90% contracted and relaxed"""
         percents = [.1, .2, .5, .8, .9]
 
-        pnt = lambda p_i, b_i, b_d: [self.get_points(p_i, b_i, b_d, p) for p in percents]
+        def pnt(p_i, b_i, b_d): return [
+            self.get_points(p_i, b_i, b_d, p) for p in percents]
 
         base_disp = [(basepoint + self.frontpoints[1][i]) /
                      2 for i, basepoint in enumerate(self.basepoints[1])]
@@ -113,15 +115,19 @@ class TissuePoints:
         Returns 90, 50, 10% points between peak and a basepoint.
         Using linear approximation.
         """
-        target_val = (percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
+        target_val = (
+            percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
 
         def cycle(step):
             for new_index in range(peak_index, base_index, step):
                 if self.smooth_disp[new_index] < target_val:
-                    y_diff=np.absolute(self.smooth_disp[new_index]-self.smooth_disp[new_index-step])
-                    x_diff=np.absolute(self.time[new_index]-self.time[new_index-step])
+                    y_diff = np.absolute(
+                        self.smooth_disp[new_index]-self.smooth_disp[new_index-step])
+                    x_diff = np.absolute(
+                        self.time[new_index]-self.time[new_index-step])
                     slope = (y_diff / x_diff) * -1 * step
-                    target_x = ((target_val-self.smooth_disp[new_index])/slope)+self.time[new_index]
+                    target_x = (
+                        (target_val-self.smooth_disp[new_index])/slope)+self.time[new_index]
                     return [target_x, target_val]
             return [self.time[base_index], self.smooth_disp[base_index]]
 
@@ -138,21 +144,21 @@ class TissuePoints:
         """Creates a dictionary with all calculated values"""
         self.calculated_values["dev_force"], self.calculated_values["dev_force_std"] \
             = calculations.dev_force(self.youngs, self.tissue.post.radius,
-                self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
-                self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
-                self.smooth_disp[self.peaks[2]], base_disp)
+                                     self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                                     self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                                     self.smooth_disp[self.peaks[2]], base_disp)
 
         self.calculated_values["sys_force"], self.calculated_values["sys_force_std"] \
             = calculations.force(self.youngs, self.tissue.post.radius,
-                self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
-                self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
-                base_disp)
+                                 self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                                 self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                                 base_disp)
 
         self.calculated_values["dias_force"], self.calculated_values["dias_force_std"] \
             = calculations.force(self.youngs, self.tissue.post.radius,
-                self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
-                self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
-                self.smooth_disp[self.peaks[2]])
+                                 self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                                 self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                                 self.smooth_disp[self.peaks[2]])
 
         self.calculated_values["beating_freq"], self.calculated_values["beating_freq_std"] \
             = calculations.beating_frequency(self.peaks[0])

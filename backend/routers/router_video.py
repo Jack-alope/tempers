@@ -2,7 +2,8 @@
 Router for Video
 """
 import os
-from typing import List
+from typing import List, Dict
+from collections import defaultdict
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
@@ -61,7 +62,7 @@ async def selected_video(video_id: int = Query(...), database: Session = Depends
     return JSONResponse(content=res)
 
 
-@router.get("/videos_show", response_model=List[schema_video.VideoShow], tags=["Videos"])
+@router.get("/videos_show", response_model=Dict[str, List[schema_video.VideoShow]], tags=["Videos"])
 def get_vids_reactors(database: Session = Depends(get_database)):
     """
     Gets all vids from db
@@ -71,7 +72,13 @@ def get_vids_reactors(database: Session = Depends(get_database)):
 
     if not videos:
         raise HTTPException(status_code=404, detail="Videos not found")
-    return videos
+
+    result = defaultdict(list)
+
+    for vid in videos:
+        result[vid.experiment_idenifer].append(vid)
+
+    return dict(result)
 
 
 @router.delete("/video/{vid_id}", tags=["Videos"])

@@ -1,18 +1,7 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
-  import { getVideos } from "../../apiCalls.js";
-  import { videos } from "../../components/Stores.js";
   import type { video_interface } from "../../interfaces";
 
-  onMount(async () => {
-    await getVideos();
-  });
-
-  let videos_value: video_interface[];
-
-  const vidspunsubscribe = videos.subscribe((value) => {
-    videos_value = value;
-  });
+  export let videos: video_interface[];
 
   async function handleVideoDel(id: number) {
     const res = await fetch(process.env.API_URL + `/video/${id}`, {
@@ -22,14 +11,11 @@
       },
     });
     if (res.ok) {
-      videos_value = videos_value.filter((video) => video.id !== id);
-      $videos = videos_value;
+      videos = videos.filter((video) => video.id !== id);
     } else {
       alert("Something went wrong");
     }
   }
-
-  onDestroy(vidspunsubscribe);
 </script>
 
 <table class="table-auto min-w-full divide-y divide-gray-200">
@@ -39,11 +25,6 @@
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         >Id</th
-      >
-      <th
-        scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Date Upload</th
       >
       <th
         scope="col"
@@ -58,23 +39,19 @@
       <th
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Calibration Distance</th
-      >
-      <th
-        scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Calibration Factor</th
-      >
-      <th
-        scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Experiment Idenifiyer</th
-      >
-      <th
-        scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         >Bio Reactor Number</th
       >
+      <th
+        scope="col"
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >Track</th
+      >
+      <th
+        scope="col"
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >Analyse</th
+      >
+
       <th
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -82,25 +59,41 @@
       >
     </tr>
   </thead>
+
   <tbody class="bg-white divide-y divide-gray-200">
-    {#if !videos_value}
+    {#if !videos}
       No Videos
     {:else}
-      {#each videos_value as video}
+      {#each videos as video}
         <tr>
           <td class="px-6 py-4 whitespace-nowrap">{video.id}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{video.date_uploaded}</td>
           <td class="px-6 py-4 whitespace-nowrap">{video.date_recorded}</td>
           <td class="px-6 py-4 whitespace-nowrap">{video.frequency}</td>
-          <td class="px-6 py-4 whitespace-nowrap"
-            >{video.calibration_distance}</td
-          >
-          <td class="px-6 py-4 whitespace-nowrap">{video.calibration_factor}</td
-          >
-          <td class="px-6 py-4 whitespace-nowrap"
-            >{video.experiment_idenifer}</td
-          >
           <td class="px-6 py-4 whitespace-nowrap">{video.bio_reactor_number}</td
+          >
+          <td class="px-6 py-4 whitespace-nowrap">
+            <button
+              class="{video.save_location
+                ? 'bg-green-500 hover:bg-green-300'
+                : 'bg-gray-300'}  text-white font-bold py-2 px-4 rounded"
+              disabled={!video.save_location}
+              title={video.save_location ? null : "No Video To Track"}
+              on:click={() =>
+                (window.location.href = `/tracking?video_id=${video.id}`)}
+              >Track</button
+            >
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap"
+            ><button
+              class="{video.tracked
+                ? 'bg-green-500 hover:bg-green-600'
+                : 'bg-gray-300'}  text-white font-bold py-2 px-4 rounded"
+              disabled={!video.tracked}
+              title={video.tracked ? null : "Must Track First"}
+              on:click={() =>
+                (window.location.href = `/analysis?video_id=${video.id}`)}
+              >Analyse</button
+            ></td
           >
           <td class="px-6 py-4 whitespace-nowrap"
             ><button

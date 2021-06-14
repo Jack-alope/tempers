@@ -1,6 +1,8 @@
 """
 Fastapi Main
 """
+import logging
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,10 @@ import models
 from database import engine
 from routers import router_upload, router_tracking, router_analysis, \
     router_experiment, router_bio_reactor, router_video
+
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
+                    datefmt='%Y-%m-%d:%H:%M:%S',
+                    level=logging.DEBUG, filename='main.log')
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -21,6 +27,7 @@ app.include_router(router_bio_reactor.router)
 app.include_router(router_video.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+logging.info("New Run Started")
 
 
 app.add_middleware(

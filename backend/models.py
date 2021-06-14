@@ -6,11 +6,13 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import List
 import os
+import logging
 
 from pytz import timezone
 from sqlalchemy import (Column, Date, ForeignKey, Integer,
                         String, Float)
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.sqltypes import Boolean
 
 from database import Base
 
@@ -36,7 +38,7 @@ class Experiment(Base):
 
     # TODO: make this Videos
     vids: List[schema_video.Video] = relationship(
-        "Video", back_populates="experiment")
+        "Video", back_populates="experiment", cascade="all, delete-orphan")
 
 
 @dataclass
@@ -57,6 +59,9 @@ class Video(Base):
 
     save_location: String = Column(String(120), nullable=True)
 
+    tracked: bool = Column(Boolean, nullable=True, default=False)
+    anaylized: bool = Column(Boolean, nullable=True, default=False)
+
     experiment_id: int = Column(Integer, ForeignKey('experiment.id'))
     experiment = relationship("Experiment", back_populates="vids")
 
@@ -64,8 +69,7 @@ class Video(Base):
     bio_reactor = relationship("BioReactor", back_populates="vids")
 
     tissues: List[schema_tissue.Tissue] = relationship(
-        "Tissue", back_populates="video",
-        cascade="all, delete-orphan")
+        "Tissue", back_populates="video", cascade="all, delete-orphan")
 
 
 @dataclass
@@ -218,4 +222,4 @@ def delete_file(path):
             os.remove(path)
             delete_empties()
         else:
-            print("The file does not exist")
+            logging.info("The file does not exist")

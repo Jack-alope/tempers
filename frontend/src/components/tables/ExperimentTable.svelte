@@ -10,12 +10,6 @@
 
   let uploadArchive: boolean = false;
   let downloadModal: boolean = false;
-  // let showExperiment: boolean = false;
-  let experiments_value: experiment_interface[];
-
-  const expunsubscribe = experiments.subscribe((value) => {
-    experiments_value = value;
-  });
 
   onMount(async () => {
     await getExperiments();
@@ -50,10 +44,9 @@
     });
     if (res.ok) {
       if ((await res.json()) == true) {
-        experiments_value = experiments_value.filter(
+        $experiments = $experiments.filter(
           (experiment) => experiment.id !== id
         );
-        $experiments = experiments_value;
       } else {
         alert("Cannot delete Experimet");
       }
@@ -61,8 +54,6 @@
       alert("Something went wrong");
     }
   }
-
-  onDestroy(expunsubscribe);
 </script>
 
 <table class="table-auto min-w-full divide-y divide-gray-200">
@@ -96,10 +87,10 @@
     </tr>
   </thead>
   <tbody class="bg-white divide-y divide-gray-200">
-    {#if !experiments_value}
+    {#if !$experiments}
       No Experiments
     {:else}
-      {#each experiments_value as experiment}
+      {#each $experiments as experiment}
         <tr>
           <td class="px-6 py-4 whitespace-nowrap">{experiment.id}</td>
           <td class="px-6 py-4 whitespace-nowrap"

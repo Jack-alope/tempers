@@ -2,7 +2,7 @@
 Router assisted with tissue tracking
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from sqlalchemy.orm import Session
 from scipy.spatial import distance
 
@@ -12,6 +12,7 @@ from schemas import schema_video
 
 from trackings.trackers import TissueTracker
 router = APIRouter()
+
 
 def coord_distance(coords_list):
     '''
@@ -31,7 +32,7 @@ def coord_distance(coords_list):
 
 
 @router.post('/boxCoordinates', tags=["tracking"])
-async def box_coordinates(post_info: schema_video.PostSelection,
+async def box_coordinates(background_tasks: BackgroundTasks, post_info: schema_video.PostSelection,
                           database: Session = Depends(get_db)):
     """
     accepts the box coords and starts tracking
@@ -50,12 +51,15 @@ async def box_coordinates(post_info: schema_video.PostSelection,
     cross_dist_mm = list(map(lambda x: x * cal_factor, cross_dist_pix))
 
     crud_video.update_cal_cross(
-        database, post_info.video_id_value,
+        database, post_info.video_id,
         post_info.calibration_distance,
         cal_factor, cross_dist_mm)
 
-    video_object = crud_video.get_vid_by_id(database, post_info.video_id_value)
+    video_object = crud_video.get_vid_by_id(database, post_info.video_id)
 
-    TissueTracker(database, post_info.boxes, cal_factor, video_object)
+    # TissueTracker(database, post_info.boxes, cal_factor, video_object)
+
+    background_tasks.add_task(TissueTracker, database,
+                              post_info.boxes, cal_factor, video_object)
 
     return {"ok": 200}

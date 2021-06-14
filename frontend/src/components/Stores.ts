@@ -1,15 +1,15 @@
-import { writable } from "svelte/store";
+import { writable, Writable } from "svelte/store";
 import type {
   experiment_interface,
   bio_reactor_interface,
 } from "../interfaces";
 
-export const video_id = writable(0);
 export const json_data_list = writable(0);
-export const experiments = writable(undefined);
-export const bio_reactors = writable(undefined);
-export const videos = writable(undefined);
+export const experiments: Writable<experiment_interface[]> =
+  writable(undefined);
+export const bio_reactors: Writable<bio_reactor_interface[]> =
+  writable(undefined);
 
-export const showExperiment = writable(false);
-export const showBioReactor = writable(false);
-export const downloadModal = writable(false);
+export const showExperiment: Writable<boolean> = writable(false);
+export const showBioReactor: Writable<boolean> = writable(false);
+export const downloadModal: Writable<boolean> = writable(false);

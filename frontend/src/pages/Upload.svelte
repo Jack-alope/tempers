@@ -43,7 +43,7 @@
     });
 
     if (res.ok) {
-      window.location.replace("/tracking");
+      window.location.replace("/database");
     } else {
       alert("Something went wrong");
     }

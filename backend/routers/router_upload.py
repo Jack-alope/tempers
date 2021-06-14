@@ -5,7 +5,7 @@ import os
 from typing import List
 import shutil
 import json
-from dataclasses import asdict
+import logging
 
 from werkzeug.utils import secure_filename
 
@@ -147,7 +147,7 @@ def _unzip_and_delete(archive_path, where_to_save):
     os.remove(archive_path)
 
 
-def _add_experiment_to_db(database_session, experiment_info, bio_ids, post_ids):
+def _add_experiment_to_db(database_session, experiment_info):
 
     # REVIEW: Proablly dont want to just delete
     crud_experiment.delete_experiment(database_session, experiment_info.id)
@@ -163,12 +163,10 @@ def _add_experiment_to_db(database_session, experiment_info, bio_ids, post_ids):
     return (experiment.id, experiment.experiment_idenifer)
 
 
-def _add_bio_reactos_to_db(database_session, bio_reactors_info):
+def _add_bio_reactos_to_db(database_session: Session, bio_reactors_info):
     bio_ids = {}
     post_ids = {}
     for bio in bio_reactors_info:
-        print("hiii")
-        print(bio.id)
         old_id = bio.id
         # REVIEW: Probally dont want to just delete
         crud_bio_reactor.delete_bio_reactor(database_session, old_id)
@@ -187,29 +185,50 @@ def _add_bio_reactos_to_db(database_session, bio_reactors_info):
     return (bio_ids, post_ids)
 
 
+def _tissue_tracking_csv_to_db(database_session: Session, new_tissue_id: int, old_tissue_id: int):
+
+    csv_path = f"{UPLOAD_FOLDER}/temp/csvs"
+
+    for file in os.listdir(csv_path):
+        if int(file.split("_")[2].split(".")[0]) == old_tissue_id:
+            try:
+                tracking_df = pd.read_csv(os.path.join(csv_path, file), usecols=[
+                    "tissue_id", "time", "displacement",
+                    "odd_x", "odd_y", "even_x", "even_y"])
+
+                tracking_df["tissue_id"] = tracking_df["tissue_id"].map(
+                    {old_tissue_id: new_tissue_id}, na_action=None)
+
+                # REVIEW: Maybe dont wanna just delete
+                crud_tissue_tracking.delete(database_session, old_tissue_id)
+                crud_tissue_tracking.create_tissue_tracking(
+                    database_session, new_tissue_id, tracking_df)
+            except pd.errors.EmptyDataError:
+                logging.info("Tracking CSV Empty")
+
+
 def _add_vids_to_db(database_session: Session, vids,
                     experiment_id: int, bio_ids: dict, post_ids: dict):
     for vid in vids:
         #old_id = vid.id
         # REVIEW: Probally dont want to just delete
-        #crud_video.delete_video(database_session, old_id)
         tissues = vid.tissues
-        # delattr(vid, "id")
-        # delattr(vid, "tissues")
         bio_id = bio_ids[vid.bio_reactor_id]
-        print(bio_id)
         delattr(vid, "bio_reactor_id")
-        vid = schema_video.VideoCreate(
-            **dict(vid), experiment_id=experiment_id,
+        vid = schema_video.Video(
+            **dict(vid),
             bio_reactor_id=bio_id,)
-        # setattr(vid, "experiment_id", experiment_id)
-        # setattr(vid, "bio_reactor_id", bio_ids[vid.bio_reactor_id])
+        setattr(vid, "experiment_id", experiment_id)
         new_vid_id = crud_video.create_video(database_session, vid).id
 
         for tissue in tissues:
             post_id = post_ids[tissue.post_id]
+            old_tissue_id = tissue.id
             delattr(tissue, "post_id")
-            tissue_caculated = dict(tissue.tissue_caculated_data)
+            delattr(tissue, "vid_id")
+            delattr(tissue, "id")
+            if tissue.tissue_caculated_data:
+                tissue_caculated = dict(tissue.tissue_caculated_data)
             delattr(tissue, "tissue_caculated_data")
 
             tissue = schema_tissue.Tissue(
@@ -217,27 +236,29 @@ def _add_vids_to_db(database_session: Session, vids,
             new_tissue_id = crud_tissue.create_tissue(
                 database_session, tissue).id
 
-            crud_tissue_caculations.create(
-                database_session, tissue_caculated, new_tissue_id)
+            if tissue_caculated:
+                crud_tissue_caculations.create(
+                    database_session, tissue_caculated, new_tissue_id)
+
+            _tissue_tracking_csv_to_db(
+                database_session, new_tissue_id, old_tissue_id)
 
 
-def _expirment_file_unpack(database_session,  dir_path):
-    print("here")
-    print(dir_path)
+def _expirment_file_unpack(database_session: Session,  dir_path: str):
 
     json_file, = [os.path.join(dir_path, f) for f in os.listdir(
         dir_path) if f.endswith('.json')]
 
-    with open(json_file) as f:
+    with open(json_file) as file:
         data: schema_experiment.ExperimentDownload = schema_experiment.ExperimentDownload(
-            **json.load(f))
+            **json.load(file))
 
     vids = data.experiment.vids
 
     bio_ids, post_ids = _add_bio_reactos_to_db(
         database_session, data.bio_reactors)
     experiment_id, experiment_idenifer = _add_experiment_to_db(
-        database_session, data.experiment, bio_ids, post_ids)
+        database_session, data.experiment)
 
     _add_vids_to_db(database_session, vids,
                     experiment_id, bio_ids, post_ids)

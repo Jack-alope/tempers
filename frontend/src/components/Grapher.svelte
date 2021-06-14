@@ -2,19 +2,14 @@
   import { onMount } from "svelte";
   import { saveAs } from "file-saver";
 
-  import { json_data_list, video_id } from "../components/Stores.js";
+  import { json_data_list } from "../components/Stores.js";
 
-  export let nums, freqs, types;
+  export let nums, freqs, types, video_id;
 
   let json_data_list_value;
-  let video_id_value;
 
   json_data_list.subscribe((value) => {
     json_data_list_value = value;
-  });
-
-  video_id.subscribe((value) => {
-    video_id_value = value;
   });
 
   onMount(async () => {
@@ -23,7 +18,7 @@
 
   async function caculate() {
     const res = await fetch(
-      process.env.API_URL + `/caculate?video_id=${video_id_value}`,
+      process.env.API_URL + `/caculate?video_id=${video_id}`,
       {
         method: "GET",
         headers: {
@@ -35,7 +30,7 @@
       const file = await res.blob();
       if (file) {
         const blob = new Blob([file]);
-        saveAs(blob, `${video_id_value}_calculations.csv`);
+        saveAs(blob, `${video_id}_calculations.csv`);
       }
     }
   }
@@ -526,7 +521,7 @@
       polynomials,
       windows,
       minDistances,
-      video_id_value,
+      video_id,
     };
     let graph_paramsJson = JSON.stringify(graph_params);
 
