@@ -26,6 +26,6 @@ class BioReactor(BioReactorBase):
     id: int
 
 
-class BioReactorFull(BioReactorBase):
+class BioReactorWithPosts(BioReactorBase):
     id: int
-    posts: List[schema_post.PostFull]
+    posts: List[schema_post.PostWithHeights]

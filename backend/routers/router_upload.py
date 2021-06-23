@@ -104,10 +104,9 @@ def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
     tissue_id = 0
 
     for tissue in tissue_li:
-        tissue_obj = schema_tissue.TissueCreate.parse_obj(tissue)
-        tissue_obj.vid_id = vid_id
-        tissue_id = crud_tissue.create_tissue(database_session, tissue_obj)
-
+        tissue_id = crud_tissue.create_tissue(
+            database_session, schema_tissue.create_tissue(tissue, vid_id))
+    # REVIEW: Does make much sense to return this
     return tissue_id
 
 
@@ -115,9 +114,7 @@ def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
 async def upload(info: str = Form(...), file: UploadFile = File(...),
                  database_session: Session = Depends(get_db)):
     """Upload csv or vid"""
-    # TODO Add schema to this form and file make it weird
-    vid_json: schema_video.VideoCreate = json.loads(info)
-    vid_info = schema_video.VideoCreate.parse_obj(vid_json)
+    vid_info = schema_video.VideoCreate.parse_obj(json.loads(info))
 
     extension = file.filename.split(".")[-1]
 
@@ -129,7 +126,7 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
 
     else:
         vid_id = save_video_file(vid_info, file, database_session)
-
+    # REVIEW: doesnt make sense to assise tissue maybe only for CSV
     tissue = add_tissues(
         vid_info.tissues, vid_id, database_session)
 
@@ -237,7 +234,7 @@ def _add_vids_to_db(database_session: Session, vids,
             new_tissue_id = crud_tissue.create_tissue(
                 database_session, tissue).id
 
-            if tissue_caculated:
+            if tissue.tissue_caculated_data:
                 crud_tissue_caculations.create(
                     database_session, tissue_caculated, new_tissue_id)
 

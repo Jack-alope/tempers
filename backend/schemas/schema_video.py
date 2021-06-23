@@ -8,10 +8,8 @@ from . import schema_tissue
 
 
 class VideoBase(BaseModel):
-    date_recorded: Optional[date]
-    frequency: Optional[float]
-
-    # bio_reactor_number: int
+    date_recorded: date
+    frequency: float
 
     class Config:
         orm_mode = True
@@ -20,36 +18,34 @@ class VideoBase(BaseModel):
 class VideoCreate(VideoBase):
     tissues: List[schema_tissue.TissueBase]
     bio_reactor_id: int
+    experiment_id: int
+    tracked: bool = False
+    analyzed: bool = False
     save_location: Optional[str]
-    experiment_id: Optional[str]
-    tracked: Optional[bool]
 
 
 class VideoInfo(VideoBase):
     id: int
-
     experiment_id: int
     save_location: Optional[str]
 
 
 class Video(VideoBase):
     bio_reactor_id: int
+    experiment_id: str
+    tissues: List[schema_tissue.Tissue]
     calibration_distance: Optional[float]
     calibration_factor: Optional[float]
-    tissues: List[schema_tissue.Tissue]
     save_location: Optional[str]
-    experiment_id: Optional[str]
 
 
 class VideoShow(VideoBase):
     id: int
-    date_uploaded: date
-    calibration_distance: Optional[float]
-    calibration_factor: Optional[float]
+    date_recorded: date
     bio_reactor_number: int
     experiment_idenifer: str
-    tracked: Optional[bool]
-    anaylized: Optional[bool]
+    tracked: bool
+    anaylized: bool
     save_location: Optional[str]
 
 
@@ -59,7 +55,3 @@ class PostSelection(BaseModel):
     cal_points: List[List[float]]
     video_id: int
     calibration_distance: int
-
-
-class VideoFull(VideoShow):
-    pass

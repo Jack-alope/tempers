@@ -26,7 +26,7 @@ def read_bio_reactors(database_session: Session = Depends(get_db)):
     return bio_reactors
 
 
-@router.get("/posts", response_model=List[schema_post.PostUpload])
+@router.get("/posts", response_model=List[schema_post.Post])
 def read_post_options(bio_id: int = Query(...), database_session=Depends(get_db)):
     """returns posts in bio reactor"""
     posts = crud_post.get_posts_by_bio_id(database_session, bio_id)
