@@ -2,7 +2,7 @@
 Router for experiment
 """
 import json
-from typing import List
+from typing import List, Dict
 from dataclasses import asdict
 import shutil
 import os
@@ -21,7 +21,7 @@ import models
 router = APIRouter()
 
 
-@router.get("/experiments", response_model=List[schema_experiment.ExperimentShow],
+@router.get("/experiments", response_model=List[schema_experiment.Experiment],
             tags=["Experiment"])
 def read_experiments(database_session: Session = Depends(get_db)):
     """retunrs all experiment"""
@@ -37,7 +37,7 @@ def delete_experiment(exp_id: int, database_session: Session = Depends(get_db)):
     return crud_experiment.delete_experiment(database_session, exp_id)
 
 
-@router.post("/addExperiment", response_model=schema_experiment.Experiment,
+@router.post("/addExperiment", response_model=schema_experiment.ExperimentWithVids,
              status_code=status.HTTP_201_CREATED, tags=["Experiment"])
 def add_experiment(experiment: schema_experiment.ExperimentBase,
                    database_session: Session = Depends(get_db)):
@@ -94,7 +94,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
     models.check_path_exisits(file_path)
     models.check_path_exisits(csv_path)
 
-    bio_reactor_ids: {int} = set()
+    bio_reactor_ids: Dict[int] = set()
     tissues = []
 
     # List comp goes creats list of tup (bio_ids, tissues) used in expetiment
@@ -110,7 +110,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
 
     # Querys database with list of bio_reactor ids list of bio_reactors is returned
     # Converts that list of bio ractors to BioReactor schema
-    bio_reactors = [schema_bio_reactor.BioReactorFull(
+    bio_reactors = [schema_bio_reactor.BioReactorWithPosts(
         **asdict(i)) for i in crud_bio_reactor.get_bio_reactors_by_li_id(
         database_session, bio_reactor_ids)]
 
@@ -119,7 +119,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
 
         json.dump(jsonable_encoder(
             schema_experiment.ExperimentDownload(
-                experiment=schema_experiment.ExperimentFull(
+                experiment=schema_experiment.ExperimentWithVids(
                     **asdict(experiment_info)),
                 bio_reactors=bio_reactors)), outfile, indent=1)
 

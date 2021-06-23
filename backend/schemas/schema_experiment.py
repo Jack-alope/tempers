@@ -17,17 +17,13 @@ class ExperimentBase(BaseModel):
 
 class Experiment(ExperimentBase):
     id: int
+
+
+class ExperimentWithVids(ExperimentBase):
+    id: int
     vids: List[schema_video.Video]
 
 
-class ExperimentFull(Experiment):
-    id: int
-
-
-class ExperimentShow(ExperimentBase):
-    id: int
-
-
 class ExperimentDownload(BaseModel):
-    experiment: Experiment
-    bio_reactors: List[schema_bio_reactor.BioReactorFull]
+    experiment: ExperimentWithVids
+    bio_reactors: List[schema_bio_reactor.BioReactorWithPosts]
