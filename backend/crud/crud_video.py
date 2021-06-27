@@ -89,13 +89,19 @@ def get_vid_by_id(database_session: Session, vid_id: int):
 
 
 def update_cal_cross(database_session: Session, video_id,
-                     cal_dist: float, cal_factor: float,
+                     cal_identifer,
                      cross_dist_passed: List):
     """update calibration and cross section distance"""
     vid = get_vid_by_id(database_session, video_id)
-    vid.calibration_distance = cal_dist
-    vid.calibration_factor = cal_factor
+
+    # if cal_dist:
+    #     # REVIEW: Check if already defined
+    #     vid.calibration_distance = cal_dist
+    # if calibration_set_iden:
+    #     vid.calibration_set_identifier = calibration_set_iden
+    # vid.calibration_factor = cal_factor
     vid.tracked = True
+    vid.calibration_set_identifier = cal_identifer
 
     tissues = vid.tissues
     for i, tissue in enumerate(tissues):

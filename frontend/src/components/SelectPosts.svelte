@@ -1,29 +1,61 @@
 <script>
   import { createEventDispatcher, onMount } from "svelte";
+  import { getCalibrationSets } from "../apiCalls";
+
   export let image_path;
   export let tissue_count;
 
   const dispatch = createEventDispatcher();
-  let calibration_distance;
+  let calibration_distance = undefined;
   let boxes = [];
   let cal_points = [];
   let cross_points = [];
+  let calibration_method;
+  let calibration_factor;
+  let calibration_set_identifier;
+  let calibration_sets;
+  let calibration_set_selected;
 
   let done = false;
 
+  onMount(async () => {
+    calibration_sets = await getCalibrationSets();
+  });
+
   // TODO: re write all this in TS also its just gross
-  function getPostCount() {
+  function getPostCount(calibration_set = [0, 0]) {
     // TODO: fix naming here
-    // var id_vid = document.getElementById("videoId").value;
+    console.log(calibration_set);
     initDraw(
       document.getElementById("canvas"),
       tissue_count,
-      calibration_distance
+      calibration_distance,
+      calibration_set[0],
+      calibration_set[1]
     );
   }
 
-  function initDraw(canvas, tissue_count, calibration_distance) {
-    let cal_done = false;
+  function handleSubmit(cal_idnt, cal_factor) {
+    getPostCount([cal_idnt, cal_factor]);
+  }
+
+  function handleCalDistance(calibration_set_identifier) {
+    getPostCount([calibration_set_identifier, 0]);
+  }
+
+  function initDraw(
+    canvas,
+    tissue_count,
+    calibration_distance = undefined,
+    cal_set_ident = undefined,
+    cal_factor = undefined
+  ) {
+    let cal_done;
+    if (cal_factor) {
+      cal_done = true;
+    } else {
+      cal_done = false;
+    }
     let crosssections = false;
 
     let post_count = tissue_count * 2;
@@ -123,6 +155,8 @@
               cal_points: cal_points,
               cross_points: cross_points,
               calibration_distance: calibration_distance,
+              cal_factor: cal_factor,
+              cal_set_ident: cal_set_ident,
             });
           }
         } else {
@@ -183,18 +217,118 @@
 <h5>Please select posts for {tissue_count} tissues</h5>
 <!-- TODO: use session instead of hidden forms -->
 <form id="number_of_posts">
-  <!-- <input type="hidden" id="videoId" name="videoId" value={video_id} /> -->
-  <label for="calDist">Enter the calibration Disttance (mm)</label>
-  <!-- TODO: Make this look better -->
-  <input
-    type="number"
-    step="any"
-    id="calDist"
-    name="calDist"
-    class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-    bind:value={calibration_distance}
-  />
-  <input type="button" value="submit" on:click={() => getPostCount()} />
+  <div>
+    <input
+      type="radio"
+      id="cal_set"
+      name="calibration_method"
+      bind:group={calibration_method}
+      value="cal_set"
+    />
+    <label for="cal_set">Calibration Set</label><br />
+    <input
+      type="radio"
+      id="cal_factor"
+      name="calibration_method"
+      bind:group={calibration_method}
+      value="cal_factor"
+    />
+    <label for="cal_factor">Calibration Factor</label><br />
+    <input
+      type="radio"
+      id="cal_dist"
+      name="calibration_method"
+      bind:group={calibration_method}
+      value="cal_dist"
+    />
+    <label for="cal_dist">Calibration Distance</label>
+  </div>
+
+  <br />
+
+  {#if !calibration_method}
+    <h1>Please select calibration method</h1>
+  {:else if calibration_method == "cal_dist"}
+    <label for="calibration_set">Enter the calibration Set identifier</label>
+    <!-- TODO: Make this look better -->
+
+    <input
+      type="text"
+      step="any"
+      id="calibration_set"
+      name="calibration_set"
+      class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      bind:value={calibration_set_identifier}
+    />
+    <label for="calDist">Enter the calibration Disttance (mm)</label>
+    <input
+      type="number"
+      step="any"
+      id="calDist"
+      name="calDist"
+      class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      bind:value={calibration_distance}
+    />
+    <input
+      type="button"
+      value="submit"
+      on:click={() => handleCalDistance(calibration_set_identifier)}
+    />
+  {:else if calibration_method == "cal_factor"}
+    <label for="calibration_set">Enter the calibration set identifier</label>
+    <input
+      type="text"
+      step="any"
+      id="calibration_set"
+      name="calibration_set"
+      class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      bind:value={calibration_set_identifier}
+    />
+
+    <label for="calibration_factor">Enter the calibration factor</label>
+    <input
+      type="number"
+      step="any"
+      id="calibration_factor"
+      name="calibration_factor"
+      class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      bind:value={calibration_factor}
+    />
+
+    <input
+      type="button"
+      value="submit"
+      on:click={() =>
+        handleSubmit(calibration_set_identifier, calibration_factor)}
+    />
+  {:else if calibration_method == "cal_set"}
+    <label for="calibration_sets_select"
+      >Enter the calibration set identifier</label
+    >
+    <select
+      id="calibration_sets_select"
+      name="calibration_sets"
+      bind:value={calibration_set_selected}
+    >
+      <option />
+      {#if calibration_sets == undefined}
+        <option>NA</option>>
+      {:else}
+        {#each calibration_sets as calibration_set}
+          <option
+            value="{calibration_set.calibration_set_identifier},{calibration_set.calibration_factor}"
+            >Set id: {calibration_set.calibration_set_identifier}, factor: {calibration_set.calibration_factor}</option
+          >
+        {/each}
+      {/if}
+    </select>
+    <input
+      type="button"
+      value="submit"
+      on:click={() =>
+        getPostCount(Object.values({ calibration_set_selected })[0].split(","))}
+    />
+  {/if}
 </form>
 
 <div id="canvas">

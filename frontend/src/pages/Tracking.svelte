@@ -34,16 +34,22 @@
   });
 
   async function handlePostsSelected(event) {
+    console.log(event.detail.cal_factor);
+    console.log(event.detail.cal_set_ident);
     const boxes = event.detail.boxes;
     const cal_points = event.detail.cal_points;
     const cross_points = event.detail.cross_points;
     const calibration_distance = event.detail.calibration_distance;
+    const calibration_factor = event.detail.cal_factor;
+    const calibration_set_identifier = event.detail.cal_set_ident;
     const boxes_and_id = {
       boxes,
       cal_points,
       cross_points,
       video_id,
       calibration_distance,
+      calibration_factor,
+      calibration_set_identifier,
     };
 
     const res = await fetch(process.env.API_URL + "/boxCoordinates", {

@@ -21,6 +21,7 @@ class VideoCreate(VideoBase):
     experiment_id: int
     tracked: bool = False
     analyzed: bool = False
+    calibration_set_identifier: Optional[str]
     save_location: Optional[str]
 
 
@@ -44,6 +45,7 @@ class VideoShow(VideoBase):
     date_recorded: date
     bio_reactor_number: int
     experiment_idenifer: str
+    calibration_set_identifier: str = None
     tracked: bool
     anaylized: bool
     save_location: Optional[str]
@@ -52,6 +54,19 @@ class VideoShow(VideoBase):
 class PostSelection(BaseModel):
     boxes: List[List[float]]
     cross_points: List[List[float]]
-    cal_points: List[List[float]]
     video_id: int
-    calibration_distance: int
+
+    """
+    Below will be used if the user is calibrating by drawing points.
+    """
+    calibration_distance: Optional[int]
+    cal_points: Optional[List[List[float]]]
+
+    """
+    Below will be used if user is adding a calibration set 
+    Or selecting from existing
+    # REVIEW: Maybe better to seprate these instead of using 'Optional'
+    """
+
+    calibration_set_identifier: Optional[str]
+    calibration_factor: Optional[float]

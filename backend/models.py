@@ -53,10 +53,6 @@ class Video(Base):
     date_recorded: Date = Column(Date, nullable=False)
     frequency: float = Column(Float, nullable=False)
 
-    calibration_distance: float = Column(Float, nullable=True)
-
-    calibration_factor: float = Column(Float, nullable=True)
-
     save_location: String = Column(String(120), nullable=True)
 
     tracked: bool = Column(Boolean, nullable=True, default=False)
@@ -68,8 +64,25 @@ class Video(Base):
     bio_reactor_id: int = Column(Integer, ForeignKey('bio_reactor.id'))
     bio_reactor = relationship("BioReactor", back_populates="vids")
 
+    calibration_set_identifier: str = Column(
+        String(120), ForeignKey('calibration_set.calibration_set_identifier'))
+    calibration_set = relationship("CalibrationSet", back_populates="videos")
+
     tissues: List[schema_tissue.Tissue] = relationship(
         "Tissue", back_populates="video", cascade="all, delete-orphan")
+
+
+@dataclass
+class CalibrationSet(Base):
+    """Calibration set for DB"""
+    __tablename__ = "calibration_set"
+
+    calibration_set_identifier: str = Column(
+        String(120), primary_key=True, nullable=False, unique=True)
+    calibration_factor: float = Column(Float, nullable=False)
+
+    videos: List[schema_video.Video] = relationship(
+        "Video", back_populates="calibration_set")
 
 
 @dataclass
