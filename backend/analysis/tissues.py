@@ -186,9 +186,9 @@ class TissuePoints:
 
         self.calculated_values["r50"], self.calculated_values["r50_std"] \
             = calculations.time_between(self.relax_points[2][0], self.peaks[0])
-
+        # TODO: DFDT is broken
         self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
-            = (0, 0)  # TODO: calculations.dfdt(self.contract_points[0], self.contract_points[4])
+            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
 
         self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
-            = (0, 0)  # calculations.dfdt(self.relax_points[0], self.relax_points[4])
+            = calculations.dfdt(self.relax_points[0], self.relax_points[4])

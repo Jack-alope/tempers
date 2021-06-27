@@ -41,6 +41,19 @@ export async function getPostOptions(bio_id: string) {
     return undefined;
   }
 }
+export async function getCalibrationSets() {
+  const res = await fetch(process.env.API_URL + `/calibrationSets`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (res.ok) {
+    return await res.json();
+  } else {
+    return undefined;
+  }
+}
 
 export async function checkExpExist(exp_idenifer: string) {
   const res = await fetch(
