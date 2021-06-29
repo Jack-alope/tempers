@@ -38,5 +38,5 @@ uvicorn main:app --reload
 Add a .env file in the backend folder with a link to your mySQLDB
 
 ```
-DATABASE_URL=mysql+pymysql://<username>:<password>@<location>:3306/testuser?charset=utf8mb4
+DATABASE_URL=mysql+pymysql://<username>:<password>@<location>:3306/<db_name>?charset=utf8mb4
 ```
