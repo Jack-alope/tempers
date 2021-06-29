@@ -23,6 +23,7 @@ class VideoCreate(VideoBase):
     analyzed: bool = False
     calibration_set_identifier: Optional[str]
     save_location: Optional[str]
+    video_note: Optional[str]
 
 
 class VideoInfo(VideoBase):
@@ -49,6 +50,7 @@ class VideoShow(VideoBase):
     tracked: bool
     anaylized: bool
     save_location: Optional[str]
+    video_note: Optional[str]
 
 
 class PostSelection(BaseModel):

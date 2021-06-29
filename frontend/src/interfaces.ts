@@ -15,7 +15,7 @@ export interface video_interface {
   date_uploaded: Date;
   date_recorded: Date;
   frequency: number;
-  // Review: Might not need this
+  // REVIEW: Might not need this
   calibration_distance: number;
   calibration_factor: number;
   experiment_idenifer: string;
@@ -23,6 +23,7 @@ export interface video_interface {
   tracked: boolean;
   anaylized: boolean;
   save_location: string;
+  video_note: string;
 }
 
 export interface post_interface {

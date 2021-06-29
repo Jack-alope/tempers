@@ -64,6 +64,7 @@
       ],
 
       frequency: "",
+      video_note: "",
     },
     /*
     TODO: figure out validation lo dash error
@@ -269,6 +270,20 @@
     </div>
 
     <div class="w-1/2 px-3 py-3">
+      <label
+        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+        for="vid">Video Note</label
+      >
+      <input
+        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+        type="text"
+        id="video_note"
+        name="video_note"
+        bind:value={$form.video_note}
+      />
+    </div>
+
+    <div class="w-1/2 px-3 py-5">
       <input
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
         type="submit"

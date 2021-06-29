@@ -53,7 +53,8 @@ class Video(Base):
     date_recorded: Date = Column(Date, nullable=False)
     frequency: float = Column(Float, nullable=False)
 
-    save_location: String = Column(String(120), nullable=True)
+    save_location: str = Column(String(120), nullable=True)
+    video_note: str = Column(String(240), nullable=True)
 
     tracked: bool = Column(Boolean, nullable=True, default=False)
     anaylized: bool = Column(Boolean, nullable=True, default=False)
