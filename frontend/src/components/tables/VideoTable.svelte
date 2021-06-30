@@ -74,7 +74,9 @@
           <td class="px-6 py-4 whitespace-nowrap">{video.id}</td>
           <td class="px-6 py-4 whitespace-nowrap">{video.date_recorded}</td>
           <td class="px-6 py-4 whitespace-nowrap">{video.frequency}</td>
-          <td class="px-6 py-4 whitespace-nowrap">{video.video_note}</td>
+          <td class="px-6 py-4 whitespace-nowrap"
+            >{#if video.video_note}{video.video_note}{/if}</td
+          >
           <td class="px-6 py-4 whitespace-nowrap">{video.bio_reactor_number}</td
           >
           <td class="px-6 py-4 whitespace-nowrap">

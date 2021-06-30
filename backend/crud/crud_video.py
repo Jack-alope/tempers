@@ -7,6 +7,7 @@ from typing import List
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql.expression import func
 
 import models
 from schemas import schema_video
@@ -111,8 +112,23 @@ def update_cal_cross(database_session: Session, video_id,
     database_session.refresh(vid)
 
 
+def update_save_location(database_session: Session, video_id: int, save_location: str):
+    vid = get_vid_by_id(database_session, video_id)
+
+    vid.save_location = save_location
+
+    database_session.commit()
+    database_session.refresh(vid)
+    return vid
+
+
 def video_anaylized(database_session: Session, vid_id: int):
     vid = get_vid_by_id(database_session, vid_id)
     vid.anaylized = True
     database_session.commit()
     database_session.refresh(vid)
+
+
+def get_next_video_id(database_session: Session):
+    """Returns what the next vid id will be"""
+    return database_session.query(func.max(models.Video.id)).scalar() + 1
