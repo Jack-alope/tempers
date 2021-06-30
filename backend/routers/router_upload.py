@@ -13,6 +13,7 @@ from fastapi import APIRouter, Form, File, UploadFile, Depends
 
 from sqlalchemy.orm import Session
 
+
 import pandas as pd
 
 
@@ -33,12 +34,14 @@ def _save_file(file, path: str):
         shutil.copyfileobj(file, buffer)
 
 
-def save_video_file(vid_info, vid_file, database_session):
+def _save_video_file(vid_info, vid_file, database_session):
     """Saves vid file to disk and adds to db"""
     date_string = vid_info.date_recorded.strftime('%m_%d_%Y')
 
     experiment_info = crud_experiment.get_experiment(
         database_session, vid_info.experiment_id)
+
+    vid = crud_video.create_video(database_session, vid_info)
 
     # gets save loaction uploadfolder/expermentnum/date/vid
     where_to_save = os.path.join(
@@ -53,8 +56,8 @@ def save_video_file(vid_info, vid_file, database_session):
     bio_reactor_info = crud_bio_reactor.get_bio_reactor(
         database_session, vid_info.bio_reactor_id)
     # makes new file name for the vid format date_frewnum_bionum.ext
-    new_filename = f"{date_string}_Freq{str(vid_info.frequency)}_Bio\
-        {str(bio_reactor_info.bio_reactor_number)}.{extenstion}"
+    new_filename = f"{date_string}_Freq{str(vid_info.frequency).replace('.','-')}_Bio\
+        {str(bio_reactor_info.bio_reactor_number)}_{str(vid.id)}.{extenstion}"
 
     # makes sure file name is correct formats
     safe_filename = secure_filename(new_filename)
@@ -62,17 +65,15 @@ def save_video_file(vid_info, vid_file, database_session):
     # creates path to file
     path_to_file = os.path.join(where_to_save, safe_filename)
 
-    vid_info.save_location = path_to_file
+    crud_video.update_save_location(database_session, vid.id, path_to_file)
 
     # saves file
     _save_file(vid_file.file, path_to_file)
 
-    vid = crud_video.create_video(database_session, vid_info)
-
     return vid.id
 
 
-def save_csv_file(vid_info, file, database_session):
+def _save_csv_file(vid_info, file, database_session):
     """Saves csv to disk and addes to db with fake vid"""
     date_string = vid_info.date_recorded.strftime('%m_%d_%Y')
     where_to_save = os.path.join(
@@ -97,8 +98,8 @@ def save_csv_file(vid_info, file, database_session):
     return (vid.id, path_to_file)
 
 
-def add_tissues(tissue_li: List[schema_tissue.TissueCreate],
-                vid_id: int, database_session: Session):
+def _add_tissues(tissue_li: List[schema_tissue.TissueCreate],
+                 vid_id: int, database_session: Session):
     """Adds tissues to databse"""
 
     tissue_id = 0
@@ -121,13 +122,13 @@ async def upload(info: str = Form(...), file: UploadFile = File(...),
     tup = ()
 
     if extension == "csv":
-        tup = save_csv_file(vid_info, file, database_session)
+        tup = _save_csv_file(vid_info, file, database_session)
         vid_id = tup[0]
 
     else:
-        vid_id = save_video_file(vid_info, file, database_session)
-    # REVIEW: doesnt make sense to assise tissue maybe only for CSV
-    tissue = add_tissues(
+        vid_id = _save_video_file(vid_info, file, database_session)
+    # REVIEW: doesnt make sense to assign tissue maybe only for CSV
+    tissue = _add_tissues(
         vid_info.tissues, vid_id, database_session)
 
     if extension == "csv":
