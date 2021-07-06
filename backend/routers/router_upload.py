@@ -77,7 +77,7 @@ def _save_csv_file(vid_info, file, database_session):
     """Saves csv to disk and addes to db with fake vid"""
     date_string = vid_info.date_recorded.strftime('%m_%d_%Y')
     where_to_save = os.path.join(
-        UPLOAD_FOLDER, vid_info.experiment_id, date_string, 'csvfiles')
+        UPLOAD_FOLDER, str(vid_info.experiment_id), date_string, 'csvfiles')
     models.check_path_exisits(where_to_save)
 
     new_filename = date_string + "_" + \
