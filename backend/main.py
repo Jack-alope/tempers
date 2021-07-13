@@ -3,7 +3,7 @@ Fastapi Main
 """
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -29,6 +29,16 @@ app.include_router(router_calibration_set.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 logging.info("New Run Started")
+
+
+@app.get("/app")
+def read_main(request: Request):
+        return {"message": "Hello World", "root_path": request.scope.get("root_path")}
+
+@app.get("/api/app")
+def read_main(request: Request):
+            return {"message": "Hello World", "root_path": request.scope.get("root_path")}
+
 
 
 app.add_middleware(
