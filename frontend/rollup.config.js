@@ -46,7 +46,10 @@ export default {
 			process:JSON.stringify({
 					env: {
 						isProd: production,
-						API_URL: "http://0.0.0.0:8000"
+						API_URL: "/api"
+						// For Local development comment the above line and uncomment bellow
+						// TODO: ideally would like to do this automatically
+						// API_URL: "http://0.0.0.0:8000"
 					}
 				})
 		}),

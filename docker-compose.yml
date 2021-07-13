@@ -29,6 +29,18 @@ services:
       mysql:
         condition: service_healthy
 
+  nginx:
+    build: ./nginx/
+    container_name: nginx
+    restart: always
+    expose: 
+      - 80
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+
   mysql:
     image: mysql:8.0.23
     container_name: mysql
