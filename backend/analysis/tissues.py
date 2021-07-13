@@ -19,6 +19,7 @@ class TissuePoints:
         self.poly = 3
         self.thresh = .5
         self.min_dist = 5
+        self.buffer = 0
         self.raw_disp = disp
         self.time = time
         self.post_dist = 6
@@ -46,12 +47,14 @@ class TissuePoints:
 
         self.find_peaks()
 
-    def find_peaks(self, thresh=None, min_dist=None, x_range=None):
+    def find_peaks(self, thresh=None, min_dist=None, x_range=None, buffer=None):
         """Finds usable peaks"""
         if thresh is not None:
             self.thresh = thresh
         if min_dist is not None:
             self.min_dist = min_dist
+        if buffer is not None:
+            self.buffer = buffer
 
         unformatted = np.array(peakutils.indexes(
             self.smooth_disp, self.thresh, self.min_dist)[1:-1])
@@ -73,12 +76,13 @@ class TissuePoints:
         return peak_list[peak_start:peak_end]
 
     def find_basepoints_frontpoints(self):
-        """Use the dfdt_recursive func to find basepoints and frontpointspyl"""
+        """Use the dfdt_recursive func to f    buffers: int
+            Ond basepoints and frontpointspyl"""
         peak_indicies = self.peaks[2]
         basepoints = [self.dfdt_recursive(
-            peak_index, lambda x:x-1) for peak_index in peak_indicies]
+            peak_index - self.buffer, lambda x:x-1) for peak_index in peak_indicies]
         frontpoints = [self.dfdt_recursive(
-            peak_index, lambda x:x+1) for peak_index in peak_indicies]
+            peak_index + self.buffer, lambda x:x+1) for peak_index in peak_indicies]
 
         self.basepoints = self.format_points(basepoints)
         self.frontpoints = self.format_points(frontpoints)
@@ -148,13 +152,13 @@ class TissuePoints:
                                      self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
                                      self.smooth_disp[self.peaks[2]], base_disp)
 
-        self.calculated_values["sys_force"], self.calculated_values["sys_force_std"] \
+        self.calculated_values["dias_force"], self.calculated_values["dias_force_std"] \
             = calculations.force(self.youngs, self.tissue.post.radius,
                                  self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
                                  self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
                                  base_disp)
 
-        self.calculated_values["dias_force"], self.calculated_values["dias_force_std"] \
+        self.calculated_values["sys_force"], self.calculated_values["sys_force_std"] \
             = calculations.force(self.youngs, self.tissue.post.radius,
                                  self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
                                  self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
@@ -188,7 +192,7 @@ class TissuePoints:
             = calculations.time_between(self.relax_points[2][0], self.peaks[0])
         # TODO: DFDT is broken
         self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
-            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
+            = (0, 0) #calculations.dfdt(self.contract_points[0], self.contract_points[4])
 
         self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
-            = calculations.dfdt(self.relax_points[0], self.relax_points[4])
+            = (0, 0) #calculations.dfdt(self.relax_points[0], self.relax_points[4])
