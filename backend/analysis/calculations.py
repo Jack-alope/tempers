@@ -9,7 +9,7 @@ def force(youngs, radius, l_right, a_right, l_left, a_left, delta_total):
     left_coef = (3 * np.pi * youngs * (radius ** 4)) / \
         (2 * (a_left ** 2) * ((3 * l_left) - a_left))
 
-    delta_left = lambda delta: (delta / (1 + force_ratio)) * left_coef
+    delta_left = lambda delta: (delta / (1 + force_ratio)) * left_coef * 1000
     left_force = list(map(delta_left, delta_total))
     return _averager(left_force)
 
@@ -21,7 +21,7 @@ def dev_force(youngs, radius, l_right, a_right, l_left, a_left, delta_max, delta
     left_coef = (3 * np.pi * youngs * (radius ** 4)) / \
         (2 * (a_left ** 2) * ((3 * l_left) - a_left))
 
-    delta_left = lambda delta: (delta / (1 + force_ratio)) * left_coef
+    delta_left = lambda delta: (delta / (1 + force_ratio)) * left_coef * 1000
     left_force_max = np.array(list(map(delta_left, delta_max)))
     left_force_min = np.array(list(map(delta_left, delta_min)))
 

@@ -45,6 +45,7 @@
     var polynomials = [];
     var windows = [];
     var minDistances = [];
+    var buffers = [];
     /* -----------------------------------------------------------------------------------*/
 
     for (var i = 0; i < df.length; i++) {
@@ -273,6 +274,78 @@
           },
         ],
       };
+      var bufferSlider = {
+        active: 0,
+        len: 0.5,
+        pad: {
+          t: 160,
+        },
+        currentvalue: {
+          xanchor: "left",
+          prefix: "Buffer: ",
+          font: {
+            color: "#888",
+            size: 10,
+          },
+        },
+        steps: [
+          {
+            label: "0",
+            method: "restyle",
+            args: ["buffer", "0"],
+          },
+          {
+            label: "5",
+            method: "restyle",
+            args: ["buffer", "5"],
+          },
+          {
+            label: "10",
+            method: "restyle",
+            args: ["buffer", "10"],
+          },
+          {
+            label: "15",
+            method: "restyle",
+            args: ["buffer", "15"],
+          },
+          {
+            label: "20",
+            method: "restyle",
+            args: ["buffer", "20"],
+          },
+          {
+            label: "25",
+            method: "restyle",
+            args: ["buffer", "25"],
+          },
+          {
+            label: "30",
+            method: "restyle",
+            args: ["buffer", "30"],
+          },
+          {
+            label: "35",
+            method: "restyle",
+            args: ["buffer", "35"],
+          },
+          {
+            label: "40",
+            method: "restyle",
+            args: ["buffer", "40"],
+          },
+          {
+            label: "45",
+            method: "restyle",
+            args: ["buffer", "45"],
+          },
+          {
+            label: "50",
+            method: "restyle",
+            args: ["buffer", "50    print(data.buffers)"],
+          },
+        ],
+      };
       var polySlider = {
         len: 0.5,
         active: 0,
@@ -400,6 +473,7 @@
           minDistSlider,
           polySlider,
           windSlider,
+          bufferSlider
         ],
       };
 
@@ -413,6 +487,7 @@
       polynomials.push("3");
       windows.push("13");
       minDistances.push("0");
+      buffers.push("0")
       /* ---------------------------------------------------------------------------------*/
       /* --------------------------Call Graphing Once with Defaults ---------------------------------*/
       let Div = document.getElementById(istring);
@@ -422,6 +497,7 @@
         polynomials[Div.valueOf().id],
         windows[Div.valueOf().id],
         minDistances[Div.valueOf().id],
+        buffers[Div.valueOf().id],
         Div
       );
       /* ---------------------------------------------------------------------------------------------------*/
@@ -437,6 +513,7 @@
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
             Div
           );
         } else if (typeof eventdata["xaxis.range"][0] != "undefined") {
@@ -448,6 +525,7 @@
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
             Div
           );
         }
@@ -465,6 +543,7 @@
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].polynom != "undefined") {
@@ -475,6 +554,7 @@
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].wind != "undefined") {
@@ -485,6 +565,7 @@
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].mdist != "undefined") {
@@ -496,6 +577,19 @@
             polynomials[Div.valueOf().id],
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
+            Div
+          );
+        } else if (typeof eventData[0].buffer != "undefined") {
+          buffers[Div.valueOf().id] = eventData[0].buffer;
+          console.log(Div.valueOf().id);
+          toPython(
+            xranges[Div.valueOf().id],
+            thresholds[Div.valueOf().id],
+            polynomials[Div.valueOf().id],
+            windows[Div.valueOf().id],
+            minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
             Div
           );
         }
@@ -510,6 +604,7 @@
     polynomials,
     windows,
     minDistances,
+    buffers,
     Div
   ) {
 
@@ -521,6 +616,7 @@
       polynomials,
       windows,
       minDistances,
+      buffers,
       video_id,
     };
     let graph_paramsJson = JSON.stringify(graph_params);

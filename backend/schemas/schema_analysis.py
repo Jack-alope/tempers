@@ -16,6 +16,7 @@ class AnalysisBase(BaseModel):
     windows: int
     minDistances: int
     video_id: int
-
+    buffers: int
+    
     class Config:
         orm_mode = True
