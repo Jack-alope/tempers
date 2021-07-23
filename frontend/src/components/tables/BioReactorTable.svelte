@@ -5,10 +5,6 @@
   import { showBioReactor, bio_reactors } from "../../components/Stores.js";
   import AddBioReactor from "../../components/AddBioReactor.svelte";
 
-  import type { bio_reactor_interface } from "../../interfaces";
-
-  let bio_reactors_value: bio_reactor_interface[];
-
   onMount(async () => {
     await getBioReactors();
   });
@@ -25,7 +21,7 @@
         $bio_reactors = $bio_reactors.filter(
           (bio_reactor) => bio_reactor.id !== id
         );
-        $bio_reactors = bio_reactors_value;
+        $bio_reactors = $bio_reactors;
       } else {
         alert("Cannot delete bio reactor");
       }

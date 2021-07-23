@@ -32,8 +32,8 @@
     initialValues: {
       date_added: "",
       bio_reactor_number: "",
-      post_distance: "",
-      youngs_modulus: "",
+      post_distance: 0,
+      youngs_modulus: 0,
       posts: [
         {
           post_number: "",
