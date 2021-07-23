@@ -47,8 +47,8 @@ def add_bio_reactor(bio_reactor: schema_bio_reactor.BioReactorCreate,
     new_bio_reactor = crud_bio_reactor.create_bio_reactor(
         database_session, bio_reactor)
 
-    # for post in bio_reactor.posts:
-    #     crud_post.create_post(database_session, post, new_bio_reactor.id)
+    for post in bio_reactor.posts:
+        crud_post.create_post(database_session, post, new_bio_reactor.id)
     return new_bio_reactor
 
 
