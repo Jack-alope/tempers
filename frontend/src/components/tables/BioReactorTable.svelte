@@ -21,7 +21,6 @@
         $bio_reactors = $bio_reactors.filter(
           (bio_reactor) => bio_reactor.id !== id
         );
-        $bio_reactors = $bio_reactors;
       } else {
         alert("Cannot delete bio reactor");
       }
