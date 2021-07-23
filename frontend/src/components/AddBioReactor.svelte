@@ -2,9 +2,9 @@
   import { createForm } from "svelte-forms-lib";
 
   import { showBioReactor, bio_reactors } from "../components/Stores.js";
-  import type { bio_reactor_interface } from "../interfaces.js";
 
   async function handleBioReactorSubmitted(bio_reactor_info) {
+    console.log(bio_reactor_info);
     const res = await fetch(process.env.API_URL + "/addBioReactor", {
       method: "POST",
       headers: {
@@ -32,6 +32,8 @@
     initialValues: {
       date_added: "",
       bio_reactor_number: "",
+      post_distance: 0,
+      youngs_modulus: 0,
       posts: [
         {
           post_number: "",
@@ -44,6 +46,7 @@
       ],
     },
     onSubmit: (values) => {
+      console.log(values);
       handleBioReactorSubmitted(values);
     },
   });
@@ -175,32 +178,66 @@
       </div>
     {/each}
 
-    <div class="w-full">
-      <label
-        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-        for="date_recorded">Date</label
-      >
-      <input
-        type="date"
-        id="date_recorded"
-        name="date_recorded"
-        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
-        bind:value={$form.date_added}
-      />
+    <div class="flex flex-wrap py-3">
+      <div class="w-1/2 px-3">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="date_recorded">Date</label
+        >
+        <input
+          type="date"
+          id="date_recorded"
+          name="date_recorded"
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
+          bind:value={$form.date_added}
+        />
+      </div>
+
+      <div class="w-1/2 px-3">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="experiment_id">Bio Reactor Number</label
+        >
+        <input
+          type="number"
+          id="bio_reactor_number"
+          name="bio_reactor_number"
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          bind:value={$form.bio_reactor_number}
+        />
+      </div>
     </div>
 
-    <div class="w-full">
-      <label
-        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-        for="experiment_id">Bio Reactor Number</label
-      >
-      <input
-        type="number"
-        id="bio_reactor_number"
-        name="experiment_idenifer"
-        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-        bind:value={$form.bio_reactor_number}
-      />
+    <div class="flex flex-wrap py-3">
+      <div class="w-1/2 px-3">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="post_distance">Post Distance</label
+        >
+        <input
+          type="number"
+          step="any"
+          id="post_distance"
+          name="post_distance"
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          bind:value={$form.post_distance}
+        />
+      </div>
+
+      <div class="w-1/2 px-3">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="youngs_modulus">Youngs Modulus</label
+        >
+        <input
+          type="number"
+          step="any"
+          id="youngs_modulus"
+          name="youngs_modulus"
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          bind:value={$form.youngs_modulus}
+        />
+      </div>
     </div>
 
     <div class="w-1/2 px-3 py-3">
