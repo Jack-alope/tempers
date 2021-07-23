@@ -260,7 +260,7 @@
       class="appearance-none block w-1/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
       bind:value={calibration_set_identifier}
     />
-    <label for="calDist">Enter the calibration Disttance (mm)</label>
+    <label for="calDist">Enter the calibration Distance (mm)</label>
     <input
       type="number"
       step="any"
@@ -333,12 +333,7 @@
 
 <div id="canvas">
   {#if image_path}
-    <img
-      id="pic"
-      src="{process.env.API_URL}/{image_path}"
-      onload="this.width/=2;"
-      alt="Heart Tissue"
-    />
+    <img id="pic" src="{process.env.API_URL}/{image_path}" alt="Heart Tissue" />
     }
   {/if}
 </div>
