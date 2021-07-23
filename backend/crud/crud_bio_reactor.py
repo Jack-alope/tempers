@@ -30,11 +30,12 @@ def get_bio_reactors_by_li_id(database_session: Session, bio_ids: List[int]):
 
 
 def create_bio_reactor(database_session: Session,
-                       bio_reactor: schema_bio_reactor.BioReactorBase):
+                       bio_reactor: schema_bio_reactor.BioReactor):
     """Adds bio reactor to DB"""
-    db_bio_reactor = models.BioReactor(
-        date_added=bio_reactor.date_added,
-        bio_reactor_number=bio_reactor.bio_reactor_number)
+    db_bio_reactor = models.BioReactor()
+    for i in bio_reactor:
+        if i[0] != "posts":
+            setattr(db_bio_reactor, i[0], i[1])
     database_session.add(db_bio_reactor)
     database_session.commit()
     database_session.refresh(db_bio_reactor)
