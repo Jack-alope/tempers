@@ -46,6 +46,7 @@ pylint:
   only:
     - merge_requests
     - main
+  when: manual
 
 pages:
   stage: publish code review
@@ -57,6 +58,7 @@ pages:
       - public
   only:
     - main
+  when: manual
 
 test:
   stage: testing
@@ -73,6 +75,7 @@ test:
   only:
     - merge_requests
     - main
+  when: manual
 
     
 
