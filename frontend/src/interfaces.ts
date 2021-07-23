@@ -8,6 +8,8 @@ export interface bio_reactor_interface {
   id: number;
   bio_reactor_number: number;
   date_added: Date;
+  post_distance: number;
+  youngs_modulus: number;
 }
 
 export interface video_interface {

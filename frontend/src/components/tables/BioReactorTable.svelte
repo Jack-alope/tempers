@@ -51,6 +51,16 @@
       <th
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >Post Distance</th
+      >
+      <th
+        scope="col"
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >Youngs Modulus</th
+      >
+      <th
+        scope="col"
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         >Date Added</th
       >
       <th
@@ -69,6 +79,12 @@
           <td class="px-6 py-4 whitespace-nowrap">{bio_reactor.id}</td>
           <td class="px-6 py-4 whitespace-nowrap"
             >{bio_reactor.bio_reactor_number}</td
+          >
+          <td class="px-6 py-4 whitespace-nowrap"
+            >{bio_reactor.post_distance}</td
+          >
+          <td class="px-6 py-4 whitespace-nowrap"
+            >{bio_reactor.youngs_modulus}</td
           >
           <td class="px-6 py-4 whitespace-nowrap">{bio_reactor.date_added}</td>
           <td class="px-6 py-4 whitespace-nowrap"
