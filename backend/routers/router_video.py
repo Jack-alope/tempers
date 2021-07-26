@@ -48,7 +48,7 @@ async def get_videos(database: Session = Depends(get_database)):
     return crud_video.get_all_vids(database)
 
 
-@router.get('/selectedVideo/', tags=["Videos"])
+@router.get('/selectedVideo', tags=["Videos"])
 async def selected_video(video_id: int = Query(...), database: Session = Depends(get_database)):
     """
     accepts vid id from query string and
