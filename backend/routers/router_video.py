@@ -13,7 +13,7 @@ import cv2
 
 
 from database import get_db as get_database
-from crud import crud_video
+from crud import crud_video, crud_bio_reactor
 from schemas import schema_video
 
 
@@ -76,7 +76,8 @@ def get_vids_reactors(database: Session = Depends(get_database)):
     result = defaultdict(list)
 
     for vid in videos:
-        result[vid.experiment_idenifer].append(vid)
+        result[vid.experiment_idenifer].append(
+            schema_video.VideoShow(**vid.__dict__))
 
     return dict(result)
 
