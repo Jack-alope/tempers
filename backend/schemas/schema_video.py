@@ -45,7 +45,6 @@ class VideoShow(VideoBase):
     id: int
     date_recorded: date
     bio_reactor_number: int
-    experiment_idenifer: str
     calibration_set_identifier: str = None
     tracked: bool
     anaylized: bool
