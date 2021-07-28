@@ -132,3 +132,7 @@ def video_anaylized(database_session: Session, vid_id: int):
 def get_next_video_id(database_session: Session):
     """Returns what the next vid id will be"""
     return database_session.query(func.max(models.Video.id)).scalar() + 1
+
+
+def get_frequency_by_id(database_session: Session, vid_id: int):
+    return database_session.query(models.Video).filter(models.Video.id == vid_id).first().frequency

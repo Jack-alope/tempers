@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from schemas import schema_analysis
-from crud import crud_video, crud_tissue_tracking, crud_tissue_caculations
+from crud import crud_video, crud_tissue_tracking, crud_tissue_caculations, crud_tissue
 from analysis.tissues import TissuePoints
 
 import models
@@ -74,13 +74,17 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     crud_video.video_anaylized(database, data.video_id)
 
     contractx = tracking_obj.contract_points[0][0].tolist() + \
-        tracking_obj.contract_points[2][0].tolist() + tracking_obj.contract_points[4][0].tolist()
+        tracking_obj.contract_points[2][0].tolist(
+    ) + tracking_obj.contract_points[4][0].tolist()
     contracty = tracking_obj.contract_points[0][1].tolist() + \
-        tracking_obj.contract_points[2][1].tolist() + tracking_obj.contract_points[4][1].tolist()
+        tracking_obj.contract_points[2][1].tolist(
+    ) + tracking_obj.contract_points[4][1].tolist()
     relaxx = tracking_obj.relax_points[0][0].tolist() + tracking_obj.relax_points[1][0].tolist() + \
-        tracking_obj.relax_points[2][0].tolist() + tracking_obj.relax_points[4][0].tolist()
+        tracking_obj.relax_points[2][0].tolist(
+    ) + tracking_obj.relax_points[4][0].tolist()
     relaxy = tracking_obj.relax_points[0][1].tolist() + tracking_obj.relax_points[1][1].tolist() + \
-        tracking_obj.relax_points[2][1].tolist() + tracking_obj.relax_points[4][1].tolist()
+        tracking_obj.relax_points[2][1].tolist(
+    ) + tracking_obj.relax_points[4][1].tolist()
     return {'status': 'OK', 'data': {
         'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),
         'peaksx': tracking_obj.peaks[0], 'peaksy': tracking_obj.peaks[1],
@@ -102,6 +106,12 @@ def download_summary(video_id=Query(...), database_session=Depends(get_db)):
 
     caculations_df = crud_tissue_caculations.get_calculations(
         database_session, tissue_ids)
+
+    caculations_df["tissue_number"] = caculations_df["tissue_id"].apply(
+        crud_tissue.get_tissue_number_by_id, database_session=(database_session))
+
+    caculations_df["pacing_frequency"] = caculations_df["tissue_id"].apply(
+        crud_tissue.get_frequency_by_tissue_id, database_session=database_session)
 
     models.check_path_exisits(f"{models.UPLOAD_FOLDER}/temp/")
 
