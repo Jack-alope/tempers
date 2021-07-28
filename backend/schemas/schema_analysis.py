@@ -19,6 +19,7 @@ class AnalysisBase(BaseModel):
     buffers: int
     experiment_identifier: Optional[str]
     tissue_number: Optional[int]
-
+    buttons: List
+    
     class Config:
         orm_mode = True

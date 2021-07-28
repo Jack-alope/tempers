@@ -18,7 +18,6 @@ werkzeug = "*"
 scipy = "*"
 pandas = "*"
 opencv-contrib-python-headless = "*"
-peakutils = "*"
 
 [dev-packages]
 pylint = "*"

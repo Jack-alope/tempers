@@ -61,6 +61,7 @@
     var windows = [];
     var minDistances = [];
     var buffers = [];
+    var buttons = [];
     /* -----------------------------------------------------------------------------------*/
 
     for (var i = 0; i < df.length; i++) {
@@ -72,7 +73,7 @@
         x: Object.values(df[i].time),
         y: Object.values(df[i].disp),
         mode: "scatter",
-        name: "Disp",
+        name: "Smoothed Force",
       };
       var temp = {
         x: [],
@@ -95,14 +96,14 @@
 
       /* ---------------Define Sliders Start------------------------------------------------*/
       var threshSlider = {
-        active: 6,
+        active: 1,
         len: 0.5,
         pad: {
           t: 100,
         },
         currentvalue: {
           xanchor: "right",
-          prefix: "Thresh: ",
+          prefix: "Prominence: ",
           font: {
             color: "#888",
             size: 10,
@@ -115,9 +116,49 @@
             args: ["thresh", "0"],
           },
           {
+            label: ".01",
+            method: "restyle",
+            args: ["thresh", ".01"],
+          },
+          {
+            label: ".02",
+            method: "restyle",
+            args: ["thresh", ".02"],
+          },
+          {
+            label: ".03",
+            method: "restyle",
+            args: ["thresh", ".03"],
+          },
+          {
+            label: ".05",
+            method: "restyle",
+            args: ["thresh", ".05"],
+          },
+          {
+            label: ".075",
+            method: "restyle",
+            args: ["thresh", ".075"],
+          },
+          {
             label: ".1",
             method: "restyle",
             args: ["thresh", ".1"],
+          },
+          {
+            label: ".125",
+            method: "restyle",
+            args: ["thresh", ".125"],
+          },
+          {
+            label: ".15",
+            method: "restyle",
+            args: ["thresh", ".15"],
+          },
+          {
+            label: ".175",
+            method: "restyle",
+            args: ["thresh", ".175"],
           },
           {
             label: ".2",
@@ -129,45 +170,10 @@
             method: "restyle",
             args: ["thresh", ".3"],
           },
-          {
-            label: ".4",
-            method: "restyle",
-            args: ["thresh", ".4"],
-          },
-          {
-            label: ".5",
-            method: "restyle",
-            args: ["thresh", ".5"],
-          },
-          {
-            label: ".6",
-            method: "restyle",
-            args: ["thresh", ".6"],
-          },
-          {
-            label: ".7",
-            method: "restyle",
-            args: ["thresh", ".7"],
-          },
-          {
-            label: ".8",
-            method: "restyle",
-            args: ["thresh", ".8"],
-          },
-          {
-            label: ".9",
-            method: "restyle",
-            args: ["thresh", ".9"],
-          },
-          {
-            label: ".99",
-            method: "restyle",
-            args: ["thresh", ".99"],
-          },
         ],
       };
       var minDistSlider = {
-        active: 0,
+        active: 3,
         len: 0.5,
         x: 0.5,
         pad: {
@@ -183,9 +189,9 @@
         },
         steps: [
           {
-            label: "0",
+            label: "1",
             method: "restyle",
-            args: ["mdist", "0"],
+            args: ["mdist", "1"],
           },
           {
             label: "5",
@@ -290,7 +296,7 @@
         ],
       };
       var bufferSlider = {
-        active: 0,
+        active: 3,
         len: 0.5,
         pad: {
           t: 160,
@@ -357,7 +363,7 @@
           {
             label: "50",
             method: "restyle",
-            args: ["buffer", "50    print(data.buffers)"],
+            args: ["buffer", "50"],
           },
         ],
       };
@@ -476,16 +482,58 @@
           },
         ],
       };
+
+      var updatemenus=[{
+        type: 'buttons',
+        y: 1.2,
+        yanchor: 'top',
+        x: 0.1,
+        xanchor: 'center',
+        direction: 'left',
+        buttons: [{
+          args: [{'graph_edits': [true, false]}],
+                label: 'Inverse',
+                method: 'restyle'
+        }, {
+          args: [{'graph_edits': [false, true]}],
+                label: 'Subtract Baseline',
+                method: 'restyle'
+        }, {
+          args: [{'graph_edits': [true, true]}],
+                label: 'Both',
+                method: 'restyle'
+        }, {
+          args: [{'graph_edits': [false, false]}],
+                label: 'Neither',
+                method: 'restyle'
+        },
+      ]
+      }];
       /* -----------------------------------------------------------------------------------*/
 
       /* ---------------Set Layout and Graph----------------------------------------------*/
       var layout = {
+        updatemenus: updatemenus,
         xaxis: {
           rangeslider: {},
+          title: {
+            text: "Time (s)"
+          }
+        },
+        yaxis: {
+          title: {
+            text: "Force (mN)"
+          }    
+        },
+        yaxis2: {
+          title: "DFDTs (mN/s)",
+          overlaying: 'y',
+          side: 'right',
+          position: .97
         },
         sliders: [
           threshSlider,
-          minDistSlider,
+          minDistSlider, 
           polySlider,
           windSlider,
           bufferSlider,
@@ -498,11 +546,12 @@
       /* -----------------Set Default Slider Values-----------------------------------------*/
       var temp = [0, 0];
       xranges.push(temp);
-      thresholds.push(".6");
+      thresholds.push(".01");
       polynomials.push("3");
       windows.push("13");
-      minDistances.push("0");
-      buffers.push("0");
+      minDistances.push("10");
+      buffers.push("10");
+      buttons.push([false, false]);
       /* ---------------------------------------------------------------------------------*/
       /* --------------------------Call Graphing Once with Defaults ---------------------------------*/
       let Div = document.getElementById(istring);
@@ -513,6 +562,7 @@
         windows[Div.valueOf().id],
         minDistances[Div.valueOf().id],
         buffers[Div.valueOf().id],
+        buttons[Div.valueOf().id],
         Div
       );
       /* ---------------------------------------------------------------------------------------------------*/
@@ -529,6 +579,7 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
         } else if (typeof eventdata["xaxis.range"][0] != "undefined") {
@@ -541,6 +592,7 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
         }
@@ -549,6 +601,7 @@
 
       /* ----------------Sliders Update---------------------------------------*/
       Div.on("plotly_restyle", function (eventData) {
+        console.log(eventData[0].graph_edits)
         //Finds which slider was changed, updates that value, and calls toPython function
         if (typeof eventData[0].thresh != "undefined") {
           thresholds[Div.valueOf().id] = eventData[0].thresh;
@@ -559,6 +612,7 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].polynom != "undefined") {
@@ -570,6 +624,7 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].wind != "undefined") {
@@ -581,11 +636,11 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].mdist != "undefined") {
           minDistances[Div.valueOf().id] = eventData[0].mdist;
-          console.log(Div.valueOf().id);
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
@@ -593,11 +648,11 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
         } else if (typeof eventData[0].buffer != "undefined") {
           buffers[Div.valueOf().id] = eventData[0].buffer;
-          console.log(Div.valueOf().id);
           toPython(
             xranges[Div.valueOf().id],
             thresholds[Div.valueOf().id],
@@ -605,8 +660,21 @@
             windows[Div.valueOf().id],
             minDistances[Div.valueOf().id],
             buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
             Div
           );
+        } else if (typeof eventData[0].graph_edits != "undefined") {
+          buttons[Div.valueOf().id] = eventData[0].graph_edits;
+          toPython(
+            xranges[Div.valueOf().id],
+            thresholds[Div.valueOf().id],
+            polynomials[Div.valueOf().id],
+            windows[Div.valueOf().id],
+            minDistances[Div.valueOf().id],
+            buffers[Div.valueOf().id],
+            buttons[Div.valueOf().id],
+            Div
+          )
         }
       });
       /* -----------------------------------------------------------------------------------*/
@@ -620,6 +688,7 @@
     windows,
     minDistances,
     buffers,
+    buttons,
     Div
   ) {
     let value = Div.valueOf().id;
@@ -634,6 +703,7 @@
         windows,
         minDistances,
         buffers,
+        buttons,
         video_id,
       };
     } else {
@@ -645,13 +715,13 @@
         windows,
         minDistances,
         buffers,
+        buttons, 
         experiment_identifier,
         tissue_number,
       };
     }
 
     let graph_paramsJson = JSON.stringify(graph_params);
-    console.log(graph_paramsJson);
 
     const res = await fetch(process.env.API_URL + "/graphUpdate", {
       method: "POST",
@@ -663,7 +733,15 @@
 
     if (res.ok) {
       const response = await res.json();
-      Plotly.deleteTraces(Div.valueOf().id, [-6, -5, -4, -3, -2, -1]);
+      Plotly.deleteTraces(Div.valueOf().id, [
+        -7,
+        -6,
+        -5,
+        -4,
+        -3,
+        -2,
+        -1,
+      ]);
       Plotly.restyle(
         Div.valueOf().id,
         "y",
@@ -743,11 +821,19 @@
         },
       });
       Plotly.addTraces(Div.valueOf().id, {
+        x: response.data.dfdtx,
+        y: response.data.dfdty,
+        mode: "scatter",
+        name: "DFDT",
+        //visible: "legendonly",
+        yaxis: 'y2'
+      });
+      Plotly.addTraces(Div.valueOf().id, {
         x: response.data.rawx,
         y: response.data.rawy,
         mode: "scatter",
-        name: "Raw",
-        visible: "legendonly",
+        name: "Raw Force",
+        visible: "legendonly"
       });
     }
   }
