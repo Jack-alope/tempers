@@ -4,7 +4,12 @@
 
   import { json_data_list } from "../components/Stores.js";
 
-  export let nums, freqs, types, video_id;
+  export let nums,
+    freqs,
+    types,
+    video_id = null,
+    experiment_identifier = null,
+    tissue_number = null;
 
   let json_data_list_value;
 
@@ -17,20 +22,30 @@
   });
 
   async function caculate() {
-    const res = await fetch(
-      process.env.API_URL + `/caculate?video_id=${video_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    let url;
+    if (video_id) {
+      url = `/caculate?video_id=${video_id}`;
+    } else {
+      url = `/caculate?experiment_identifier=${experiment_identifier}&tissue_number=${tissue_number}`;
+    }
+    const res = await fetch(process.env.API_URL + url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (res.ok) {
       const file = await res.blob();
       if (file) {
         const blob = new Blob([file]);
-        saveAs(blob, `${video_id}_calculations.csv`);
+        if (video_id) {
+          saveAs(blob, `${video_id}_calculations.csv`);
+        } else {
+          saveAs(
+            blob,
+            `${experiment_identifier}_${tissue_number}_calculations.csv`
+          );
+        }
       }
     }
   }
@@ -72,9 +87,9 @@
         temp,
         temp,
         temp,
-        temp, 
-        temp, 
-        temp
+        temp,
+        temp,
+        temp,
       ];
       /* ------------------------------------------------------------------------------------*/
 
@@ -473,7 +488,7 @@
           minDistSlider,
           polySlider,
           windSlider,
-          bufferSlider
+          bufferSlider,
         ],
       };
 
@@ -487,7 +502,7 @@
       polynomials.push("3");
       windows.push("13");
       minDistances.push("0");
-      buffers.push("0")
+      buffers.push("0");
       /* ---------------------------------------------------------------------------------*/
       /* --------------------------Call Graphing Once with Defaults ---------------------------------*/
       let Div = document.getElementById(istring);
@@ -607,19 +622,36 @@
     buffers,
     Div
   ) {
-
     let value = Div.valueOf().id;
-    const graph_params = {
-      xrange,
-      value,
-      thresholds,
-      polynomials,
-      windows,
-      minDistances,
-      buffers,
-      video_id,
-    };
+    let graph_params;
+
+    if (video_id) {
+      graph_params = {
+        xrange,
+        value,
+        thresholds,
+        polynomials,
+        windows,
+        minDistances,
+        buffers,
+        video_id,
+      };
+    } else {
+      graph_params = {
+        xrange,
+        value,
+        thresholds,
+        polynomials,
+        windows,
+        minDistances,
+        buffers,
+        experiment_identifier,
+        tissue_number,
+      };
+    }
+
     let graph_paramsJson = JSON.stringify(graph_params);
+    console.log(graph_paramsJson);
 
     const res = await fetch(process.env.API_URL + "/graphUpdate", {
       method: "POST",
@@ -631,18 +663,13 @@
 
     if (res.ok) {
       const response = await res.json();
-      Plotly.deleteTraces(Div.valueOf().id, [
-        -6,
-        -5,
-        -4,
-        -3,
-        -2,
-        -1,
-      ]);
+      Plotly.deleteTraces(Div.valueOf().id, [-6, -5, -4, -3, -2, -1]);
       Plotly.restyle(
         Div.valueOf().id,
-        "y", [response.data.ys],
-        "x", [response.data.xs], 
+        "y",
+        [response.data.ys],
+        "x",
+        [response.data.xs],
         [0]
       );
       Plotly.addTraces(Div.valueOf().id, {
@@ -651,13 +678,13 @@
         mode: "markers",
         name: "Peaks",
         marker: {
-          color: 'rgb(255, 179, 0)',
+          color: "rgb(255, 179, 0)",
           symbol: "triangle-up-dot",
-          size: 10, 
+          size: 10,
           line: {
-            width: 1.5
-          }
-        }
+            width: 1.5,
+          },
+        },
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.basex,
@@ -665,27 +692,27 @@
         mode: "markers",
         name: "Base",
         marker: {
-          color: 'rgba(17, 157, 255,0.5)',
+          color: "rgba(17, 157, 255,0.5)",
           symbol: "triangle-right-dot",
-          size: 10, 
+          size: 10,
           line: {
-            width: 1.5
-          }
-        }
+            width: 1.5,
+          },
+        },
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.frontx,
         y: response.data.fronty,
-        mode: 'markers', 
-        name: 'Front',
+        mode: "markers",
+        name: "Front",
         marker: {
           symbol: "triangle-left-dot",
-          size: 10, 
+          size: 10,
           line: {
-            width: 1.5
-          }
+            width: 1.5,
+          },
         },
-        visible: "legendonly"
+        visible: "legendonly",
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.contractx,
@@ -693,13 +720,13 @@
         mode: "markers",
         name: "Contractpoints (10, 50, 90%)",
         marker: {
-          color: 'rgb(0, 131, 87)',
+          color: "rgb(0, 131, 87)",
           symbol: "circle-open-dot",
-          size: 7, 
+          size: 7,
           line: {
-            width: 1.5
-          }
-        }
+            width: 1.5,
+          },
+        },
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.relaxx,
@@ -707,13 +734,13 @@
         mode: "markers",
         name: "Relaxpoints (10, 50, 80, 90%)",
         marker: {
-          color: 'rgb(233, 0, 0)',
+          color: "rgb(233, 0, 0)",
           symbol: "circle-open-dot",
-          size: 7, 
+          size: 7,
           line: {
-            width: 1.5
-          }
-        }
+            width: 1.5,
+          },
+        },
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.rawx,

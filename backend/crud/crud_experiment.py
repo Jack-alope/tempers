@@ -62,6 +62,7 @@ def delete_experiment(database_session: Session, exp_id: int):
         return True
     except UnmappedInstanceError:
         logging.info("experiment does not exist")
+        return False
 
 
 def delete_experiment_by_identifer(database_session: Session, experiment_idenifer: str):

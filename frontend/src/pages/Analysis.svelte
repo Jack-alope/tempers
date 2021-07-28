@@ -2,22 +2,19 @@
   import { onMount } from "svelte";
   import Grapher from "../components/Grapher.svelte";
 
-  import { json_data_list } from "../components/Stores.js";
+  import { experiments, json_data_list } from "../components/Stores.js";
 
   let video_id: number;
 
-  let nums, freqs, types;
+  let nums, freqs, types, experiment_identifier, tissue_number;
 
-  async function handleVideoSelected(video_id: number) {
-    const res = await fetch(
-      process.env.API_URL + `/analyze?video_id=${video_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  async function handleVideoSelected(url: string) {
+    const res = await fetch(process.env.API_URL + url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     if (res.ok) {
       const response_json = await res.json();
@@ -33,7 +30,15 @@
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
     video_id = parseInt(urlParams.get("video_id"));
-    await handleVideoSelected(video_id);
+    experiment_identifier = urlParams.get("experiment_id");
+    tissue_number = parseInt(urlParams.get("tissue_number"));
+    if (video_id) {
+      await handleVideoSelected(`/analyze?video_id=${video_id}`);
+    } else if (experiment_identifier && tissue_number) {
+      await handleVideoSelected(
+        `/analyze/tissue_number?tissue_number=${tissue_number}&experiment_identifier=${experiment_identifier}`
+      );
+    }
   });
 </script>
 
@@ -49,4 +54,6 @@
 
 {#if nums && freqs && types && video_id}
   <Grapher {nums} {freqs} {types} {video_id} />
+{:else if nums && freqs && types && experiment_identifier && tissue_number}
+  <Grapher {nums} {freqs} {types} {experiment_identifier} {tissue_number} />
 {/if}

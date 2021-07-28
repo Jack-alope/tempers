@@ -33,7 +33,7 @@
         title="experiment: {exp}"
         class="shadow-sm rounded-lg border-2 border-blue-600 border-opacity-50"
       >
-        <VideoTable videos={vid_list} />
+        <VideoTable videos={vid_list} experiment_ident={exp} />
       </AccordionItem>
     {/each}
   {/if}
