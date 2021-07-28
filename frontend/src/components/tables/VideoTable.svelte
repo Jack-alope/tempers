@@ -150,6 +150,7 @@
 {#if !tissue_numbers}
   <h1>no tissues</h1>
 {:else}
+  <p>To analyze by tissue number within an experiment select tissue number</p>
   <form on:submit|preventDefault={handleTissueNumberSubmitted}>
     <select bind:value={selectedTissueNumber}>
       {#each tissue_numbers as tissue_number}

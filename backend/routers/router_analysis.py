@@ -139,10 +139,18 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
 
 @router.get("/caculate", tags=["analysis"])
-def download_summary(video_id=Query(...), database_session=Depends(get_db)):
+def download_summary(video_id=Query(None), experiment_identifier=Query(None), tissue_number=Query(None), database_session=Depends(get_db)):
     """Download summary of vid caculatios"""
 
-    tissues = crud_video.get_vid_by_id(database_session, video_id).tissues
+    tissues = []
+
+    if video_id:
+        tissues = crud_video.get_vid_by_id(database_session, video_id).tissues
+    else:
+        tissues = crud_tissue.get_tissues_by_experiemnt_and_tissue_number(
+            database_session, experiment_identifier, tissue_number)
+        # this returns a tuple with tissue, freq, only need the tissue object in this case
+        tissues = [x[0] for x in tissues]
 
     tissue_ids = [tissue.id for tissue in tissues]
 

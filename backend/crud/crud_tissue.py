@@ -56,4 +56,4 @@ def get_tissues_by_experiemnt_and_tissue_number(database_session: Session, exper
         database_session, experiment_identifer).id
 
     return database_session.query(models.Tissue, models.Video.frequency).join(models.Video).filter(
-        models.Video.experiment_id == experiment_id, models.Tissue.tissue_number == tissue_number).all()
+        models.Video.experiment_id == experiment_id, models.Tissue.tissue_number == tissue_number).order_by(models.Tissue.id).all()

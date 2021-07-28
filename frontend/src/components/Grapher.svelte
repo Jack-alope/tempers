@@ -22,20 +22,30 @@
   });
 
   async function caculate() {
-    const res = await fetch(
-      process.env.API_URL + `/caculate?video_id=${video_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    let url;
+    if (video_id) {
+      url = `/caculate?video_id=${video_id}`;
+    } else {
+      url = `/caculate?experiment_identifier=${experiment_identifier}&tissue_number=${tissue_number}`;
+    }
+    const res = await fetch(process.env.API_URL + url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (res.ok) {
       const file = await res.blob();
       if (file) {
         const blob = new Blob([file]);
-        saveAs(blob, `${video_id}_calculations.csv`);
+        if (video_id) {
+          saveAs(blob, `${video_id}_calculations.csv`);
+        } else {
+          saveAs(
+            blob,
+            `${experiment_identifier}_${tissue_number}_calculations.csv`
+          );
+        }
       }
     }
   }
