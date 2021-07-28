@@ -102,11 +102,11 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
     dataframe = crud_tissue_tracking.get_tracking_by_id(
         database, tissue_obj.id)
-    print(data.buffers)
+
     tracking_obj = TissuePoints(
         dataframe['displacement'].to_list(), dataframe['time'].to_list(), tissue_obj)
-    tracking_obj.smooth(int(data.windows), int(data.polynomials))
-    tracking_obj.find_peaks(data.thresholds, int(
+    tracking_obj.smooth(int(data.windows), int(data.polynomials), data.buttons[0], data.buttons[1])
+    tracking_obj.find_peaks(float(data.thresholds), int(
         data.minDistances), data.xrange, int(data.buffers))
 
     crud_tissue_caculations.create(
@@ -128,13 +128,14 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
         tracking_obj.relax_points[2][1].tolist(
     ) + tracking_obj.relax_points[4][1].tolist()
     return {'status': 'OK', 'data': {
-        'xs': tracking_obj.time, 'ys': tracking_obj.smooth_disp.tolist(),
+        'xs': tracking_obj.time, 'ys': tracking_obj.smooth_force.tolist(),
         'peaksx': tracking_obj.peaks[0], 'peaksy': tracking_obj.peaks[1],
         'basex': tracking_obj.basepoints[0], 'basey': tracking_obj.basepoints[1],
         'frontx': tracking_obj.frontpoints[0], 'fronty': tracking_obj.frontpoints[1],
         'contractx': contractx, 'contracty': contracty,
         'relaxx': relaxx, 'relaxy': relaxy,
-        'rawx': tracking_obj.time, 'rawy': tracking_obj.raw_disp_norm.tolist()
+        'dfdtx': tracking_obj.time, 'dfdty': tracking_obj.dfdt.tolist(),
+        'rawx': tracking_obj.time, 'rawy': tracking_obj.raw_force.tolist()
     }}
 
 

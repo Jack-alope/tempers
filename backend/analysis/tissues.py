@@ -3,9 +3,8 @@ This file contains a class used for finding peaks
 """
 
 import sys
-import peakutils
 import numpy as np
-from scipy.signal import savgol_filter
+import scipy.signal as signal
 from . import calculations
 sys.setrecursionlimit(10000)
 
@@ -17,9 +16,9 @@ class TissuePoints:
         """Initalize relevant values"""
         self.window = 13
         self.poly = 3
-        self.thresh = .5
-        self.min_dist = 5
-        self.buffer = 0
+        self.thresh = 0.01
+        self.min_dist = 10
+        self.buffer = 10
         self.raw_disp = disp
         self.time = time
         self.post_dist = 6
@@ -29,21 +28,35 @@ class TissuePoints:
 
         # To be defined later, set to None for readability.
         self.peaks = self.basepoints = self.frontpoints = self.smooth_disp = \
-            self.contract_points = self.relax_points = None
+            self.smooth_force = self.contract_points = self.relax_points = \
+            self.raw_force = None
 
         self.calculated_values = {}
 
         self.smooth(self.window, self.poly)
 
-    def smooth(self, window=None, poly=None):
+    def smooth(self, window=None, poly=None, inverse=False, baseline=False):
         """Applies Savitzky–Golay filter to data"""
         if window is not None:
             self.window = window
         if poly is not None:
             self.poly = poly
 
-        smoothed = savgol_filter(self.raw_disp, self.window, self.poly)
-        self.smooth_disp = self.post_dist - smoothed
+        smoothed = signal.savgol_filter(self.raw_disp, self.window, self.poly)
+
+        if inverse:
+            self.smooth_disp = -1*(self.post_dist - smoothed) 
+            self.raw_force = np.array(self.continuous_df(-1*self.raw_disp_norm))
+        else:
+            self.smooth_disp = self.post_dist - smoothed
+            self.raw_force = np.array(self.continuous_df(self.raw_disp_norm))
+
+        self.smooth_force = np.array(self.continuous_df(self.smooth_disp))
+
+        if baseline:
+            signal.detrend(self.smooth_force, overwrite_data=True)
+
+        self.dfdt = signal.savgol_filter(self.raw_force, self.window, self.poly, deriv=1)
 
         self.find_peaks()
 
@@ -56,15 +69,19 @@ class TissuePoints:
         if buffer is not None:
             self.buffer = buffer
 
-        unformatted = np.array(peakutils.indexes(
-            self.smooth_disp, self.thresh, self.min_dist)[1:-1])
+        peaks = signal.find_peaks(self.smooth_force, distance=self.min_dist, prominence=self.thresh)[0]
 
-        if not ((x_range is None) | (x_range == [0, 0])):
-            unformatted = self.crop_peaks(unformatted, x_range[0], x_range[1])
+        if not list(peaks):
+            print('No Peaks')
+        else:
+            unformatted = peaks[1:-1]
 
-        self.peaks = self.format_points(unformatted)
+            if not (x_range is None) | (x_range == [0, 0]):
+                unformatted = self.crop_peaks(unformatted, x_range[0], x_range[1])
 
-        self.find_basepoints_frontpoints()
+            self.peaks = self.format_points(unformatted, self.smooth_force)
+
+            self.find_basepoints_frontpoints()
 
     def crop_peaks(self, peak_list, start, end):
         """crops peaks to allow for time region selection"""
@@ -84,8 +101,8 @@ class TissuePoints:
         frontpoints = [self.dfdt_recursive(
             peak_index + self.buffer, lambda x:x+1) for peak_index in peak_indicies]
 
-        self.basepoints = self.format_points(basepoints)
-        self.frontpoints = self.format_points(frontpoints)
+        self.basepoints = self.format_points(basepoints, self.smooth_force)
+        self.frontpoints = self.format_points(frontpoints, self.smooth_force)
 
         self.find_analysispoints()
 
@@ -110,7 +127,7 @@ class TissuePoints:
     def dfdt_recursive(self, peak_index, incrementor):
         """Recursively moves along graph until it changes direction"""
         new_index = incrementor(peak_index)
-        if self.smooth_disp[new_index] - self.smooth_disp[peak_index] > 0:
+        if self.smooth_force[new_index] - self.smooth_force[peak_index] > 0:
             return peak_index
         return self.dfdt_recursive(new_index, incrementor)
 
@@ -120,29 +137,35 @@ class TissuePoints:
         Using linear approximation.
         """
         target_val = (
-            percentage * (self.smooth_disp[peak_index] - b_disp)) + b_disp
+            percentage * (self.smooth_force[peak_index] - b_disp)) + b_disp
 
         def cycle(step):
             for new_index in range(peak_index, base_index, step):
-                if self.smooth_disp[new_index] < target_val:
+                if self.smooth_force[new_index] < target_val:
                     y_diff = np.absolute(
-                        self.smooth_disp[new_index]-self.smooth_disp[new_index-step])
+                        self.smooth_force[new_index]-self.smooth_force[new_index-step])
                     x_diff = np.absolute(
                         self.time[new_index]-self.time[new_index-step])
                     slope = (y_diff / x_diff) * -1 * step
                     target_x = (
-                        (target_val-self.smooth_disp[new_index])/slope)+self.time[new_index]
+                        (target_val-self.smooth_force[new_index])/slope)+self.time[new_index]
                     return [target_x, target_val]
-            return [self.time[base_index], self.smooth_disp[base_index]]
+            return [self.time[base_index], self.smooth_force[base_index]]
 
         return cycle(-1) if peak_index > base_index else cycle(1)
 
-    def format_points(self, indicies):
+    def format_points(self, indicies, list):
         """Formats points into a tuple with usable points as well as
         index"""
         x_axis = [self.time[index] for index in indicies]
-        y_axis = [self.smooth_disp[index] for index in indicies]
+        y_axis = [list[index] for index in indicies]
         return (x_axis, y_axis, indicies)
+
+    def continuous_df(self, disps):
+        return calculations.force_continuous(self.youngs, self.tissue.post.radius,
+                                 self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
+                                 self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
+                                 disps)
 
     def calculate_values(self, base_disp):
         """Creates a dictionary with all calculated values"""
@@ -192,7 +215,7 @@ class TissuePoints:
             = calculations.time_between(self.relax_points[2][0], self.peaks[0])
         # TODO: DFDT is broken
         self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
-            = (0, 0) #calculations.dfdt(self.contract_points[0], self.contract_points[4])
+            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
 
         self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
             = (0, 0) #calculations.dfdt(self.relax_points[0], self.relax_points[4])

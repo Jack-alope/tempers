@@ -61,7 +61,7 @@ class TissueTracker:
         zipped = zip(self.times[0], disps, id_repeated,
                      odd_x, odd_y, even_x, even_y)
         dataframe = pd.DataFrame(list(zipped),
-                                 columns=["time", "displacement", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
+            columns=["time", "displacement", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
 
         crud_tissue_tracking.create_tissue_tracking(
             self.database, self.tissue_ids[rel_tiss_id], dataframe)
@@ -82,8 +82,9 @@ class TissueTracker:
             (x_dist, y_dist, width, height) = post
             centroid = (float(x_dist + width / 2), float(y_dist + height / 2))
 
-            centroid_list.append(self.calibrate(centroid))
-            timer.append(videostream.get(cv2.CAP_PROP_POS_MSEC) / 1000)
+            if (time := videostream.get(cv2.CAP_PROP_POS_MSEC)) != 0:
+                centroid_list.append(self.calibrate(centroid))
+                timer.append(time / 1000)
 
         self.times.append(timer)
         return centroid_list
