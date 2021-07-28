@@ -3,6 +3,8 @@ Router for analysis
 """
 import json
 import io
+import logging
+from typing import Optional
 
 from fastapi import APIRouter,  Depends, Query
 from fastapi.encoders import jsonable_encoder
@@ -21,20 +23,53 @@ router = APIRouter()
 
 
 @router.get('/analyze', tags=["analysis"])
-async def analyze(video_id: int = Query(...), database: Session = Depends(get_db)):
+async def analyze(video_id: Optional[int] = Query(None),
+                  database: Session = Depends(get_db)):
     """Sets up the graphing areas and initally plots raw data"""
-    video = video_id
 
     json_list = []
-    video_object = crud_video.get_vid_by_id(database, video)
-
     tiss_nums = []
     tiss_freq = []
     tiss_types = []
+
+    video_object = crud_video.get_vid_by_id(database, video_id)
     tissues = video_object.tissues
+
     for tissue_object in tissues:
-        # Reads each file in as a dataframe
         tiss_freq.append(video_object.frequency)
+        tiss_types.append(tissue_object.tissue_type)
+        tiss_nums.append(tissue_object.tissue_number)
+
+        data = crud_tissue_tracking.get_tracking_by_id(
+            database, tissue_object.id)
+
+        # TODO: Change this is js not here
+        data['disp'] = data['displacement']
+        json_list.append(data.to_json(orient='columns'))
+
+    json_list = json.dumps(json_list)
+
+    res = jsonable_encoder({'json_data_list': json_list,
+                            'nums': tiss_nums, 'freqs': tiss_freq, 'types': tiss_types})
+
+    return JSONResponse(content=res)
+
+
+@router.get('/analyze/tissue_number', tags=["analysis"])
+async def analyze_tissue_number(tissue_number: int = Query(...),
+                                experiment_identifier: str = Query(...),
+                                database: Session = Depends(get_db)):
+
+    json_list = []
+    tiss_nums = []
+    tiss_freq = []
+    tiss_types = []
+
+    tissues_with_freq = crud_tissue.get_tissues_by_experiemnt_and_tissue_number(
+        database, experiment_identifier, tissue_number)
+
+    for tissue_object, frequency in tissues_with_freq:
+        tiss_freq.append(frequency)
         tiss_types.append(tissue_object.tissue_type)
         tiss_nums.append(tissue_object.tissue_number)
 
@@ -56,10 +91,15 @@ async def analyze(video_id: int = Query(...), database: Session = Depends(get_db
 @ router.post("/graphUpdate", tags=["analysis"])
 def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends(get_db)):
     """Function gets called to update graph with new parameters"""
+    tissue_obj = 0
+    if data.video_id:
+        video_object = crud_video.get_vid_by_id(database, data.video_id)
+        tissue_obj = video_object.tissues[data.value]
+    else:
+        tissue_with_freq = crud_tissue.get_tissues_by_experiemnt_and_tissue_number(
+            database, data.experiment_identifier, data.tissue_number)[data.value]
+        tissue_obj = tissue_with_freq[0]
 
-    video_object = crud_video.get_vid_by_id(database, data.video_id)
-
-    tissue_obj = video_object.tissues[data.value]
     dataframe = crud_tissue_tracking.get_tracking_by_id(
         database, tissue_obj.id)
     print(data.buffers)
@@ -71,7 +111,9 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
     crud_tissue_caculations.create(
         database, tracking_obj.calculated_values, tissue_obj.id)
-    crud_video.video_anaylized(database, data.video_id)
+
+    # TODO: add anaylized to tissue
+    # crud_video.video_anaylized(database, data.video_id)
 
     contractx = tracking_obj.contract_points[0][0].tolist() + \
         tracking_obj.contract_points[2][0].tolist(
