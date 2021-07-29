@@ -333,7 +333,11 @@
 
 <div id="canvas">
   {#if image_path}
-    <img id="pic" src="{process.env.API_URL}/{image_path}" alt="Heart Tissue" />
+    <img
+      id="pic"
+      srcset="{process.env.API_URL}/{image_path} 2x"
+      alt="Heart Tissue"
+    />
     }
   {/if}
 </div>

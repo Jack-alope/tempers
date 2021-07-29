@@ -23,9 +23,9 @@ TODO: make this not gloabl
   border: 2px solid pink;
   position: absolute;
 }
-
+/* 
 #pic {
-  /* FIXME: this shouldnt be hard coded */
+   FIXME: this shouldnt be hard coded 
   height: 540px;
   width: 960px;
-}
+} */
