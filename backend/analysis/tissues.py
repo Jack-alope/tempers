@@ -16,9 +16,9 @@ class TissuePoints:
         """Initalize relevant values"""
         self.window = 13
         self.poly = 3
-        self.thresh = 0.01
+        self.thresh = 0.5
         self.min_dist = 10
-        self.buffer = 10
+        self.buffer = 15
         self.raw_disp = disp
         self.time = time
         self.post_dist = 6
@@ -47,7 +47,7 @@ class TissuePoints:
         if inverse:
             self.smooth_disp = -1*(self.post_dist - smoothed) 
             self.raw_force = np.array(self.continuous_df(-1*self.raw_disp_norm))
-        else:
+        else:#
             self.smooth_disp = self.post_dist - smoothed
             self.raw_force = np.array(self.continuous_df(self.raw_disp_norm))
 
@@ -56,7 +56,7 @@ class TissuePoints:
         if baseline:
             signal.detrend(self.smooth_force, overwrite_data=True)
 
-        self.dfdt = signal.savgol_filter(self.raw_force, self.window, self.poly, deriv=1)
+        self.dfdt = signal.savgol_filter(self.raw_force, self.window, self.poly, deriv=1, delta= np.average(np.diff(self.time)))
 
         self.find_peaks()
 
@@ -69,7 +69,8 @@ class TissuePoints:
         if buffer is not None:
             self.buffer = buffer
 
-        peaks = signal.find_peaks(self.smooth_force, distance=self.min_dist, prominence=self.thresh)[0]
+        rel_thresh = self.thresh * (max(self.smooth_force) - min(self.smooth_force))
+        peaks = signal.find_peaks(self.smooth_force, distance=self.min_dist, prominence=rel_thresh)[0]
 
         if not list(peaks):
             print('No Peaks')
@@ -154,11 +155,11 @@ class TissuePoints:
 
         return cycle(-1) if peak_index > base_index else cycle(1)
 
-    def format_points(self, indicies, list):
+    def format_points(self, indicies, points):
         """Formats points into a tuple with usable points as well as
         index"""
         x_axis = [self.time[index] for index in indicies]
-        y_axis = [list[index] for index in indicies]
+        y_axis = [points[index] for index in indicies]
         return (x_axis, y_axis, indicies)
 
     def continuous_df(self, disps):
@@ -170,22 +171,13 @@ class TissuePoints:
     def calculate_values(self, base_disp):
         """Creates a dictionary with all calculated values"""
         self.calculated_values["dev_force"], self.calculated_values["dev_force_std"] \
-            = calculations.dev_force(self.youngs, self.tissue.post.radius,
-                                     self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
-                                     self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
-                                     self.smooth_disp[self.peaks[2]], base_disp)
+            = _averager(np.array(self.peaks[1]) - np.array(base_disp))
 
         self.calculated_values["dias_force"], self.calculated_values["dias_force_std"] \
-            = calculations.force(self.youngs, self.tissue.post.radius,
-                                 self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
-                                 self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
-                                 base_disp)
+            = _averager(base_disp)
 
         self.calculated_values["sys_force"], self.calculated_values["sys_force_std"] \
-            = calculations.force(self.youngs, self.tissue.post.radius,
-                                 self.tissue.post.left_post_height, self.tissue.post.left_tissue_height,
-                                 self.tissue.post.right_post_height, self.tissue.post.right_tissue_height,
-                                 self.smooth_disp[self.peaks[2]])
+            = _averager(self.peaks[1])
 
         self.calculated_values["beating_freq"], self.calculated_values["beating_freq_std"] \
             = calculations.beating_frequency(self.peaks[0])
@@ -213,9 +205,12 @@ class TissuePoints:
 
         self.calculated_values["r50"], self.calculated_values["r50_std"] \
             = calculations.time_between(self.relax_points[2][0], self.peaks[0])
-        # TODO: DFDT is broken
-        self.calculated_values["dfdt"], self.calculated_values["dfdt_std"] \
-            = calculations.dfdt(self.contract_points[0], self.contract_points[4])
 
-        self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"] \
-            = (0, 0) #calculations.dfdt(self.relax_points[0], self.relax_points[4])
+        (self.calculated_values["dfdt"], self.calculated_values["dfdt_std"]), \
+            (self.calculated_values["negdfdt"], self.calculated_values["negdfdt_std"]) \
+            = calculations.dfdt_calc(self.basepoints, self.frontpoints, self.dfdt)
+
+
+def _averager(value_list):
+    """return the avg and std of a list"""
+    return np.average(value_list), np.std(value_list)

@@ -52,17 +52,15 @@ def time_between(first_times, second_times):
     list_vals = list(map(_subtraction, first_times, second_times))
     return _averager(list_vals)
 
-def dfdt(ten_points, nine_points):
-    """Find slope between points"""
-    rise_list = list(map(_subtraction, ten_points[1], nine_points[1]))
-    run_list = list(map(_subtraction, ten_points[0], nine_points[0]))
-
-    if nine_points[0][0] > ten_points[0][0]:
-        slope_list = list(map(lambda x, y: x/y, rise_list, run_list))
-    else:
-        slope_list = list(map(lambda x, y: -1* x/y, rise_list, run_list))
-
-    return _averager(slope_list)
+def dfdt_calc(basepoints, frontpoints, dfdt):
+    """
+    Calculates max and min of dfdt for each peak, then averages
+    for all peaks
+    """
+    dfdt_split = list(map(lambda x,y : dfdt[x:y], basepoints[2], frontpoints[2]))
+    maxs = [max(interval) for interval in dfdt_split]
+    mins = [min(interval) for interval in dfdt_split]
+    return _averager(maxs), _averager(mins)
 
 def _subtraction(first_points, second_points):
     """simple subtraction, primarily used for mapping time diffs"""
