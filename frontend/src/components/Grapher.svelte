@@ -96,13 +96,13 @@
 
       /* ---------------Define Sliders Start------------------------------------------------*/
       var threshSlider = {
-        active: 1,
+        active: 5,
         len: 0.5,
         pad: {
           t: 100,
         },
         currentvalue: {
-          xanchor: "right",
+          xanchor: "left",
           prefix: "Prominence: ",
           font: {
             color: "#888",
@@ -116,49 +116,9 @@
             args: ["thresh", "0"],
           },
           {
-            label: ".01",
-            method: "restyle",
-            args: ["thresh", ".01"],
-          },
-          {
-            label: ".02",
-            method: "restyle",
-            args: ["thresh", ".02"],
-          },
-          {
-            label: ".03",
-            method: "restyle",
-            args: ["thresh", ".03"],
-          },
-          {
-            label: ".05",
-            method: "restyle",
-            args: ["thresh", ".05"],
-          },
-          {
-            label: ".075",
-            method: "restyle",
-            args: ["thresh", ".075"],
-          },
-          {
             label: ".1",
             method: "restyle",
             args: ["thresh", ".1"],
-          },
-          {
-            label: ".125",
-            method: "restyle",
-            args: ["thresh", ".125"],
-          },
-          {
-            label: ".15",
-            method: "restyle",
-            args: ["thresh", ".15"],
-          },
-          {
-            label: ".175",
-            method: "restyle",
-            args: ["thresh", ".175"],
           },
           {
             label: ".2",
@@ -169,6 +129,46 @@
             label: ".3",
             method: "restyle",
             args: ["thresh", ".3"],
+          },
+          {
+            label: ".4",
+            method: "restyle",
+            args: ["thresh", ".4"],
+          },
+          {
+            label: ".5",
+            method: "restyle",
+            args: ["thresh", ".5"],
+          },
+          {
+            label: ".6",
+            method: "restyle",
+            args: ["thresh", ".6"],
+          },
+          {
+            label: ".7",
+            method: "restyle",
+            args: ["thresh", ".7"],
+          },
+          {
+            label: ".8",
+            method: "restyle",
+            args: ["thresh", ".8"],
+          },
+          {
+            label: ".9",
+            method: "restyle",
+            args: ["thresh", ".9"],
+          },
+          {
+            label: ".95",
+            method: "restyle",
+            args: ["thresh", ".95"],
+          },
+          {
+            label: ".99",
+            method: "restyle",
+            args: ["thresh", ".99"],
           },
         ],
       };
@@ -546,11 +546,11 @@
       /* -----------------Set Default Slider Values-----------------------------------------*/
       var temp = [0, 0];
       xranges.push(temp);
-      thresholds.push(".01");
+      thresholds.push(".5");
       polynomials.push("3");
       windows.push("13");
       minDistances.push("10");
-      buffers.push("10");
+      buffers.push("15");
       buttons.push([false, false]);
       /* ---------------------------------------------------------------------------------*/
       /* --------------------------Call Graphing Once with Defaults ---------------------------------*/
