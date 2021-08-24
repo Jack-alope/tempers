@@ -28,7 +28,7 @@ If you use this software in research please cite it as:
 
 ## Contributing  
   
-If you are a member of a lab with a different bioreactor setup or have different analysis needs and would like to contribute to this repository please see [`contributing.md`](https://gitlab.com/hect-software/rianu/-/blob/main/contributing.md). Alternatively, open and issue on this repository or email `jack@mrph.dev` and I can work to add support for your system. We are very open to collaboration and want this software to be applicable to as many systems as possible.
+If you are a member of a lab with a different bioreactor setup or have different analysis needs and would like to contribute to this repository please see [`contributing.md`](https://gitlab.com/hect-software/rianu/-/blob/main/CONTRIBUTING.md). Alternatively, open and issue on this repository or email `jack@mrph.dev` and I can work to add support for your system. We are very open to collaboration and want this software to be applicable to as many systems as possible.
 
 
 ---
