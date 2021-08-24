@@ -50,6 +50,11 @@ def delete_experiment(database_session: Session, exp_id: int):
     """Deletes expeiments returns false if cannot delete bc has children"""
     try:
         experiment = get_experiment(database_session, exp_id)
+
+        if experiment.vids:
+            # returns false so that the experiemnt does not delete
+            # if exp has vids
+            return False
         database_session.delete(experiment)
         database_session.commit()
         shutil.rmtree(
@@ -61,7 +66,7 @@ def delete_experiment(database_session: Session, exp_id: int):
         logging.info("file doesnt not exsit")
         return True
     except UnmappedInstanceError:
-        logging.info("experiment does not exist")
+        logging.info("Experiment does not exist")
         return False
 
 

@@ -53,13 +53,22 @@ def create_bio_reactor(database_session: Session,
 def delete_bio_reactor(database_session: Session, bio_id: int):
     """Deletes bio Reactor"""
     try:
-        database_session.delete(get_bio_reactor(database_session, bio_id))
+        bio_reactor = get_bio_reactor(database_session, bio_id)
+        if bio_reactor.vids:
+            # returns false so that the experiemnt does not delete
+            # if bio has vids
+            return False
+        database_session.delete(bio_reactor)
         database_session.commit()
         return True
     except IntegrityError:
         return False
     except UnmappedInstanceError:
-        logging.info("bio does not exsists")
+        logging.info("Bio reactor does not exsists")
+
+
+def check_bio_reactor_has_vids(database_session: Session, bio_id: int):
+    pass
 
 
 def check_bio_reactor_number_exsits(database_session: Session,

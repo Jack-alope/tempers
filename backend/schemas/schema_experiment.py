@@ -1,5 +1,5 @@
 """Schema expirment"""
-from typing import List
+from typing import List, Optional
 from datetime import date
 
 from pydantic import BaseModel
@@ -17,6 +17,7 @@ class ExperimentBase(BaseModel):
 
 class Experiment(ExperimentBase):
     id: int
+    has_vids: Optional[bool]
 
 
 class ExperimentWithVids(ExperimentBase):

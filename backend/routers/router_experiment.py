@@ -24,10 +24,21 @@ router = APIRouter()
 @router.get("/experiments", response_model=List[schema_experiment.Experiment],
             tags=["Experiment"])
 def read_experiments(database_session: Session = Depends(get_db)):
-    """retunrs all experiment"""
+    """returns all experiment"""
     experiments = crud_experiment.get_experiments(database_session)
     if not experiments:
         raise HTTPException(status_code=404, detail="Experiments not found")
+
+    for i, experiment in enumerate(experiments):
+        has_vids = bool(experiment.vids)
+        experiment = schema_experiment.Experiment(**experiment.__dict__)
+        if has_vids:
+            setattr(experiment, "has_vids", True)
+        else:
+            setattr(experiment, "has_vids", False)
+
+        experiments[i] = experiment
+
     return experiments
 
 

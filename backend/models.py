@@ -36,7 +36,6 @@ class Experiment(Base):
         String(120), nullable=False, unique=True)
     start_date: Date = Column(Date, nullable=True, default=datetime.now(tz))
 
-    # TODO: make this Videos
     vids: List[schema_video.Video] = relationship(
         "Video", back_populates="experiment", cascade="all, delete-orphan")
 
