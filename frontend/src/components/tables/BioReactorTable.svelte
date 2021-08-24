@@ -8,7 +8,7 @@
   onMount(async () => {
     await getBioReactors();
   });
-
+  console.log(bio_reactors);
   async function handleBioReactorDel(id: number) {
     const res = await fetch(process.env.API_URL + `/bio_reactor/${id}`, {
       method: "DELETE",
@@ -84,7 +84,13 @@
           <td class="px-6 py-4 whitespace-nowrap">{bio_reactor.date_added}</td>
           <td class="px-6 py-4 whitespace-nowrap"
             ><button
-              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              class="{bio_reactor.has_vids
+                ? 'bg-gray-300'
+                : 'bg-red-500 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded"
+              disabled={bio_reactor.has_vids}
+              title={bio_reactor.has_vids
+                ? "Cannot Delete Must Delete Videos First"
+                : "Delete"}
               on:click={() => handleBioReactorDel(bio_reactor.id)}
               >Delete</button
             ></td

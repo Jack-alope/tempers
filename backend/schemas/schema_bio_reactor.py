@@ -27,6 +27,7 @@ class BioReactorCreate(BioReactorBase):
 
 class BioReactor(BioReactorBase):
     id: int
+    has_vids: Optional[bool]
 
 
 class BioReactorWithPosts(BioReactorBase):

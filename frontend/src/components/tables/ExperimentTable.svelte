@@ -6,8 +6,6 @@
   import UploadExperimentArchive from "../../components/UploadExperimentArchive.svelte";
   import { showExperiment, experiments } from "../../components/Stores.js";
 
-  import type { experiment_interface } from "../../interfaces";
-
   let uploadArchive: boolean = false;
   let downloadModal: boolean = false;
 
@@ -48,7 +46,7 @@
           (experiment) => experiment.id !== id
         );
       } else {
-        alert("Cannot delete Experimet");
+        alert("Cannot delete Experiment");
       }
     } else {
       alert("Something went wrong");
@@ -106,7 +104,13 @@
           </td>
           <td class="px-6 py-4 whitespace-nowrap"
             ><button
-              class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              class="{experiment.has_vids
+                ? 'bg-gray-300'
+                : 'bg-red-500 hover:bg-red-700'} text-white font-bold py-2 px-4 rounded"
+              disabled={experiment.has_vids}
+              title={experiment.has_vids
+                ? "Cannot Delete Must Delete Videos First"
+                : "Delete"}
               on:click={() => handleExperimentDel(experiment.id)}>Delete</button
             ></td
           >
