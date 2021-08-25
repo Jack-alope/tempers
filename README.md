@@ -2,13 +2,14 @@
 
 This project is called `rianú`, the Irish Language word for tracking. 
 
-Rianú is an open source software, released under the BSD 3-Clause License, designed to more efficiently track engineered cardiac tissues. For further information on installation, setup, and customization please visit [rianu.mrph.dev](https://rianu.mrph.dev).
+Rianú is an open-source software, released under the BSD 3-Clause License, designed to more efficiently track engineered cardiac tissues. For further information on installation, setup, and customization please visit [rianu.mrph.dev](https://rianu.mrph.dev).
 
 [![Website](https://img.shields.io/website?down_color=red&down_message=offline&label=docs&style=flat&up_color=success&up_message=online&url=https://rianu.mrph.dev)](https://rianu.mrph.dev)
 [![paper doi](https://img.shields.io/badge/paper%20doi-manuscript%20in%20preparation-blue)](https://gitlab.com/hect-software/rianu)
 [![project doi](https://img.shields.io/badge/project%20doi-10.17605/OSF.IO/YWCHZ-blue)](https://doi.org/10.17605/OSF.IO/YWCHZ)
 [![pylint](https://hect-software.gitlab.io/rianu/badges/pylint.svg)](https://hect-software.gitlab.io/rianu/lint/)
 [![pipeline status](https://gitlab.com/hect-software/rianu/badges/main/pipeline.svg)](https://gitlab.com/hect-software/rianu/commits/main)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 
 ## Pronunciation  
@@ -62,7 +63,7 @@ Tracking:
 - If calibration set is selected or calibration factor inputted, no box is drawn for calibration.
 - For the calibration distance and cross section distance the distance used is the euclidian distance between the first click and second click of the mouse (diagonal of the box).
 - The difference between the centroid of box locations is taken in pairs to measure contraction (boxes 1-2; 3-4; 5-6; n-n+1). This means boxes should be drawn in the following order: left post of tissue 1 --> right post of tissue 1 --> left post of tissue 2 --> right post if tissue 2  --> left post of tissue n --> right post of tissue n. This is also because the first box drawn for each tissue (boxes 1,3,5,n) relates to the left height entry in the bioreactor database while the second box for each tissue (boxes 2,3,6,n+1) relate to the right post, so in order to get accurate force measurements this convention must be followed. 
-- Tracking takes a while, and until the video is finished tracking analysis of those tissues will show up blank. You can do other things like database editing while tracking is running but it may be slower (depends on how powerful computer is).
+- Tracking 6 tissues normally takes under 5 minutes, but this will vary depening on length of video, number of tissues, and FPS. Analysis of those tissues will show up blank until the video is finished tracking. You can do other things like database editing while tracking is running but it may be slower (depends on how powerful computer is).
 
 Analysis:
 - If the data does not auto-smooth and find points right away this means it failed to detect peaks. Try these fixes in the following order: Lower the threshold slider --> Lower the buffer slider --> Lower the minimum distance slider.
