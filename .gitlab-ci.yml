@@ -3,6 +3,7 @@ stages:
   - code review
   - publish code review
   - testing
+  - release
 
 docker-builder:
   image: docker:latest
@@ -14,8 +15,10 @@ docker-builder:
   script:
     - docker build --pull -t $CI_REGISTRY_IMAGE_FRONTEND ./frontend/
     - docker build --pull -t $CI_REGISTRY_IMAGE_BACKEND ./backend/
+    - docker build --pull -t $CI_REGISTRY_IMAGE_PROXY ./nginx/
     - docker push $CI_REGISTRY_IMAGE_FRONTEND
     - docker push $CI_REGISTRY_IMAGE_BACKEND
+    - docker push $CI_REGISTRY_IMAGE_PROXY
   only:
     - main
   when: manual
@@ -77,5 +80,13 @@ test:
     - main
   when: manual
 
-    
+release:
+  stage: release
+  image: node:13
+  only:
+    - main
+  script:
+    - npm install @semantic-release/gitlab
+    - npx semantic-release
+  
 
