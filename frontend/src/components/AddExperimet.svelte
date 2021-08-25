@@ -20,7 +20,6 @@
       showExperiment.set(false);
       if ($experiments) {
         $experiments.push(await res.json());
-        $experiments = $experiments;
       }
     } else {
       if (res.status == 409) {
@@ -31,16 +30,16 @@
     }
   }
 
-  function get_exp_ident(): [] {
-    return $experiments.map(function (val) {
-      return val.experiment_idenifer;
-    });
-  }
+  // function get_exp_ident(): [] {
+  //   return $experiments.map(function (val) {
+  //     return val.id;
+  //   });
+  // }
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
       start_date: "",
-      experiment_idenifer: "",
+      id: "",
     },
     onSubmit: (values) => {
       handleExperimentSubmitted(values);
@@ -74,7 +73,7 @@
       id="experiment_idenifer"
       name="experiment_idenifer"
       class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-      bind:value={$form.experiment_idenifer}
+      bind:value={$form.id}
     />
   </div>
 

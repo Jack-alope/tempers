@@ -14,6 +14,7 @@ from . import schema_post
 class BioReactorBase(BaseModel):
     date_added: date
     bio_reactor_number: int
+    bio_reactor_note: str
     post_distance: Optional[float]
     youngs_modulus: Optional[float]
 

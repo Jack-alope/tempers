@@ -76,7 +76,7 @@ def get_vids_reactors(database: Session = Depends(get_database)):
     result = defaultdict(list)
 
     for vid in videos:
-        result[vid.experiment_idenifer].append(
+        result[vid.experiment_id].append(
             schema_video.VideoShow(**vid.__dict__))
 
     return dict(result)

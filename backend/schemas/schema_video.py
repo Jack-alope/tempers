@@ -18,7 +18,7 @@ class VideoBase(BaseModel):
 class VideoCreate(VideoBase):
     tissues: List[schema_tissue.TissueBase]
     bio_reactor_id: int
-    experiment_id: int
+    experiment_id: str
     tracked: bool = False
     analyzed: bool = False
     calibration_set_identifier: Optional[str]

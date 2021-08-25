@@ -19,19 +19,13 @@ def get_experiments(database_session: Session):
     return database_session.query(models.Experiment).all()
 
 
-def get_experiment(database_session: Session, exp_id: int):
+def get_experiment(database_session: Session, exp_id: str):
     """Retunrs experiment by id"""
     return database_session.query(models.Experiment).filter(
         models.Experiment.id == exp_id).first()
 
 
-def get_experiment_by_idenifier(database_session: Session, experiment_idenifer: str):
-    """Retunrs experiment by idenifer"""
-    return database_session.query(models.Experiment).filter(
-        models.Experiment.experiment_idenifer == experiment_idenifer).first()
-
-
-def get_experiment_vid(database_session: Session, exp_id: int):
+def get_experiment_vid(database_session: Session, exp_id: str):
     """Retunrs experiment by id"""
     return database_session.query(models.Experiment, models.Video.id).join(
         models.Video).filter(models.Experiment.id == exp_id).first()
@@ -46,7 +40,7 @@ def create_experiment(database_session: Session, experiment: schema_experiment.E
     return db_experiment
 
 
-def delete_experiment(database_session: Session, exp_id: int):
+def delete_experiment(database_session: Session, exp_id: str):
     """Deletes expeiments returns false if cannot delete bc has children"""
     try:
         experiment = get_experiment(database_session, exp_id)
@@ -58,7 +52,7 @@ def delete_experiment(database_session: Session, exp_id: int):
         database_session.delete(experiment)
         database_session.commit()
         shutil.rmtree(
-            f"{models.UPLOAD_FOLDER}/{experiment.experiment_idenifer}")
+            f"{models.UPLOAD_FOLDER}/{experiment.id}")
         return True
     except IntegrityError:
         return False
@@ -70,14 +64,7 @@ def delete_experiment(database_session: Session, exp_id: int):
         return False
 
 
-def delete_experiment_by_identifer(database_session: Session, experiment_idenifer: str):
-    exp = get_experiment_by_idenifier(database_session, experiment_idenifer)
-
-    if exp:
-        delete_experiment(database_session, exp.id)
-
-
-def check_experiment_idetifyer_exsits(database_session: Session, experiment_idenifer: str):
+def check_experiment_id_exists(database_session: Session, experiment_id: str):
     """Returns true if experiment_idenifier is in DB"""
     return database_session.query(exists().where(
-        models.Experiment.experiment_idenifer == experiment_idenifer)).scalar()
+        models.Experiment.id == experiment_id)).scalar()

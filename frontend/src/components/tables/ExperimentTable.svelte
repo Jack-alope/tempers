@@ -60,12 +60,7 @@
       <th
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >ID</th
-      >
-      <th
-        scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Experiment Idenifiyer</th
+        >Experiment ID</th
       >
       <th
         scope="col"
@@ -91,9 +86,6 @@
       {#each $experiments as experiment}
         <tr>
           <td class="px-6 py-4 whitespace-nowrap">{experiment.id}</td>
-          <td class="px-6 py-4 whitespace-nowrap"
-            >{experiment.experiment_idenifer}</td
-          >
           <td class="px-6 py-4 whitespace-nowrap">{experiment.start_date}</td>
           <td class="px-6 py-4 whitespace-nowrap">
             <button

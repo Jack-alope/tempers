@@ -49,11 +49,11 @@ def get_frequency_by_tissue_id(tissue_id: int, database_session: Session):
     return crud_video.get_frequency_by_id(database_session, video_id)
 
 
-def get_tissues_by_experiemnt_and_tissue_number(database_session: Session, experiment_identifer: str, tissue_number: int):
-    """Retunrs the tissues within an experiemnt with the same tissue number"""
+def get_tissues_by_experiemnt_and_tissue_number(database_session: Session,
+                                                experiment_id: str, tissue_number: int):
+    """Returns the tissues within an experiemnt with the same tissue number"""
 
-    experiment_id = crud_experiment.get_experiment_by_idenifier(
-        database_session, experiment_identifer).id
-
-    return database_session.query(models.Tissue, models.Video.frequency).join(models.Video).filter(
-        models.Video.experiment_id == experiment_id, models.Tissue.tissue_number == tissue_number).order_by(models.Tissue.id).all()
+    return database_session.query(models.Tissue,
+                                  models.Video.frequency).join(models.Video).filter(
+        models.Video.experiment_id == experiment_id,
+        models.Tissue.tissue_number == tissue_number).order_by(models.Tissue.id).all()

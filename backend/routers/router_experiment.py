@@ -43,7 +43,7 @@ def read_experiments(database_session: Session = Depends(get_db)):
 
 
 @router.delete("/experiment/{exp_id}", tags=["Experiment"])
-def delete_experiment(exp_id: int, database_session: Session = Depends(get_db)):
+def delete_experiment(exp_id: str, database_session: Session = Depends(get_db)):
     """Delete expirment by id"""
     return crud_experiment.delete_experiment(database_session, exp_id)
 
@@ -53,8 +53,8 @@ def delete_experiment(exp_id: int, database_session: Session = Depends(get_db)):
 def add_experiment(experiment: schema_experiment.ExperimentBase,
                    database_session: Session = Depends(get_db)):
     """Add experiment"""
-    if crud_experiment.check_experiment_idetifyer_exsits(
-            database_session, experiment.experiment_idenifer):
+    if crud_experiment.check_experiment_id_exists(
+            database_session, experiment.id):
         raise HTTPException(status.HTTP_409_CONFLICT)
     new_experiment = crud_experiment.create_experiment(
         database_session, experiment)
@@ -66,7 +66,7 @@ def add_experiment(experiment: schema_experiment.ExperimentBase,
 def check_experiment_exists(experiment_identifier: str = Query(...),
                             database_session: Session = Depends(get_db)):
     """Router to check if the experiment identiyer is used retunes true if it exsits"""
-    return crud_experiment.check_experiment_idetifyer_exsits(
+    return crud_experiment.check_experiment_id_exsits(
         database_session, experiment_identifier)
 
 

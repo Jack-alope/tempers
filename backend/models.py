@@ -31,9 +31,7 @@ class Experiment(Base):
     """Experiment model for DB"""
     __tablename__ = "experiment"
 
-    id: int = Column(Integer, primary_key=True)
-    experiment_idenifer: String = Column(
-        String(120), nullable=False, unique=True)
+    id: str = Column(String(120), primary_key=True)
     start_date: Date = Column(Date, nullable=True, default=datetime.now(tz))
 
     vids: List[schema_video.Video] = relationship(
@@ -58,7 +56,7 @@ class Video(Base):
     tracked: bool = Column(Boolean, nullable=True, default=False)
     anaylized: bool = Column(Boolean, nullable=True, default=False)
 
-    experiment_id: int = Column(Integer, ForeignKey('experiment.id'))
+    experiment_id: str = Column(String(120), ForeignKey('experiment.id'))
     experiment = relationship("Experiment", back_populates="vids")
 
     bio_reactor_id: int = Column(Integer, ForeignKey('bio_reactor.id'))
@@ -181,6 +179,7 @@ class BioReactor(Base):
     bio_reactor_number: int = Column(Integer, nullable=False)
 
     date_added: Date = Column(Date, nullable=False)
+    bio_reactor_note: str = Column(String(240), nullable=True)
     post_distance: Float = Column(Float, nullable=True)
     youngs_modulus: Float = Column(Float, nullable=True)
 

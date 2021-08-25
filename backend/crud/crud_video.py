@@ -52,7 +52,7 @@ def get_videos(database_session: Session):
     """
     # each vid is retuned as a tuple with the vid object, exp_idenifyer, bio_number
     result = database_session.query(models.Video,
-                                    models.Experiment.experiment_idenifer,
+                                    models.Experiment.id,
                                     models.BioReactor.bio_reactor_number).join(
         models.Experiment).join(models.BioReactor).distinct(models.Video.id).all()
 
@@ -63,7 +63,7 @@ def get_videos(database_session: Session):
         Returning the tup with the exp and bio attrubutes
         '''
 
-        setattr(tup[0], "experiment_idenifer", tup[1])
+        setattr(tup[0], "experiment_id", tup[1])
         setattr(tup[0], "bio_reactor_number", tup[2])
         return tup[0]
 
