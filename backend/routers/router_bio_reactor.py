@@ -15,6 +15,21 @@ from schemas import schema_bio_reactor, schema_post
 router = APIRouter()
 
 
+def _check_bio_reactor_has_vids(bio_reactor):
+    """
+    Accepts a models.Bioreactor and returns
+    bio reactor schema with attrbure has vids
+    """
+    has_vids = bool(bio_reactor.vids)
+    bio_reactor = schema_bio_reactor.BioReactor(**bio_reactor.__dict__)
+    if has_vids:
+        setattr(bio_reactor, "has_vids", True)
+    else:
+        setattr(bio_reactor, "has_vids", False)
+
+    return bio_reactor
+
+
 @router.get("/bio_reactors",
             response_model=List[schema_bio_reactor.BioReactor],
             tags=["Bio_reactor"])
@@ -26,14 +41,8 @@ def read_bio_reactors(database_session: Session = Depends(get_db)):
         raise HTTPException(status_code=404,
                             detail="Bio Reactos not found")
 
-    for i, bio_reactor in enumerate(bio_reactors):
-        has_vids = bool(bio_reactor.vids)
-        bio_reactor = schema_bio_reactor.BioReactor(**bio_reactor.__dict__)
-        if has_vids:
-            setattr(bio_reactor, "has_vids", True)
-        else:
-            setattr(bio_reactor, "has_vids", False)
-        bio_reactors[i] = bio_reactor
+    bio_reactors = [_check_bio_reactor_has_vids(
+        bio_reactor) for bio_reactor in bio_reactors]
 
     return bio_reactors
 

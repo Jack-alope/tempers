@@ -2,7 +2,6 @@
 from typing import Optional
 
 from pydantic import BaseModel
-from pydantic.types import OptionalInt
 
 from . import schema_tissue_calculated_data
 

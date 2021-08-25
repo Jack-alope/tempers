@@ -64,7 +64,7 @@ class PostSelection(BaseModel):
     cal_points: Optional[List[List[float]]]
 
     """
-    Below will be used if user is adding a calibration set 
+    Below will be used if user is adding a calibration set
     Or selecting from existing
     # REVIEW: Maybe better to seprate these instead of using 'Optional'
     """
