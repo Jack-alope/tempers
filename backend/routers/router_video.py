@@ -13,7 +13,7 @@ import cv2
 
 
 from database import get_db as get_database
-from crud import crud_video, crud_bio_reactor
+from crud import crud_video
 from schemas import schema_video
 
 

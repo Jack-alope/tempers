@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 import models
 from schemas import schema_tissue
 
-from crud import crud_experiment, crud_video
+from crud import crud_video
 
 
 def create_tissue(database_session: Session, tissue: schema_tissue.TissueCreate):
@@ -23,7 +23,8 @@ def create_tissue(database_session: Session, tissue: schema_tissue.TissueCreate)
 
 def get_tissue_by_id(database_session: Session, tissue_id: int):
     """Get tissue by id"""
-    return database_session.query(models.Tissue).filter(models.Tissue.id == tissue_id).first()
+    return database_session.query(models.Tissue).filter(
+        models.Tissue.id == tissue_id).first()
 
 
 def get_tissue_number_by_id(tissue_id: int, database_session: Session):

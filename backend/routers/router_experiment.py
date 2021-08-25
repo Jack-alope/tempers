@@ -21,6 +21,21 @@ import models
 router = APIRouter()
 
 
+def _check_experiment_has_vids(experiment):
+    """
+    Accepts a models.Experiment and returns 
+    experiment schema with attrbure has vids
+    """
+    has_vids = bool(experiment.vids)
+    experiment = schema_experiment.Experiment(**experiment.__dict__)
+    if has_vids:
+        setattr(experiment, "has_vids", True)
+    else:
+        setattr(experiment, "has_vids", False)
+
+    return experiment
+
+
 @router.get("/experiments", response_model=List[schema_experiment.Experiment],
             tags=["Experiment"])
 def read_experiments(database_session: Session = Depends(get_db)):
@@ -29,15 +44,8 @@ def read_experiments(database_session: Session = Depends(get_db)):
     if not experiments:
         raise HTTPException(status_code=404, detail="Experiments not found")
 
-    for i, experiment in enumerate(experiments):
-        has_vids = bool(experiment.vids)
-        experiment = schema_experiment.Experiment(**experiment.__dict__)
-        if has_vids:
-            setattr(experiment, "has_vids", True)
-        else:
-            setattr(experiment, "has_vids", False)
-
-        experiments[i] = experiment
+    experiments = [_check_experiment_has_vids(
+        experiment) for experiment in experiments]
 
     return experiments
 

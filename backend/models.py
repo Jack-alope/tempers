@@ -22,7 +22,6 @@ from schemas import schema_tissue, schema_tissue_calculated_data,\
 tz = timezone('EST')
 
 
-# TODO: Move this to diffent file
 UPLOAD_FOLDER = "static/uploads"
 
 
