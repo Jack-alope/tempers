@@ -1,6 +1,5 @@
 export interface experiment_interface {
   id: number;
-  experiment_idenifer: string;
   start_date: Date;
   has_vids: boolean;
 }
@@ -9,6 +8,7 @@ export interface bio_reactor_interface {
   id: number;
   bio_reactor_number: number;
   date_added: Date;
+  bio_reactor_note: string;
   post_distance: number;
   youngs_modulus: number;
   has_vids: boolean;

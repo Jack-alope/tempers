@@ -46,6 +46,11 @@
       <th
         scope="col"
         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >Note</th
+      >
+      <th
+        scope="col"
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
         >Post Distance</th
       >
       <th
@@ -74,6 +79,9 @@
           <td class="px-6 py-4 whitespace-nowrap">{bio_reactor.id}</td>
           <td class="px-6 py-4 whitespace-nowrap"
             >{bio_reactor.bio_reactor_number}</td
+          >
+          <td class="px-6 py-4 whitespace-nowrap"
+            >{#if bio_reactor.bio_reactor_note}{bio_reactor.bio_reactor_note}{/if}</td
           >
           <td class="px-6 py-4 whitespace-nowrap"
             >{bio_reactor.post_distance}</td

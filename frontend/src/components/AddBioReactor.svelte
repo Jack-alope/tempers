@@ -17,7 +17,6 @@
       showBioReactor.set(false);
       if ($bio_reactors) {
         $bio_reactors.push(await res.json());
-        $bio_reactors = $bio_reactors;
       }
     } else {
       if (res.status == 409) {
@@ -32,6 +31,7 @@
     initialValues: {
       date_added: "",
       bio_reactor_number: "",
+      bio_reactor_note: "",
       post_distance: 0,
       youngs_modulus: 0,
       posts: [
@@ -240,11 +240,27 @@
       </div>
     </div>
 
-    <div class="w-1/2 px-3 py-3">
-      <input
-        class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-        type="submit"
-      />
+    <div class="flex flex-wrap py-3">
+      <div class="w-1/2 px-3 py-3">
+        <label
+          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="vid">Bio Reactor Note</label
+        >
+        <input
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          type="text"
+          id="video_note"
+          name="video_note"
+          bind:value={$form.bio_reactor_note}
+        />
+      </div>
+
+      <div class="w-1/2 px-3 py-5">
+        <input
+          class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+          type="submit"
+        />
+      </div>
     </div>
   </div>
 </form>

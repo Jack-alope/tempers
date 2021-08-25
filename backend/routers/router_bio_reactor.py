@@ -47,7 +47,6 @@ def read_post_options(bio_id: int = Query(...), database_session=Depends(get_db)
     return posts
 
 
-@ router.get("/bio_reactor/has_vids")
 @ router.post("/addBioReactor",
               response_model=schema_bio_reactor.BioReactor,
               tags=["Bio_reactor"])

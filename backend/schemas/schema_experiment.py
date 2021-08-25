@@ -8,7 +8,7 @@ from . import schema_video, schema_bio_reactor
 
 
 class ExperimentBase(BaseModel):
-    experiment_idenifer: str
+    id: str
     start_date: date
 
     class Config:
@@ -16,12 +16,12 @@ class ExperimentBase(BaseModel):
 
 
 class Experiment(ExperimentBase):
-    id: int
+    id: str
     has_vids: Optional[bool]
 
 
 class ExperimentWithVids(ExperimentBase):
-    id: int
+    id: str
     vids: List[schema_video.Video]
 
 

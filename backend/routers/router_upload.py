@@ -45,7 +45,7 @@ def _save_video_file(vid_info, vid_file, database_session):
 
     # gets save loaction uploadfolder/expermentnum/date/vid
     where_to_save = os.path.join(
-        UPLOAD_FOLDER, experiment_info.experiment_idenifer, 'videos')
+        UPLOAD_FOLDER, experiment_info.id, 'videos')
 
     # cheacks to make sure the save location exists if not exists
     models.check_path_exisits(where_to_save)

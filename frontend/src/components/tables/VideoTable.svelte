@@ -4,13 +4,13 @@
   import type { video_interface } from "../../interfaces";
 
   export let videos: video_interface[];
-  export let experiment_ident: string;
+  export let experiment_id: string;
 
   let tissue_numbers;
   let selectedTissueNumber: number;
 
   onMount(async () => {
-    await getTissueNumbers(experiment_ident);
+    await getTissueNumbers(experiment_id);
   });
 
   async function handleVideoDel(id: number) {
@@ -27,10 +27,10 @@
     }
   }
 
-  async function getTissueNumbers(experiment_iden: string) {
+  async function getTissueNumbers(experiment_id: string) {
     const res = await fetch(
       process.env.API_URL +
-        `/tissues_in_experiment?experiment_identifier=${experiment_iden}`,
+        `/tissues_in_experiment?experiment_id=${experiment_id}`,
       {
         method: "GET",
         headers: {
@@ -46,7 +46,7 @@
   }
 
   async function handleTissueNumberSubmitted() {
-    window.location.href = `/analysis?experiment_id=${experiment_ident}&tissue_number=${selectedTissueNumber}`;
+    window.location.href = `/analysis?experiment_id=${experiment_id}&tissue_number=${selectedTissueNumber}`;
   }
 </script>
 

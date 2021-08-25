@@ -161,7 +161,7 @@
         {:else}
           {#each experiments_value as experiment}
             <option value={experiment.id}
-              >{experiment.experiment_idenifer} - Start Date: {experiment.start_date}</option
+              >{experiment.id} - Start Date: {experiment.start_date}</option
             >
           {/each}
         {/if}

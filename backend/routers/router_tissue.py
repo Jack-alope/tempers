@@ -11,10 +11,10 @@ router = APIRouter()
 
 
 @router.get('/tissues_in_experiment', tags=["tissues"])
-async def tissues_in_experiment(experiment_identifier: str = Query(...),
+async def tissues_in_experiment(experiment_id: str = Query(...),
                                 database: Session = Depends(get_db)):
     """Returns tissues within an experiment"""
-    experiment_id = crud_experiment.get_experiment_by_idenifier(
-        database, experiment_identifier).id
+    experiment_id = crud_experiment.get_experiment(
+        database, experiment_id).id
     return crud_tissue.get_tissue_numbers_in_experiment(
         database, experiment_id)
