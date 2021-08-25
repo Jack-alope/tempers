@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   frontend:
-    image: registry.gitlab.com/hect-software/rianu/frontend:latest
+    build: ./frontend/
     container_name: frontend
     restart: always
     ports:
@@ -11,7 +11,7 @@ services:
       - backend
 
   backend:
-    image: registry.gitlab.com/hect-software/rianu/backend:latest
+    build: ./backend/
     container_name: backend
     restart: always
     environment:
@@ -25,7 +25,7 @@ services:
         condition: service_healthy
 
   nginx:
-    image: registry.gitlab.com/hect-software/rianu/proxy:latest
+    build: ./nginx/ 
     container_name: nginx
     restart: always
     expose: 
