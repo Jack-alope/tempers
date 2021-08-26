@@ -95,13 +95,6 @@ def update_cal_cross(database_session: Session, video_id,
     """update calibration and cross section distance"""
     vid = get_vid_by_id(database_session, video_id)
 
-    # if cal_dist:
-    #     # REVIEW: Check if already defined
-    #     vid.calibration_distance = cal_dist
-    # if calibration_set_iden:
-    #     vid.calibration_set_identifier = calibration_set_iden
-    # vid.calibration_factor = cal_factor
-    vid.tracked = True
     vid.calibration_set_identifier = cal_identifer
 
     tissues = vid.tissues
@@ -112,7 +105,16 @@ def update_cal_cross(database_session: Session, video_id,
     database_session.refresh(vid)
 
 
+def update_tracked_status(database_session: Session, vid_id: int, tracked_status: bool):
+    """Updates the tracked status of a vid by id"""
+    video = get_vid_by_id(database_session, vid_id)
+    video.tracked = tracked_status
+    database_session.commit()
+    database_session.refresh(video)
+
+
 def update_save_location(database_session: Session, video_id: int, save_location: str):
+    """Added save location to Vid by id"""
     vid = get_vid_by_id(database_session, video_id)
 
     vid.save_location = save_location
@@ -123,6 +125,7 @@ def update_save_location(database_session: Session, video_id: int, save_location
 
 
 def video_anaylized(database_session: Session, vid_id: int):
+    """Sets anaylized to true for vid by id"""
     vid = get_vid_by_id(database_session, vid_id)
     vid.anaylized = True
     database_session.commit()
