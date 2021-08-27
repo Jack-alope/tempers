@@ -7,7 +7,7 @@ import cv2
 import pandas as pd
 import numpy as np
 from scipy.spatial import distance
-from crud import crud_tissue_tracking
+from crud import crud_tissue_tracking, crud_video
 
 
 class TissueTracker:
@@ -43,6 +43,7 @@ class TissueTracker:
             if index % 2 == 1:
                 rel_index = int((index - 1) / 2)
                 self.add_to_database(post_info, post_locs[index-1], rel_index)
+        crud_video.update_tracked_status(database, video_object.id, True)
 
     def add_to_database(self, post_locs_one, post_locs_two, rel_tiss_id):
         """Adds information to database"""
@@ -61,7 +62,7 @@ class TissueTracker:
         zipped = zip(self.times[0], disps, id_repeated,
                      odd_x, odd_y, even_x, even_y)
         dataframe = pd.DataFrame(list(zipped),
-            columns=["time", "displacement", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
+                                 columns=["time", "displacement", "tissue_id", "odd_x", "odd_y", "even_x", "even_y"])
 
         crud_tissue_tracking.create_tissue_tracking(
             self.database, self.tissue_ids[rel_tiss_id], dataframe)
