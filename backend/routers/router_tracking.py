@@ -50,7 +50,8 @@ async def box_coordinates(background_tasks: BackgroundTasks, post_info: schema_v
         # since there are four points to the box passed but we only care
         # care ablout the length of the diagnal line
         cal_dist_pix = _coord_distance(post_info.cal_points)[0]
-        cal_factor = post_info.calibration_distance / cal_dist_pix
+        # Calib factor multiplied by 2 because video is scaled down orignally
+        cal_factor = 2 * cal_dist_pix / post_info.calibration_distance
 
     cross_dist_pix = _coord_distance(post_info.cross_points)
     cross_dist_mm = list(map(lambda x: x * cal_factor, cross_dist_pix))

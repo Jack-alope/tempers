@@ -92,7 +92,7 @@ class TissueTracker:
 
     def calibrate(self, centroids):
         """Converts the locations from pixels to mms"""
-        return (centroids[0] * self.calib_factor / 2, centroids[1] * self.calib_factor / 2)
+        return (centroids[0] / self.calib_factor, centroids[1] / self.calib_factor)
 
 
 def trackers_init(box, vid_path, image):
