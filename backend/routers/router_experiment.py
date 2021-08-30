@@ -13,8 +13,8 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from database import get_db
-from crud import crud_experiment, crud_bio_reactor, crud_tissue_tracking
-from schemas import schema_experiment, schema_bio_reactor
+from crud import crud_experiment, crud_bio_reactor, crud_tissue_tracking, crud_calibration_set
+from schemas import schema_experiment, schema_bio_reactor, schema_calibration_set
 import models
 
 
@@ -105,24 +105,29 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
     experiment_info = crud_experiment.get_experiment(
         database_session, experiment_id)
     # Path to the base of the experiment folder
-    file_path = f"{models.UPLOAD_FOLDER}/{experiment_info.experiment_idenifer}/"
+    file_path = f"{models.UPLOAD_FOLDER}/{experiment_info.id}/"
     csv_path = f"{file_path}csvs/"
     experiment_info_file_path = \
-        f"{file_path}{experiment_info.experiment_idenifer}_{experiment_info.start_date}"
+        f"{file_path}{experiment_info.id}_{experiment_info.start_date}"
+    zip_file_path = f"{models.UPLOAD_FOLDER}/zips/{experiment_info.id}"
 
     models.check_path_exisits(file_path)
     models.check_path_exisits(csv_path)
+    models.check_path_exisits(f"{models.UPLOAD_FOLDER}/zips/")
 
     bio_reactor_ids: Dict[int] = set()
+    calibration_set_identifers = set()
     tissues = []
 
     # List comp goes creats list of tup (bio_ids, tissues) used in expetiment
-    # REVIEW: Would like to cut out the nested for lo0ps
-    for x in [(vid.bio_reactor_id, vid.tissues)
+    # REVIEW: Would like to cut out the nested for loops
+    for x in [(vid.bio_reactor_id, vid.calibration_set_identifier, vid.tissues)
               for vid in experiment_info.vids]:
         # Adds bio id to set
         bio_reactor_ids.add(x[0])
-        for j in x[1]:
+        # Adds calibration ids to set
+        calibration_set_identifers.add(x[1])
+        for j in x[2]:
             # iterrates over tissues in vid
             # Appends tissue to list of tissue
             tissues.append(j)
@@ -133,6 +138,9 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
         **asdict(i)) for i in crud_bio_reactor.get_bio_reactors_by_li_id(
         database_session, bio_reactor_ids)]
 
+    calibration_sets = [schema_calibration_set.CalibrationSet(
+        **asdict(i)) for i in crud_calibration_set.get_calibration_sets_by_li_identifier(database_session, calibration_set_identifers)]
+
     with open(f"{experiment_info_file_path}.json", "w") as outfile:
         # Saves json file with the experiemtn data by using the experiment download schema
 
@@ -140,7 +148,8 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
             schema_experiment.ExperimentDownload(
                 experiment=schema_experiment.ExperimentWithVids(
                     **asdict(experiment_info)),
-                bio_reactors=bio_reactors)), outfile, indent=1)
+                bio_reactors=bio_reactors, calibration_sets=calibration_sets)),
+            outfile, indent=1)
 
     # Pass in list of tissues and path to csv folder
     # saves csv of tracking data for each tissue
@@ -148,7 +157,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
 
     # Zips the experimet folder
     # Including experiment info json, vidfolder and csv folder
-    shutil.make_archive(experiment_info_file_path,
+    shutil.make_archive(zip_file_path,
                         "zip", file_path)
 
     # removes the csv files and folder
@@ -158,6 +167,6 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
 
     # Adds backgroud task to delete zip archive after the file is returned
     background_tasks.add_task(
-        models.delete_file, f"{experiment_info_file_path}.zip")
+        models.delete_file, f"{zip_file_path}.zip")
 
-    return FileResponse(f"{experiment_info_file_path}.zip")
+    return FileResponse(f"{zip_file_path}.zip")

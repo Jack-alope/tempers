@@ -32,7 +32,8 @@ def get_bio_identifer_from_id(database_session: Session, bio_id: int):
 
 
 def get_bio_reactors_by_li_id(database_session: Session, bio_ids: List[int]):
-    return database_session.query(models.BioReactor).options(noload(models.BioReactor.vids)).filter(
+    return database_session.query(models.BioReactor).options(
+        noload(models.BioReactor.vids)).filter(
         models.BioReactor.id.in_(bio_ids)).all()
 
 
