@@ -4,7 +4,7 @@ from datetime import date
 
 from pydantic import BaseModel
 
-from . import schema_tissue
+from . import schema_tissue, schema_calibration_set
 
 
 class VideoBase(BaseModel):
@@ -36,9 +36,8 @@ class Video(VideoBase):
     bio_reactor_id: int
     experiment_id: str
     tissues: List[schema_tissue.Tissue]
-    calibration_distance: Optional[float]
-    calibration_factor: Optional[float]
     save_location: Optional[str]
+    calibration_set_identifier: Optional[str]
 
 
 class VideoShow(VideoBase):
