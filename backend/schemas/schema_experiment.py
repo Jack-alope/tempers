@@ -1,4 +1,5 @@
 """Schema expirment"""
+from schemas import schema_calibration_set
 from typing import List, Optional
 from datetime import date
 
@@ -28,3 +29,4 @@ class ExperimentWithVids(ExperimentBase):
 class ExperimentDownload(BaseModel):
     experiment: ExperimentWithVids
     bio_reactors: List[schema_bio_reactor.BioReactorWithPosts]
+    calibration_sets: List[schema_calibration_set.CalibrationSet]
