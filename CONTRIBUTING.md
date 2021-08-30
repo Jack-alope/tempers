@@ -4,7 +4,7 @@ If you are looking to develop and contribute to this software here is a good pla
 2. Fork and clone this repository. 
 3. Create a `.env` file in the `backend/` directory with the login to your mysql database. It should look something like:
     ```bash
-    DATABASE_URL=mysql+pymysql://<username>:<password>@<location>:3306/db_name
+    DATABASE_URL=mysql+pymysql://<username>:<password>@<location>:3306/<db_name>
     ```
 4. Change the `API_URL` in `frontend/rollup.config.js` to `http://0.0.0.0:8000`
 5. Start the backend in one terminal window.
