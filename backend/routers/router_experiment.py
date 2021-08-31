@@ -2,10 +2,11 @@
 Router for experiment
 """
 import json
-from typing import List, Dict
-from dataclasses import asdict
+from typing import List, Set
 import shutil
 import os
+import logging
+from dataclasses import asdict
 
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
 from fastapi.encoders import jsonable_encoder
@@ -93,7 +94,7 @@ def _tissue_tracking_to_csv(database_session: Session, tissues, file_path: str):
 
 
 @router.get("/experimentsJSON/{experiment_id}", tags=["Experiment"])
-def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
+def json_experiment(background_tasks: BackgroundTasks, experiment_id: str,
                     database_session=Depends(get_db)):
     """
     Genrates a JSON of experiment data and csv for tissue tracking database
@@ -115,8 +116,8 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: int,
     models.check_path_exisits(csv_path)
     models.check_path_exisits(f"{models.UPLOAD_FOLDER}/zips/")
 
-    bio_reactor_ids: Dict[int] = set()
-    calibration_set_identifers = set()
+    bio_reactor_ids: Set[int] = set()
+    calibration_set_identifers: Set[str] = set()
     tissues = []
 
     # List comp goes creats list of tup (bio_ids, tissues) used in expetiment
