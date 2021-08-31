@@ -1,3 +1,5 @@
 {
-  "extends": ["config:base", ":dependencyDashboard"]
+  "extends": ["config:base", ":dependencyDashboard"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 10
 }
