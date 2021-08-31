@@ -32,8 +32,8 @@
       date_added: "",
       bio_reactor_number: "",
       bio_reactor_note: "",
-      post_distance: 0,
-      youngs_modulus: 0,
+      post_distance: 6,
+      youngs_modulus: 1.33,
       posts: [
         {
           post_number: "",
@@ -211,8 +211,8 @@
     <div class="flex flex-wrap py-3">
       <div class="w-1/2 px-3">
         <label
-          class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          for="post_distance">Post Distance</label
+          class="block tracking-wide text-gray-700 text-xs font-bold mb-2"
+          for="post_distance">POST DISTANCE (mm)</label
         >
         <input
           type="number"
@@ -227,7 +227,7 @@
       <div class="w-1/2 px-3">
         <label
           class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-          for="youngs_modulus">Youngs Modulus</label
+          for="youngs_modulus">YOUNGS MODULUS (MPa)</label
         >
         <input
           type="number"

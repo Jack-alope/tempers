@@ -50,13 +50,13 @@
       >
       <th
         scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Post Distance</th
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider"
+        >POST DISTANCE (mm)</th
       >
       <th
         scope="col"
-        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >Youngs Modulus</th
+        class="px-6 py-3 text-left text-xs font-medium text-gray-500 tracking-wider"
+        >YOUNGS MODULUS (MPa)</th
       >
       <th
         scope="col"

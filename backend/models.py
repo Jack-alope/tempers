@@ -179,8 +179,8 @@ class BioReactor(Base):
 
     date_added: Date = Column(Date, nullable=False)
     bio_reactor_note: str = Column(String(240), nullable=True)
-    post_distance: Float = Column(Float, nullable=True)
-    youngs_modulus: Float = Column(Float, nullable=True)
+    post_distance: Float = Column(Float, nullable=False, default=6)
+    youngs_modulus: Float = Column(Float, nullable=False, default=1.33)
 
     vids: List[schema_video.Video] = relationship(
         "Video", back_populates="bio_reactor")

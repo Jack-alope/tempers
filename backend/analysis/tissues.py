@@ -21,8 +21,8 @@ class TissuePoints:
         self.buffer = 15
         self.raw_disp = disp
         self.time = time
-        self.post_dist = 6
-        self.youngs = 1.33
+        self.post_dist = tissue_object.post.bio_reactor.post_distance
+        self.youngs = tissue_object.post.bio_reactor.youngs_modulus
         self.tissue = tissue_object
         self.raw_disp_norm = self.post_dist - np.array(disp)
 
