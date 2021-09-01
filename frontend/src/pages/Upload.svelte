@@ -115,7 +115,7 @@
         name="date_recorded"
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-red-500 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white"
         bind:value={$form.date_recorded}
-        on:change={handleBioChange}
+        on:change={handleChange}
       />
     </div>
 
@@ -178,9 +178,8 @@
         <div class="flex flex-wrap py-3">
           <div class="w-full md:w-1/4 px-3">
             <select
-              name={`tissues[${j}].post_id`}
+              name={tissue.post_id}
               placeholder="Post Number"
-              on:change={handleChange}
               on:blur={handleChange}
               class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
               bind:value={$form.tissues[j].post_id}
