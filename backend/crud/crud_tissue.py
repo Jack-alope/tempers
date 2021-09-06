@@ -1,7 +1,7 @@
 """
 CRUD for tissues
 """
-
+from datetime import date
 from sqlalchemy.orm import Session
 
 import models
@@ -41,6 +41,17 @@ def get_tissue_numbers_in_experiment(database_session: Session, experiment_id: i
     return {tissue.tissue_number for tissue in tissues}
 
 
+def get_tissue_numbers_in_experiment_on_date(database_session: Session,
+                                             experiment_id: int,
+                                             date_recorded: date):
+    """Returns tissues within an experiment"""
+    tissues = database_session.query(models.Tissue).join(models.Video).filter(
+        models.Video.experiment_id == experiment_id,
+        models.Video.date_recorded == date_recorded).distinct().all()
+
+    return {tissue.tissue_number for tissue in tissues}
+
+
 def get_frequency_by_tissue_id(tissue_id: int, database_session: Session):
     """Returns the Frequency by tissue id"""
 
@@ -50,7 +61,7 @@ def get_frequency_by_tissue_id(tissue_id: int, database_session: Session):
     return crud_video.get_frequency_by_id(database_session, video_id)
 
 
-def get_tissues_by_experiemnt_and_tissue_number(database_session: Session,
+def get_tissues_by_experiment_and_tissue_number(database_session: Session,
                                                 experiment_id: str, tissue_number: int):
     """Returns the tissues within an experiemnt with the same tissue number"""
 
@@ -58,3 +69,15 @@ def get_tissues_by_experiemnt_and_tissue_number(database_session: Session,
                                   models.Video.frequency).join(models.Video).filter(
         models.Video.experiment_id == experiment_id,
         models.Tissue.tissue_number == tissue_number).order_by(models.Tissue.id).all()
+
+
+def get_tissues_by_experiment_and_tissue_number_and_date_recorded(database_session: Session,
+                                                                  experiment_id: str,
+                                                                  tissue_number: int,
+                                                                  date_recorded: date):
+    """Returns the tissues within an experiemnt with the same tissue number and date recorded"""
+    return database_session.query(models.Tissue,
+                                  models.Video.frequency).join(models.Video).filter(
+        models.Video.experiment_id == experiment_id,
+        models.Tissue.tissue_number == tissue_number,
+        models.Video.date_recorded == date_recorded).order_by(models.Tissue.id).all()

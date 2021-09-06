@@ -15,18 +15,18 @@ from schemas import schema_experiment
 
 
 def get_experiments(database_session: Session):
-    """returns all experiments"""
+    """Returns all experiments"""
     return database_session.query(models.Experiment).all()
 
 
 def get_experiment(database_session: Session, exp_id: str):
-    """Retunrs experiment by id"""
+    """Returns experiment by id"""
     return database_session.query(models.Experiment).filter(
         models.Experiment.id == exp_id).first()
 
 
 def get_experiment_vid(database_session: Session, exp_id: str):
-    """Retunrs experiment by id"""
+    """Returns experiment by id"""
     return database_session.query(models.Experiment, models.Video.id).join(
         models.Video).filter(models.Experiment.id == exp_id).first()
 
@@ -64,7 +64,7 @@ def delete_experiment(database_session: Session, exp_id: str):
         return False
 
 
-def check_experiment_id_exists(database_session: Session, experiment_id: str):
+def check_experiment_id_exsits(database_session: Session, experiment_id: str):
     """Returns true if experiment_idenifier is in DB"""
     return database_session.query(exists().where(
         models.Experiment.id == experiment_id)).scalar()

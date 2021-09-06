@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onMount } from "svelte";
   import { createForm } from "svelte-forms-lib";
   // import * as yup from "yup";
   import {
@@ -18,14 +18,6 @@
   let experiments_value: experiment_interface[];
   let bio_reactors_value: bio_reactor_interface[];
   let post_options: post_interface[];
-
-  const unsubscribe = bio_reactors.subscribe((value) => {
-    bio_reactors_value = value;
-  });
-
-  const expunsubscribe = experiments.subscribe((value) => {
-    experiments_value = value;
-  });
 
   onMount(async () => {
     await getBioReactors();
@@ -96,9 +88,6 @@
   async function handleBioChange() {
     post_options = await getPostOptions($form.bio_reactor_id);
   }
-
-  onDestroy(unsubscribe);
-  onDestroy(expunsubscribe);
 </script>
 
 <form class="w-full" on:submit={handleSubmit}>
@@ -132,10 +121,10 @@
         on:blur={handleBioChange}
       >
         <option />
-        {#if bio_reactors_value == undefined}
+        {#if $bio_reactors == undefined}
           <option>NA</option>>
         {:else}
-          {#each bio_reactors_value as bio_reactor}
+          {#each $bio_reactors as bio_reactor}
             <option value={bio_reactor.id}
               >{bio_reactor.bio_reactor_number}</option
             >
@@ -156,10 +145,10 @@
         bind:value={$form.experiment_id}
       >
         <option />
-        {#if experiments_value == undefined}
+        {#if $experiments == undefined}
           <option>NA</option>>
         {:else}
-          {#each experiments_value as experiment}
+          {#each $experiments as experiment}
             <option value={experiment.id}
               >{experiment.id} - Start Date: {experiment.start_date}</option
             >

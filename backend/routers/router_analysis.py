@@ -22,7 +22,7 @@ import models
 router = APIRouter()
 
 
-@router.get('/analyze', tags=["analysis"])
+@router.get('/analyze', tags=["analyze"])
 async def analyze(video_id: Optional[int] = Query(None),
                   database: Session = Depends(get_db)):
     """Sets up the graphing areas and initally plots raw data"""
@@ -55,9 +55,10 @@ async def analyze(video_id: Optional[int] = Query(None),
     return JSONResponse(content=res)
 
 
-@router.get('/analyze/tissue_number', tags=["analysis"])
+@router.get('/analyze/tissue_number', tags=["analyze"])
 async def analyze_tissue_number(tissue_number: int = Query(...),
-                                experiment_identifier: str = Query(...),
+                                experiment_id: str = Query(...),
+                                date_recorded: str = Query(None),
                                 database: Session = Depends(get_db)):
 
     json_list = []
@@ -65,8 +66,14 @@ async def analyze_tissue_number(tissue_number: int = Query(...),
     tiss_freq = []
     tiss_types = []
 
-    tissues_with_freq = crud_tissue.get_tissues_by_experiemnt_and_tissue_number(
-        database, experiment_identifier, tissue_number)
+    tissues_with_freq = []
+
+    if date_recorded:
+        tissues_with_freq = crud_tissue.get_tissues_by_experiment_and_tissue_number_and_date_recorded(
+            database, experiment_id, tissue_number, date_recorded)
+    else:
+        tissues_with_freq = crud_tissue.get_tissues_by_experiment_and_tissue_number(
+            database, experiment_id, tissue_number)
 
     for tissue_object, frequency in tissues_with_freq:
         tiss_freq.append(frequency)
@@ -88,16 +95,22 @@ async def analyze_tissue_number(tissue_number: int = Query(...),
     return JSONResponse(content=res)
 
 
-@ router.post("/graphUpdate", tags=["analysis"])
+@ router.post("/graphUpdate", tags=["analyze"])
 def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends(get_db)):
     """Function gets called to update graph with new parameters"""
     tissue_obj = 0
     if data.video_id:
         video_object = crud_video.get_vid_by_id(database, data.video_id)
         tissue_obj = video_object.tissues[data.value]
+    elif data.date_recorded:
+        tissue_with_freq = crud_tissue.get_tissues_by_experiment_and_tissue_number_and_date_recorded(
+            database, data.experiment_id, data.tissue_number, data.date_recorded)[data.value]
+        # the tissue object is in spot zero of the tuple frew in spot 1
+        tissue_obj = tissue_with_freq[0]
     else:
-        tissue_with_freq = crud_tissue.get_tissues_by_experiemnt_and_tissue_number(
-            database, data.experiment_identifier, data.tissue_number)[data.value]
+        tissue_with_freq = crud_tissue.get_tissues_by_experiment_and_tissue_number(
+            database, data.experiment_id, data.tissue_number)[data.value]
+        # the tissue object is in spot zero of the tuple frew in spot 1
         tissue_obj = tissue_with_freq[0]
 
     dataframe = crud_tissue_tracking.get_tracking_by_id(
@@ -105,7 +118,8 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
     tracking_obj = TissuePoints(
         dataframe['displacement'].to_list(), dataframe['time'].to_list(), tissue_obj)
-    tracking_obj.smooth(int(data.windows), int(data.polynomials), data.buttons[0], data.buttons[1])
+    tracking_obj.smooth(int(data.windows), int(
+        data.polynomials), data.buttons[0], data.buttons[1])
     tracking_obj.find_peaks(float(data.thresholds), int(
         data.minDistances), data.xrange, int(data.buffers))
 
@@ -139,7 +153,7 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
     }}
 
 
-@router.get("/caculate", tags=["analysis"])
+@router.get("/caculate", tags=["analyze"])
 def download_summary(video_id=Query(None), experiment_identifier=Query(None), tissue_number=Query(None), database_session=Depends(get_db)):
     """Download summary of vid caculatios"""
 
@@ -148,7 +162,7 @@ def download_summary(video_id=Query(None), experiment_identifier=Query(None), ti
     if video_id:
         tissues = crud_video.get_vid_by_id(database_session, video_id).tissues
     else:
-        tissues = crud_tissue.get_tissues_by_experiemnt_and_tissue_number(
+        tissues = crud_tissue.get_tissues_by_experiment_and_tissue_number(
             database_session, experiment_identifier, tissue_number)
         # this returns a tuple with tissue, freq, only need the tissue object in this case
         tissues = [x[0] for x in tissues]

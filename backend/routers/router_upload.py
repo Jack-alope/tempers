@@ -107,7 +107,7 @@ def _add_tissues(tissue_li: List[schema_tissue.TissueCreate],
     for tissue in tissue_li:
         tissue_id = crud_tissue.create_tissue(
             database_session, schema_tissue.create_tissue(tissue, vid_id))
-    # REVIEW: Does make much sense to return this
+    # REVIEW: Doeen't make much sense to return this
     return tissue_id
 
 
@@ -150,8 +150,6 @@ def _add_experiment_to_db(database_session, experiment_info):
 
     # REVIEW: Proablly dont want to just delete
     crud_experiment.delete_experiment(database_session, experiment_info.id)
-    crud_experiment.delete_experiment_by_identifer(
-        database_session, experiment_info.experiment_idenifer)
 
     delattr(experiment_info, "id")
     delattr(experiment_info, "vids")
@@ -265,7 +263,7 @@ def _expirment_file_unpack(database_session: Session,  dir_path: str):
     return experiment_idenifer
 
 
-@router.post("/upload/experiment_archive", tags=["upload", "experiment"])
+@router.post("/upload/experiment_archive", tags=["upload", "Experiment"])
 async def upload_experiment(file: UploadFile = File(...),
                             database_session: Session = Depends(get_db)):
 

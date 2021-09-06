@@ -2,8 +2,10 @@
   import { onMount } from "svelte";
   import { Accordion, AccordionItem } from "svelte-accessible-accordion";
 
+  import TissueNumberSelector from "./TissueNumberSelector.svelte";
   import VideoTable from "./tables/VideoTable.svelte";
   import type { vid_show } from "../interfaces";
+  import { experiments } from "./Stores";
 
   let videos: vid_show;
 
@@ -33,7 +35,18 @@
         title="experiment: {exp}"
         class="shadow-sm rounded-lg border-2 border-blue-600 border-opacity-50"
       >
-        <VideoTable videos={vid_list} experiment_id={exp} />
+        <Accordion>
+          {#each Object.entries(vid_list) as [date_recorded, vids]}
+            <AccordionItem
+              title="Date Recorded: {date_recorded}"
+              class="shadow-sm rounded-lg border-2 border-blue-600 border-opacity-50"
+            >
+              <VideoTable videos={vids} />
+              <TissueNumberSelector experiment_id={exp} {date_recorded} />
+            </AccordionItem>
+          {/each}
+        </Accordion>
+        <TissueNumberSelector experiment_id={exp} />
       </AccordionItem>
     {/each}
   {/if}

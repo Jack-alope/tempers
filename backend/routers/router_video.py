@@ -4,6 +4,8 @@ Router for Video
 import os
 from typing import List, Dict
 from collections import defaultdict
+from itertools import groupby
+from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.encoders import jsonable_encoder
@@ -62,12 +64,19 @@ async def selected_video(video_id: int = Query(...), database: Session = Depends
     return JSONResponse(content=res)
 
 
-@router.get("/videos_show", response_model=Dict[str, List[schema_video.VideoShow]], tags=["Videos"])
+@router.get("/videos_show", response_model=Dict[str, Dict[date, List[schema_video.VideoShow]]], tags=["Videos"])
 def get_vids_reactors(database: Session = Depends(get_database)):
     """
     Gets all vids from db
     returns 404 if none
     """
+
+    def experiment_key_func(k):
+        return k.experiment_id
+
+    def date_key_func(k):
+        return k.date_recorded
+
     videos = crud_video.get_videos(database)
 
     if not videos:
@@ -75,14 +84,27 @@ def get_vids_reactors(database: Session = Depends(get_database)):
 
     result = defaultdict(list)
 
-    for vid in videos:
-        result[vid.experiment_id].append(
-            schema_video.VideoShow(**vid.__dict__))
+    videos = [schema_video.VideoShow(
+        **vid.__dict__) for vid in videos]
+    videos = sorted(videos, key=experiment_key_func)
+
+    for key, value in groupby(videos, experiment_key_func):
+        result[key] = list(value)
+
+    for key in result:
+        vids = sorted(result[key], key=date_key_func)
+
+        date_vids = {}
+
+        for other_key, value in groupby(vids, date_key_func):
+            date_vids[other_key] = list(value)
+
+        result[key] = date_vids
 
     return dict(result)
 
 
-@router.delete("/video/{vid_id}", tags=["Videos"])
+@ router.delete("/video/{vid_id}", tags=["Videos"])
 def delete_video(vid_id: int, database: Session = Depends(get_database)):
     """
     endpoint to delete vid from DB

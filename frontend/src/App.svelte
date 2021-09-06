@@ -5,7 +5,7 @@
   import Home from "./pages/Home.svelte";
   import Upload from "./pages/Upload.svelte";
   import Tracking from "./pages/Tracking.svelte";
-  import Analysis from "./pages/Analysis.svelte";
+  import Analyze from "./pages/Analyze.svelte";
   import Database from "./pages/Database.svelte";
 
   let page;
@@ -13,7 +13,7 @@
   router("/", () => (page = Home));
   router("/upload", () => (page = Upload));
   router("/tracking", () => (page = Tracking));
-  router("/analysis", () => (page = Analysis));
+  router("/analyze", () => (page = Analyze));
   router("/database", () => (page = Database));
 
   router.start();

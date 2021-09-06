@@ -2,6 +2,7 @@
 Schema for analysis
 """
 from typing import List, Optional
+from datetime import date
 
 
 from pydantic import BaseModel
@@ -17,9 +18,10 @@ class AnalysisBase(BaseModel):
     minDistances: int
     video_id: Optional[int]
     buffers: int
-    experiment_identifier: Optional[str]
+    experiment_id: Optional[str]
     tissue_number: Optional[int]
     buttons: List
-    
+    date_recorded: Optional[date]
+
     class Config:
         orm_mode = True

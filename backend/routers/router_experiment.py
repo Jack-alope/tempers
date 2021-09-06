@@ -62,16 +62,20 @@ def delete_experiment(exp_id: str, database_session: Session = Depends(get_db)):
 def add_experiment(experiment: schema_experiment.ExperimentBase,
                    database_session: Session = Depends(get_db)):
     """Add experiment"""
-    if crud_experiment.check_experiment_id_exists(
+    if crud_experiment.check_experiment_id_exsits(
             database_session, experiment.id):
         raise HTTPException(status.HTTP_409_CONFLICT)
+    elif experiment.id == "":
+        # REVIEW: Better error message
+        raise HTTPException(status.HTTP_406_NOT_ACCEPTABLE)
+
     new_experiment = crud_experiment.create_experiment(
         database_session, experiment)
     return new_experiment
 
 
 @router.post("/experiment_exist",
-             tags=["experiment", "upload"])
+             tags=["Experiment", "upload"])
 def check_experiment_exists(experiment_identifier: str = Query(...),
                             database_session: Session = Depends(get_db)):
     """Router to check if the experiment identiyer is used retunes true if it exsits"""

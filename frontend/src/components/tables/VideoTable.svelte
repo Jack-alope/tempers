@@ -1,17 +1,7 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-
   import type { video_interface } from "../../interfaces";
 
   export let videos: video_interface[];
-  export let experiment_id: string;
-
-  let tissue_numbers;
-  let selectedTissueNumber: number;
-
-  onMount(async () => {
-    await getTissueNumbers(experiment_id);
-  });
 
   async function handleVideoDel(id: number) {
     const res = await fetch(process.env.API_URL + `/video/${id}`, {
@@ -25,28 +15,6 @@
     } else {
       alert("Something went wrong");
     }
-  }
-
-  async function getTissueNumbers(experiment_id: string) {
-    const res = await fetch(
-      process.env.API_URL +
-        `/tissues_in_experiment?experiment_id=${experiment_id}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    if (res.ok) {
-      tissue_numbers = await res.json();
-    } else {
-      return undefined;
-    }
-  }
-
-  async function handleTissueNumberSubmitted() {
-    window.location.href = `/analysis?experiment_id=${experiment_id}&tissue_number=${selectedTissueNumber}`;
   }
 </script>
 
@@ -131,7 +99,7 @@
               disabled={!video.tracked}
               title={video.tracked ? null : "Must Track First"}
               on:click={() =>
-                (window.location.href = `/analysis?video_id=${video.id}`)}
+                (window.location.href = `/analyze?video_id=${video.id}`)}
               >Analyse</button
             ></td
           >
@@ -146,20 +114,3 @@
     {/if}
   </tbody>
 </table>
-
-{#if !tissue_numbers}
-  <h1>no tissues</h1>
-{:else}
-  <p>To analyze by tissue number within an experiment select tissue number</p>
-  <form on:submit|preventDefault={handleTissueNumberSubmitted}>
-    <select bind:value={selectedTissueNumber}>
-      {#each tissue_numbers as tissue_number}
-        <option value={tissue_number}>
-          {tissue_number}
-        </option>
-      {/each}
-    </select>
-
-    <button type="submit"> Submit </button>
-  </form>
-{/if}

@@ -28,7 +28,7 @@ class VideoCreate(VideoBase):
 
 class VideoInfo(VideoBase):
     id: int
-    experiment_id: int
+    experiment_id: str
     save_location: Optional[str]
 
 
@@ -42,8 +42,8 @@ class Video(VideoBase):
 
 class VideoShow(VideoBase):
     id: int
-    date_recorded: date
     bio_reactor_number: int
+    experiment_id: str
     calibration_set_identifier: str = None
     tracked: bool
     anaylized: bool

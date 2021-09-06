@@ -6,7 +6,7 @@
 
   let video_id: number;
 
-  let nums, freqs, types, experiment_identifier, tissue_number;
+  let nums, freqs, types, experiment_id, tissue_number, date_recorded;
 
   async function handleVideoSelected(url: string) {
     const res = await fetch(process.env.API_URL + url, {
@@ -30,13 +30,18 @@
   onMount(async () => {
     const urlParams = new URLSearchParams(window.location.search);
     video_id = parseInt(urlParams.get("video_id"));
-    experiment_identifier = urlParams.get("experiment_id");
+    experiment_id = urlParams.get("experiment_id");
     tissue_number = parseInt(urlParams.get("tissue_number"));
+    date_recorded = urlParams.get("date_recorded");
     if (video_id) {
       await handleVideoSelected(`/analyze?video_id=${video_id}`);
-    } else if (experiment_identifier && tissue_number) {
+    } else if (experiment_id && tissue_number && date_recorded) {
       await handleVideoSelected(
-        `/analyze/tissue_number?tissue_number=${tissue_number}&experiment_identifier=${experiment_identifier}`
+        `/analyze/tissue_number?tissue_number=${tissue_number}&experiment_id=${experiment_id}&date_recorded${date_recorded}`
+      );
+    } else {
+      await handleVideoSelected(
+        `/analyze/tissue_number?tissue_number=${tissue_number}&experiment_id=${experiment_id}`
       );
     }
   });
@@ -50,10 +55,19 @@
   </script>
 </svelte:head>
 
-<h1>Analysis</h1>
+<h1>Analyze</h1>
 
 {#if nums && freqs && types && video_id}
   <Grapher {nums} {freqs} {types} {video_id} />
-{:else if nums && freqs && types && experiment_identifier && tissue_number}
-  <Grapher {nums} {freqs} {types} {experiment_identifier} {tissue_number} />
+{:else if date_recorded && nums && freqs && types && experiment_id && tissue_number}
+  <Grapher
+    {nums}
+    {freqs}
+    {types}
+    {experiment_id}
+    {tissue_number}
+    {date_recorded}
+  />
+{:else if nums && freqs && types && experiment_id && tissue_number}
+  <Grapher {nums} {freqs} {types} {experiment_id} {tissue_number} />
 {/if}

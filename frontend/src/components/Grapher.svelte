@@ -8,8 +8,9 @@
     freqs,
     types,
     video_id = null,
-    experiment_identifier = null,
-    tissue_number = null;
+    experiment_id = null,
+    tissue_number = null,
+    date_recorded = null;
 
   let json_data_list_value;
 
@@ -26,7 +27,7 @@
     if (video_id) {
       url = `/caculate?video_id=${video_id}`;
     } else {
-      url = `/caculate?experiment_identifier=${experiment_identifier}&tissue_number=${tissue_number}`;
+      url = `/caculate?experiment_id=${experiment_id}&tissue_number=${tissue_number}`;
     }
     const res = await fetch(process.env.API_URL + url, {
       method: "GET",
@@ -41,10 +42,7 @@
         if (video_id) {
           saveAs(blob, `${video_id}_calculations.csv`);
         } else {
-          saveAs(
-            blob,
-            `${experiment_identifier}_${tissue_number}_calculations.csv`
-          );
+          saveAs(blob, `${experiment_id}_${tissue_number}_calculations.csv`);
         }
       }
     }
@@ -483,32 +481,38 @@
         ],
       };
 
-      var updatemenus=[{
-        type: 'buttons',
-        y: 1.2,
-        yanchor: 'top',
-        x: 0.1,
-        xanchor: 'center',
-        direction: 'left',
-        buttons: [{
-          args: [{'graph_edits': [true, false]}],
-                label: 'Inverse',
-                method: 'restyle'
-        }, {
-          args: [{'graph_edits': [false, true]}],
-                label: 'Subtract Baseline',
-                method: 'restyle'
-        }, {
-          args: [{'graph_edits': [true, true]}],
-                label: 'Both',
-                method: 'restyle'
-        }, {
-          args: [{'graph_edits': [false, false]}],
-                label: 'Neither',
-                method: 'restyle'
+      var updatemenus = [
+        {
+          type: "buttons",
+          y: 1.2,
+          yanchor: "top",
+          x: 0.1,
+          xanchor: "center",
+          direction: "left",
+          buttons: [
+            {
+              args: [{ graph_edits: [true, false] }],
+              label: "Inverse",
+              method: "restyle",
+            },
+            {
+              args: [{ graph_edits: [false, true] }],
+              label: "Subtract Baseline",
+              method: "restyle",
+            },
+            {
+              args: [{ graph_edits: [true, true] }],
+              label: "Both",
+              method: "restyle",
+            },
+            {
+              args: [{ graph_edits: [false, false] }],
+              label: "Neither",
+              method: "restyle",
+            },
+          ],
         },
-      ]
-      }];
+      ];
       /* -----------------------------------------------------------------------------------*/
 
       /* ---------------Set Layout and Graph----------------------------------------------*/
@@ -517,23 +521,23 @@
         xaxis: {
           rangeslider: {},
           title: {
-            text: "Time (s)"
-          }
+            text: "Time (s)",
+          },
         },
         yaxis: {
           title: {
-            text: "Force (mN)"
-          }    
+            text: "Force (mN)",
+          },
         },
         yaxis2: {
           title: "DFDTs (mN/s)",
-          overlaying: 'y',
-          side: 'right',
-          position: .97
+          overlaying: "y",
+          side: "right",
+          position: 0.97,
         },
         sliders: [
           threshSlider,
-          minDistSlider, 
+          minDistSlider,
           polySlider,
           windSlider,
           bufferSlider,
@@ -601,7 +605,7 @@
 
       /* ----------------Sliders Update---------------------------------------*/
       Div.on("plotly_restyle", function (eventData) {
-        console.log(eventData[0].graph_edits)
+        console.log(eventData[0].graph_edits);
         //Finds which slider was changed, updates that value, and calls toPython function
         if (typeof eventData[0].thresh != "undefined") {
           thresholds[Div.valueOf().id] = eventData[0].thresh;
@@ -674,7 +678,7 @@
             buffers[Div.valueOf().id],
             buttons[Div.valueOf().id],
             Div
-          )
+          );
         }
       });
       /* -----------------------------------------------------------------------------------*/
@@ -706,6 +710,21 @@
         buttons,
         video_id,
       };
+    } else if (date_recorded) {
+      console.log("date");
+      graph_params = {
+        xrange,
+        value,
+        thresholds,
+        polynomials,
+        windows,
+        minDistances,
+        buffers,
+        buttons,
+        experiment_id,
+        tissue_number,
+        date_recorded,
+      };
     } else {
       graph_params = {
         xrange,
@@ -715,8 +734,8 @@
         windows,
         minDistances,
         buffers,
-        buttons, 
-        experiment_identifier,
+        buttons,
+        experiment_id,
         tissue_number,
       };
     }
@@ -733,15 +752,7 @@
 
     if (res.ok) {
       const response = await res.json();
-      Plotly.deleteTraces(Div.valueOf().id, [
-        -7,
-        -6,
-        -5,
-        -4,
-        -3,
-        -2,
-        -1,
-      ]);
+      Plotly.deleteTraces(Div.valueOf().id, [-7, -6, -5, -4, -3, -2, -1]);
       Plotly.restyle(
         Div.valueOf().id,
         "y",
@@ -826,14 +837,14 @@
         mode: "scatter",
         name: "DFDT",
         //visible: "legendonly",
-        yaxis: 'y2'
+        yaxis: "y2",
       });
       Plotly.addTraces(Div.valueOf().id, {
         x: response.data.rawx,
         y: response.data.rawy,
         mode: "scatter",
         name: "Raw Force",
-        visible: "legendonly"
+        visible: "legendonly",
       });
     }
   }

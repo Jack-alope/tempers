@@ -35,6 +35,10 @@ export interface post_interface {
   post_number: number;
 }
 
+export interface vid_date_show {
+  [date: string]: video_interface[];
+}
+
 export interface vid_show {
-  [experiment_idenifer: string]: video_interface[];
+  [experiment_idenifer: string]: vid_date_show;
 }
