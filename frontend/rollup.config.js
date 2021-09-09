@@ -42,16 +42,12 @@ export default {
 	},
 	plugins: [
 		replace({
-			preventAssignment: true,
-			process:JSON.stringify({
-					env: {
-						isProd: production,
-					    API_URL: "/api"
+			'process.env.API_URL':JSON.stringify(
+					    "/api"
 						// For Local development comment the above line and uncomment bellow
 						// TODO: ideally would like to do this automatically
-						// API_URL: "http://0.0.0.0:8000"
-					}
-				})
+						// "http://0.0.0.0:8000"
+			)
 		}),
 		svelte({
 			preprocess: sveltePreprocess({ sourceMap: !production,
