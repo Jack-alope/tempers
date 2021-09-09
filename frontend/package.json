@@ -40,7 +40,7 @@
     "sirv-cli": "1.0.14",
     "svelte-forms-lib": "1.10.6",
     "tailwind-hamburgers": "1.1.1",
-    "tailwindcss": "2.2.9",
+    "tailwindcss": "2.2.14",
     "yup": "0.32.9"
   }
 }
