@@ -1,5 +1,5 @@
 {
-  "extends": ["config:base", ":dependencyDashboard"],
+  "extends": ["config:base", ":dependencyDashboard", ":semanticCommitTypeAll(chore)"],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 10,
   "labels": ["dependencies"]
