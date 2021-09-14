@@ -37,7 +37,7 @@
       await handleVideoSelected(`/analyze?video_id=${video_id}`);
     } else if (experiment_id && tissue_number && date_recorded) {
       await handleVideoSelected(
-        `/analyze/tissue_number?tissue_number=${tissue_number}&experiment_id=${experiment_id}&date_recorded${date_recorded}`
+        `/analyze/tissue_number?tissue_number=${tissue_number}&experiment_id=${experiment_id}&date_recorded=${date_recorded}`
       );
     } else {
       await handleVideoSelected(

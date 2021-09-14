@@ -47,7 +47,8 @@ export default {
 						// For Local development comment the above line and uncomment bellow
 						// TODO: ideally would like to do this automatically
 						// "http://0.0.0.0:8000"
-			)
+			),
+			preventAssignment: true
 		}),
 		svelte({
 			preprocess: sveltePreprocess({ sourceMap: !production,
