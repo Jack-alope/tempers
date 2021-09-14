@@ -38,7 +38,7 @@
     "file-saver": "2.0.5",
     "page": "1.11.6",
     "sirv-cli": "1.0.14",
-    "svelte-forms-lib": "1.10.6",
+    "svelte-forms-lib": "1.10.7",
     "tailwind-hamburgers": "1.1.1",
     "tailwindcss": "2.2.15",
     "yup": "0.32.9"
