@@ -17,6 +17,12 @@ If you are looking to develop and contribute to this software here is a good pla
 6. Start the frontend in a different terminal window.
     ```bash
     cd frontend/
+    ```
+
+    Comment line 46-49 of `rollup.config.js`
+    
+    
+    ```
     npm install
     npm run dev
     ```
