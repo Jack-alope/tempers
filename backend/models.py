@@ -126,6 +126,9 @@ class TissueTracking(Base):
     odd_y: float = Column(Float)
     even_x: float = Column(Float)
     even_y: float = Column(Float)
+    smooth_force: float = Column(Float)
+    raw_force: float = Column(Float)
+    smooth_disp_norm: float = Column(Float)
 
 
 @dataclass

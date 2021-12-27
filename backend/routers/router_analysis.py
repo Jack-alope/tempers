@@ -125,9 +125,10 @@ def graph_update(data: schema_analysis.AnalysisBase, database: Session = Depends
 
     crud_tissue_caculations.create(
         database, tracking_obj.calculated_values, tissue_obj.id)
-
     # TODO: add anaylized to tissue
     # crud_video.video_anaylized(database, data.video_id)
+
+    crud_tissue_tracking.update_forces_disp(database, tissue_obj.id, tracking_obj.smooth_force, tracking_obj.raw_force, tracking_obj.smooth_disp)
 
     contractx = tracking_obj.contract_points[0][0].tolist() + \
         tracking_obj.contract_points[2][0].tolist(
