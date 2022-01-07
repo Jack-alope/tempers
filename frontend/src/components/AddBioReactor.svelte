@@ -4,7 +4,6 @@
   import { showBioReactor, bio_reactors } from "../components/Stores.js";
 
   async function handleBioReactorSubmitted(bio_reactor_info) {
-    console.log(bio_reactor_info);
     const res = await fetch(process.env.API_URL + "/addBioReactor", {
       method: "POST",
       headers: {

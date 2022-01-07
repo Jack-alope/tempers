@@ -1,9 +1,15 @@
 """
 Router for bio reactor
 """
+import json
 from typing import List
+import datetime
+from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status, BackgroundTasks
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import FileResponse
 
 from sqlalchemy.orm import Session
 
@@ -11,6 +17,7 @@ from database import get_db
 from crud import crud_bio_reactor, crud_post
 from schemas import schema_bio_reactor, schema_post
 
+import models
 
 router = APIRouter()
 
@@ -77,3 +84,18 @@ def add_bio_reactor(bio_reactor: schema_bio_reactor.BioReactorCreate,
 def delete_bio_reactor(bio_id: int, database_session: Session = Depends(get_db)):
     """deletes bio reactor by id"""
     return crud_bio_reactor.delete_bio_reactor(database_session, bio_id)
+
+
+@router.get("/download/bio_reactor_archive", tags=["Bio_reactor"])
+def dowload_bio_reactor_archive(background_tasks: BackgroundTasks, database_session: Session = Depends(get_db)):
+    bio_reactor_archive_file_path = "{models.UPLOAD_FOLDER}/temp"
+    date_time = datetime.datetime.now()
+    json_file_name = f"bio_reactor_archive_{date_time.strftime('%Y')}-{date_time.strftime('%b')}-{date_time.strftime('%d')}"
+    models.check_path_exisits(bio_reactor_archive_file_path)
+    bio_reactors = crud_bio_reactor.get_bio_reactors_as_schema(database_session)
+    with open(f"{bio_reactor_archive_file_path}/{json_file_name}", "w") as outfile:
+        json.dump(jsonable_encoder(schema_bio_reactor.BioReactorArchive(bio_reactors=bio_reactors)), outfile, indent=1)
+
+    background_tasks.add_task(models.delete_file, f"{bio_reactor_archive_file_path}/{json_file_name}")
+
+    return FileResponse(f"{bio_reactor_archive_file_path}/{json_file_name}")

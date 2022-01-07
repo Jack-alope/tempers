@@ -3,6 +3,7 @@ CRUD for Bio reactor
 """
 from typing import List
 import logging
+from dataclasses import asdict
 
 from sqlalchemy.orm import Session, noload
 from sqlalchemy.exc import IntegrityError
@@ -55,12 +56,13 @@ def delete_bio_reactor(database_session: Session, bio_id: int):
     """Deletes bio Reactor"""
     try:
         bio_reactor = get_bio_reactor(database_session, bio_id)
-        if bio_reactor.vids:
-            # returns false so that the experiemnt does not delete
-            # if bio has vids
-            return False
-        database_session.delete(bio_reactor)
-        database_session.commit()
+        if bio_reactor:
+            if bio_reactor.vids:
+                # returns false so that the experiemnt does not delete
+                # if bio has vids
+                return False
+            database_session.delete(bio_reactor)
+            database_session.commit()
         return True
     except IntegrityError:
         return False
@@ -77,3 +79,19 @@ def check_bio_reactor_number_exsits(database_session: Session,
     """Retuns true if bio number exsits"""
     return database_session.query(exists().where(
         models.BioReactor.bio_reactor_number == bio_reactor_number)).scalar()
+
+def get_bio_reactors_as_schema(database_session: Session, bio_reactor_ids: List[int] = []):
+
+
+    if bio_reactor_ids:
+        # Querys database with list of bio_reactor ids list of bio_reactors is returned
+        bio_reactors = get_bio_reactors_by_li_id(
+            database_session, bio_reactor_ids)
+    else:
+        bio_reactors = get_bio_reactors(database_session)   
+    
+    # Converts that list of bio ractors to BioReactor schema
+    bio_reactors_schema = [schema_bio_reactor.BioReactorWithPosts(
+            **asdict(i)) for i in bio_reactors]
+
+    return bio_reactors_schema

@@ -52,7 +52,7 @@
   <div class="w-full">
     <label
       class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-      for="date_recorded">Date Recorded</label
+      for="date_recorded">Start Date</label
     >
     <input
       type="date"

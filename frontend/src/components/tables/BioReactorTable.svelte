@@ -4,11 +4,17 @@
   import { getBioReactors } from "../../apiCalls.js";
   import { showBioReactor, bio_reactors } from "../../components/Stores.js";
   import AddBioReactor from "../../components/AddBioReactor.svelte";
+  import DownloadModal from "../DownloadModal.svelte";
+  import UploadBioReactorArchive from "../UploadBioReactorArchive.svelte";
+
 
   onMount(async () => {
     await getBioReactors();
   });
-  console.log(bio_reactors);
+
+  let showDownloadModal: boolean = false;
+  let uploadBioReactorArchive: boolean = false;
+
   async function handleBioReactorDel(id: number) {
     const res = await fetch(process.env.API_URL + `/bio_reactor/${id}`, {
       method: "DELETE",
@@ -26,6 +32,29 @@
       }
     } else {
       alert("Something went wrong");
+    }
+  }
+
+  async function handleDownloadBioReactor(){
+    showDownloadModal = true;
+    const res = await fetch(process.env.API_URL + "/download/bio_reactor_archive", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      },
+
+    });
+
+    if (res.ok){
+      const file = await res.blob();
+      if (file) {
+        const date = new Date().toISOString().split('T')[0];
+        const blob = new Blob([file]);
+        saveAs(blob, `bio_reactors_archive_${date}.json`);
+        showDownloadModal = false;
+      }
+    } else {
+      alert("Something Went Wrong")
     }
   }
 </script>
@@ -108,11 +137,29 @@
     {/if}
   </tbody>
 </table>
+<div class="flex flex-wrap overflow-hidden">
+  <div class="w-1/3 overflow-hidden">
+    <button
+    class="appearance-none justify-center block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    on:click={() => ($showBioReactor = true)}>Add Bio Reactor</button
+  >
+  </div>
+  <div class="w-1/3 overflow-hidden">
+    <button
+      class="{$bio_reactors 
+      ? "bg-blue-500 hover:bg-blue-700 text-white"
+      :"bg-gray-200 text-gray-700"} 
+      appearance-none justify-center block w-3/4 bg-gray-200 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+      on:click={() =>(handleDownloadBioReactor())}>Download Bio Reactors</button>
+  </div>
+  <div class="w-1/3 overflow-hidden">
+    <button
+    class="appearance-none justify-center block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+    on:click={() => (uploadBioReactorArchive = true)}>Upload Bio Reactor Archive</button
+  >
 
-<button
-  class="appearance-none justify-center block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-  on:click={() => ($showBioReactor = true)}>Add Bio Reactor</button
->
+  </div>
+</div>
 
 {#if $showBioReactor}
   <Modal on:close={() => ($showBioReactor = false)}>
@@ -121,4 +168,13 @@
       <AddBioReactor />
     </p>
   </Modal>
+{:else if showDownloadModal}
+  <DownloadModal bind:showDownloadModal />
+{:else if uploadBioReactorArchive}
+<Modal on:close={() => (uploadBioReactorArchive = false)}>
+  <h1 slot="header">Upload Archive</h1>
+  <p slot="content">
+    <UploadBioReactorArchive bind:uploadBioReactorArchive />
+  </p>
+</Modal>
 {/if}

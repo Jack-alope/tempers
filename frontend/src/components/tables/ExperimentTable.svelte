@@ -1,20 +1,21 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
   import { getExperiments } from "../../apiCalls.js";
   import Modal from "../../components/Modal.svelte";
   import AddExperimet from "../../components/AddExperimet.svelte";
   import UploadExperimentArchive from "../../components/UploadExperimentArchive.svelte";
   import { showExperiment, experiments } from "../../components/Stores.js";
+  import DownloadModal from "../DownloadModal.svelte"
 
   let uploadArchive: boolean = false;
-  let downloadModal: boolean = false;
+  let showDownloadModal: boolean = false;
 
   onMount(async () => {
     await getExperiments();
   });
 
   async function handleExperimentDownload(id: number) {
-    downloadModal = true;
+    showDownloadModal = true;
     const res = await fetch(process.env.API_URL + `/experimentsJSON/${id}`, {
       method: "GET",
       headers: {
@@ -26,7 +27,7 @@
       if (file) {
         const blob = new Blob([file]);
         saveAs(blob, `${id}.zip`);
-        downloadModal = false;
+        showDownloadModal = false;
       }
     } else {
       alert("Something went wrong");
@@ -131,15 +132,11 @@
   <Modal on:close={() => (uploadArchive = false)}>
     <h1 slot="header">Upload Archive</h1>
     <p slot="content">
-      <UploadExperimentArchive on:message={() => (uploadArchive = false)} />
+      <UploadExperimentArchive bind:uploadArchive />
     </p>
   </Modal>
-{:else if downloadModal}
-  <!-- REVIEW: this is ugly -->
-  <Modal on:close={() => (downloadModal = false)}>
-    <h1 slot="header">Download experiment</h1>
-    <p slot="content">Downloading....</p>
-  </Modal>
+{:else if showDownloadModal}
+  <DownloadModal bind:showDownloadModal />
 {:else if $showExperiment}
   <Modal on:close={() => ($showExperiment = false)}>
     <h1 slot="header">Add a Experiment</h1>

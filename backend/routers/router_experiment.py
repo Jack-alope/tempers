@@ -11,6 +11,7 @@ from dataclasses import asdict
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import FileResponse
+
 from sqlalchemy.orm import Session
 
 from database import get_db
@@ -99,7 +100,7 @@ def _tissue_tracking_to_csv(database_session: Session, tissues, file_path: str):
 
 @router.get("/experimentsJSON/{experiment_id}", tags=["Experiment"])
 def json_experiment(background_tasks: BackgroundTasks, experiment_id: str,
-                    database_session=Depends(get_db)):
+                    database_session: Session=Depends(get_db)):
     """
     Genrates a JSON of experiment data and csv for tissue tracking database
     zips that with the vid files and sends the zip as a file response
@@ -137,11 +138,7 @@ def json_experiment(background_tasks: BackgroundTasks, experiment_id: str,
             # Appends tissue to list of tissue
             tissues.append(j)
 
-    # Querys database with list of bio_reactor ids list of bio_reactors is returned
-    # Converts that list of bio ractors to BioReactor schema
-    bio_reactors = [schema_bio_reactor.BioReactorWithPosts(
-        **asdict(i)) for i in crud_bio_reactor.get_bio_reactors_by_li_id(
-        database_session, bio_reactor_ids)]
+    bio_reactors = crud_bio_reactor.get_bio_reactors_as_schema(database_session, bio_reactor_ids)
 
     calibration_sets = [schema_calibration_set.CalibrationSet(
         **asdict(i)) for i in crud_calibration_set.get_calibration_sets_by_li_identifier(database_session, calibration_set_identifers)]

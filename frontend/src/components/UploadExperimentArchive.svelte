@@ -1,24 +1,22 @@
 <script lang="ts">
-  import { createForm } from "svelte-forms-lib";
 
   import { checkExpExist } from "../apiCalls";
 
-  import { createEventDispatcher } from "svelte";
-
-  const dispatch = createEventDispatcher();
-
   let files;
+  let experiment_idenifer: string
+
+  export let uploadArchive: boolean = false;
 
   async function checkExp() {
-    console.log();
-    if (await checkExpExist($form.experiment_idenifer)) {
+    if (await checkExpExist(experiment_idenifer)) {
       alert("Experirment Exsists uploading will over write exsisting data");
     }
   }
 
-  async function addArchive(values) {
+  async function addArchive() {
     const formData = new FormData();
     formData.append("file", files[0]);
+
 
     const res = await fetch(
       process.env.API_URL + "/upload/experiment_archive",
@@ -29,24 +27,15 @@
     );
 
     if (res.ok) {
-      dispatch("message");
+      uploadArchive = false;
     } else {
       alert("Something went wrong");
     }
   }
 
-  const { form, errors, state, handleChange, handleSubmit } = createForm({
-    initialValues: {
-      start_date: "",
-      experiment_idenifer: "",
-    },
-    onSubmit: (values) => {
-      addArchive(values);
-    },
-  });
 </script>
 
-<form class="w-full" on:submit={handleSubmit}>
+<form class="w-full" on:submit|preventDefault={addArchive}>
   <!-- TODO: Maybe use grid instead -->
   <div class="w-full">
     <div class="w-full px-3">
@@ -59,7 +48,7 @@
         id="experiment_idenifer"
         name="experiment_idenifer"
         class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-        bind:value={$form.experiment_idenifer}
+        bind:value={experiment_idenifer}
         on:blur={checkExp}
       />
     </div>

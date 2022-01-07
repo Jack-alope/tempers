@@ -5,7 +5,6 @@
   import TissueNumberSelector from "./TissueNumberSelector.svelte";
   import VideoTable from "./tables/VideoTable.svelte";
   import type { vid_show } from "../interfaces";
-  import { experiments } from "./Stores";
 
   let videos: vid_show;
 

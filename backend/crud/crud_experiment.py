@@ -44,16 +44,17 @@ def delete_experiment(database_session: Session, exp_id: str):
     """Deletes expeiments returns false if cannot delete bc has children"""
     try:
         experiment = get_experiment(database_session, exp_id)
-
-        if experiment.vids:
-            # returns false so that the experiemnt does not delete
-            # if exp has vids
-            return False
-        database_session.delete(experiment)
-        database_session.commit()
-        shutil.rmtree(
-            f"{models.UPLOAD_FOLDER}/{experiment.id}")
-        return True
+        if experiment:
+            if experiment.vids:
+                # returns false so that the experiemnt does not delete
+                # if exp has vids
+                return False
+            database_session.delete(experiment)
+            database_session.commit()
+            shutil.rmtree(
+                f"{models.UPLOAD_FOLDER}/{experiment.id}")
+            return True
+        return False
     except IntegrityError:
         return False
     except FileNotFoundError:

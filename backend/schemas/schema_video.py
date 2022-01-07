@@ -38,6 +38,7 @@ class Video(VideoBase):
     tissues: List[schema_tissue.Tissue]
     save_location: Optional[str]
     calibration_set_identifier: Optional[str]
+    tracked: bool
 
 
 class VideoShow(VideoBase):

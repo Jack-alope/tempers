@@ -14,7 +14,7 @@ def _get_tracking_by_id_query(database_session: Session, tissue_id: int):
         models.TissueTracking.tissue_id == tissue_id).order_by(models.TissueTracking.time.asc())
 
 
-def _delete(database_session: Session, tissue_id: int):
+def delete(database_session: Session, tissue_id: int):
     database_session.query(models.TissueTracking).filter(
         models.TissueTracking.tissue_id ==
         tissue_id).delete(synchronize_session=False)
@@ -25,7 +25,7 @@ def create_tissue_tracking(database_session: Session, tissue_id: int, dataframe)
     Accepts the DB Session, tissue_id and a data frame
     Inserts tissue tracking data to databse
     """
-    _delete(database_session, tissue_id)
+    delete(database_session, tissue_id)
     database_session.bulk_insert_mappings(models.TissueTracking,
                                           dataframe.to_dict(orient="records"))
     database_session.commit()

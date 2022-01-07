@@ -2,6 +2,8 @@
 from typing import List
 
 from sqlalchemy.orm import Session, noload
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm.exc import UnmappedInstanceError
 
 import models
 
@@ -10,11 +12,31 @@ from schemas import schema_calibration_set
 
 def create(database_session: Session,
            calibration_set: schema_calibration_set.CalibrationSet):
+
+    if type(calibration_set) is not dict:
+        calibration_set = calibration_set.dict()
     db_calibration_set = models.CalibrationSet(**calibration_set)
     database_session.add(db_calibration_set)
     database_session.commit()
     database_session.refresh(db_calibration_set)
     return db_calibration_set
+
+def delete(database_session: Session, calibration_set_identifier: str):
+
+    try:
+        calibration_set = get_calibration_set_by_identifier(database_session, calibration_set_identifier)
+        database_session.delete(calibration_set)
+        database_session.commit()
+        return True
+    except IntegrityError:
+        return False
+    except FileNotFoundError:
+        return True
+    except UnmappedInstanceError:
+        return False
+
+
+
 
 
 def get_calibration_sets(database_session: Session):

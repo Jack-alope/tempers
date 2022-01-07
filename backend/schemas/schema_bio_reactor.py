@@ -34,3 +34,7 @@ class BioReactor(BioReactorBase):
 class BioReactorWithPosts(BioReactorBase):
     id: int
     posts: List[schema_post.PostWithHeights]
+
+
+class BioReactorArchive(BaseModel):
+    bio_reactors: List[BioReactorWithPosts]

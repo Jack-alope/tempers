@@ -20,8 +20,8 @@ import pandas as pd
 import models
 from database import get_db
 from crud import crud_video, crud_tissue, crud_tissue_tracking, \
-    crud_experiment, crud_bio_reactor, crud_post, crud_tissue_caculations
-from schemas import schema_video, schema_tissue, schema_experiment
+    crud_experiment, crud_bio_reactor, crud_post, crud_tissue_caculations, crud_calibration_set
+from schemas import schema_video, schema_tissue, schema_experiment, schema_bio_reactor, schema_calibration_set
 
 
 router = APIRouter()
@@ -146,18 +146,25 @@ def _unzip_and_delete(archive_path, where_to_save):
     os.remove(archive_path)
 
 
+def _add_calibration_sets_to_db(database_session, calibration_sets: schema_calibration_set.CalibrationSet):
+    for cal_set in calibration_sets:
+        # REVIEW: Proablly dont want to just delete
+        crud_calibration_set.delete(database_session, cal_set.calibration_set_identifier)
+        crud_calibration_set.create(database_session, cal_set)
+    
+
 def _add_experiment_to_db(database_session, experiment_info):
 
     # REVIEW: Proablly dont want to just delete
     crud_experiment.delete_experiment(database_session, experiment_info.id)
 
-    delattr(experiment_info, "id")
+    # delattr(experiment_info, "id")
     delattr(experiment_info, "vids")
 
     experiment = crud_experiment.create_experiment(
         database_session, experiment_info)
 
-    return (experiment.id, experiment.experiment_idenifer)
+    return experiment.id
 
 
 def _add_bio_reactos_to_db(database_session: Session, bio_reactors_info):
@@ -240,6 +247,13 @@ def _add_vids_to_db(database_session: Session, vids,
             _tissue_tracking_csv_to_db(
                 database_session, new_tissue_id, old_tissue_id)
 
+def _bio_reactor_archive_unpack(database_session: Session, file_path: str):
+
+    with open(file_path) as file:
+        data: schema_bio_reactor.BioReactorArchive = schema_bio_reactor.BioReactorArchive(**json.load(file))
+    _add_bio_reactos_to_db(database_session, data.bio_reactors)
+
+    return {200: "OK"}
 
 def _expirment_file_unpack(database_session: Session,  dir_path: str):
 
@@ -252,22 +266,21 @@ def _expirment_file_unpack(database_session: Session,  dir_path: str):
 
     vids = data.experiment.vids
 
+    _add_calibration_sets_to_db(database_session, data.calibration_sets)
     bio_ids, post_ids = _add_bio_reactos_to_db(
         database_session, data.bio_reactors)
-    experiment_id, experiment_idenifer = _add_experiment_to_db(
+    experiment_id = _add_experiment_to_db(
         database_session, data.experiment)
 
     _add_vids_to_db(database_session, vids,
                     experiment_id, bio_ids, post_ids)
 
-    return experiment_idenifer
+    return experiment_id
 
 
 @router.post("/upload/experiment_archive", tags=["upload", "Experiment"])
 async def upload_experiment(file: UploadFile = File(...),
                             database_session: Session = Depends(get_db)):
-
-    # TODO: add Tracking data
 
     where_to_save = os.path.join(UPLOAD_FOLDER, "temp")
     models.check_path_exisits(where_to_save)
@@ -280,12 +293,23 @@ async def upload_experiment(file: UploadFile = File(...),
 
     _unzip_and_delete(archive_path, where_to_save)
 
-    experiment_idenifer = _expirment_file_unpack(
-        database_session, where_to_save)
-
+    experiment_id = _expirment_file_unpack(
+    database_session, where_to_save)
+    
     shutil.move(os.path.join(where_to_save, "videos"), os.path.join(
-        UPLOAD_FOLDER, experiment_idenifer, "videos"))
+        UPLOAD_FOLDER, experiment_id, "videos"))
 
     shutil.rmtree(where_to_save)
 
     return {200: "OK"}
+
+
+@router.post("/upload/bio_reactor_archive", tags=["upload", "Bio_reactor"])
+async def upload_bio_reactor_archive(file: UploadFile = File(...), database_session: Session = Depends(get_db)):
+    where_to_save =  os.path.join(UPLOAD_FOLDER, "temp")
+    models.check_path_exisits(where_to_save)
+    file_path = f"{where_to_save}/bio_reactos_archive.json"
+
+    _save_file(file.file, file_path)
+    _bio_reactor_archive_unpack(database_session, file_path)
+    return {200:"OK"}
