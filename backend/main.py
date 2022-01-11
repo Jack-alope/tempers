@@ -9,13 +9,23 @@ from fastapi.middleware.cors import CORSMiddleware
 
 import models
 from database import engine
-from routers import router_upload, router_tracking, router_analysis, \
-    router_experiment, router_bio_reactor, router_video, router_calibration_set, \
-    router_tissue
+from routers import (
+    router_upload,
+    router_tracking,
+    router_analysis,
+    router_experiment,
+    router_bio_reactor,
+    router_video,
+    router_calibration_set,
+    router_tissue,
+)
 
-logging.basicConfig(format='%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-                    datefmt='%Y-%m-%d:%H:%M:%S',
-                    level=logging.DEBUG, filename='main.log')
+logging.basicConfig(
+    format="%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s",
+    datefmt="%Y-%m-%d:%H:%M:%S",
+    level=logging.DEBUG,
+    filename="main.log",
+)
 
 models.Base.metadata.create_all(bind=engine)
 

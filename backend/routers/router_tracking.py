@@ -11,14 +11,15 @@ from crud import crud_video, crud_calibration_set
 from schemas import schema_video
 
 from trackings.trackers import TissueTracker
+
 router = APIRouter()
 
 
 def _coord_distance(coords_list):
-    '''
+    """
     Accepts a list of coords
     Returns a list of those coords coverted to distance in pixel
-    '''
+    """
     dist_list = []
     for i in range(1, len(coords_list), 2):
         point_one = coords_list[i - 1]
@@ -31,9 +32,12 @@ def _coord_distance(coords_list):
     return dist_list
 
 
-@router.post('/boxCoordinates', tags=["tracking"])
-async def box_coordinates(background_tasks: BackgroundTasks, post_info: schema_video.PostSelection,
-                          database: Session = Depends(get_db)):
+@router.post("/boxCoordinates", tags=["tracking"])
+async def box_coordinates(
+    background_tasks: BackgroundTasks,
+    post_info: schema_video.PostSelection,
+    database: Session = Depends(get_db),
+):
     """
     accepts the box coords and starts tracking
 
@@ -55,16 +59,15 @@ async def box_coordinates(background_tasks: BackgroundTasks, post_info: schema_v
 
     cross_dist_pix = _coord_distance(post_info.cross_points)
     cross_dist_mm = list(map(lambda x: x * cal_factor, cross_dist_pix))
-    crud_calibration_set.update_calibration_set(
-        database, cal_identifier, cal_factor)
+    crud_calibration_set.update_calibration_set(database, cal_identifier, cal_factor)
     crud_video.update_cal_cross(
-        database, post_info.video_id,
-        cal_identifier,
-        cross_dist_mm)
+        database, post_info.video_id, cal_identifier, cross_dist_mm
+    )
 
     video_object = crud_video.get_vid_by_id(database, post_info.video_id)
 
-    background_tasks.add_task(TissueTracker, database,
-                              post_info.boxes, cal_factor, video_object)
+    background_tasks.add_task(
+        TissueTracker, database, post_info.boxes, cal_factor, video_object
+    )
 
     return {"ok": 200}

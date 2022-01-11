@@ -14,7 +14,8 @@ def create(database_session: Session, caculations_dict: dict, tissue_id: int):
     """
     # REVIEW: change to update maybe
     database_session.query(models.TissueCalculatedData).filter(
-        models.TissueCalculatedData.tissue_id == tissue_id).delete(synchronize_session=False)
+        models.TissueCalculatedData.tissue_id == tissue_id
+    ).delete(synchronize_session=False)
     caculations_dict["tissue_id"] = tissue_id
     db_tissue_caculation = models.TissueCalculatedData(**caculations_dict)
     database_session.add(db_tissue_caculation)
@@ -25,5 +26,9 @@ def create(database_session: Session, caculations_dict: dict, tissue_id: int):
 
 def get_calculations(database_session: Session, tissue_ids: List[int]):
     """Gets caculation for tissue"""
-    return pd.read_sql(database_session.query(models.TissueCalculatedData).filter(
-        models.TissueCalculatedData.tissue_id.in_(tissue_ids)).statement, database_session.bind)
+    return pd.read_sql(
+        database_session.query(models.TissueCalculatedData)
+        .filter(models.TissueCalculatedData.tissue_id.in_(tissue_ids))
+        .statement,
+        database_session.bind,
+    )

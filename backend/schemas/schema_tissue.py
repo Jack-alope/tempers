@@ -25,11 +25,14 @@ class Tissue(TissueBase):
     cross_section_dist: Optional[float]
     # REVIEW: tissie tracking
     # tissue_tracking: List[schema_tissue_tracking.TissueTrackingBase]
-    tissue_caculated_data: Optional[schema_tissue_calculated_data.TissueCalculatedDataBase]
+    tissue_caculated_data: Optional[
+        schema_tissue_calculated_data.TissueCalculatedDataBase
+    ]
 
 
 class TissueFull(Tissue):
     """Schema for to JSON"""
+
     id: int
     vid_id: int
 
@@ -37,6 +40,6 @@ class TissueFull(Tissue):
 def create_tissue(base_tissue: TissueBase, vid_id: int):
     """Converts TissueBase to TissueCreate"""
     tissue_dict = base_tissue.dict()
-    tissue_dict['vid_id'] = (vid_id)
+    tissue_dict["vid_id"] = vid_id
 
     return TissueCreate.parse_obj(tissue_dict)

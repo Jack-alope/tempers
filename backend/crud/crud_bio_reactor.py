@@ -21,25 +21,35 @@ def get_bio_reactors(database_session: Session):
 
 def get_bio_reactor(database_session: Session, bio_id: int):
     """Returns bio reactor by for id"""
-    return database_session.query(models.BioReactor).filter(
-        models.BioReactor.id == bio_id).first()
+    return (
+        database_session.query(models.BioReactor)
+        .filter(models.BioReactor.id == bio_id)
+        .first()
+    )
 
 
 def get_bio_identifer_from_id(database_session: Session, bio_id: int):
     """Returns bio ideneifier from id"""
 
-    return database_session.query(models.BioReactor.bio_reactor_number).filter(
-        models.BioReactor.id == bio_id).first()
+    return (
+        database_session.query(models.BioReactor.bio_reactor_number)
+        .filter(models.BioReactor.id == bio_id)
+        .first()
+    )
 
 
 def get_bio_reactors_by_li_id(database_session: Session, bio_ids: List[int]):
-    return database_session.query(models.BioReactor).options(
-        noload(models.BioReactor.vids)).filter(
-        models.BioReactor.id.in_(bio_ids)).all()
+    return (
+        database_session.query(models.BioReactor)
+        .options(noload(models.BioReactor.vids))
+        .filter(models.BioReactor.id.in_(bio_ids))
+        .all()
+    )
 
 
-def create_bio_reactor(database_session: Session,
-                       bio_reactor: schema_bio_reactor.BioReactor):
+def create_bio_reactor(
+    database_session: Session, bio_reactor: schema_bio_reactor.BioReactor
+):
     """Adds bio reactor to DB"""
     db_bio_reactor = models.BioReactor()
     for i in bio_reactor:
@@ -74,24 +84,26 @@ def check_bio_reactor_has_vids(database_session: Session, bio_id: int):
     pass
 
 
-def check_bio_reactor_number_exsits(database_session: Session,
-                                    bio_reactor_number: int):
+def check_bio_reactor_number_exsits(database_session: Session, bio_reactor_number: int):
     """Retuns true if bio number exsits"""
-    return database_session.query(exists().where(
-        models.BioReactor.bio_reactor_number == bio_reactor_number)).scalar()
+    return database_session.query(
+        exists().where(models.BioReactor.bio_reactor_number == bio_reactor_number)
+    ).scalar()
 
-def get_bio_reactors_as_schema(database_session: Session, bio_reactor_ids: List[int] = []):
 
+def get_bio_reactors_as_schema(
+    database_session: Session, bio_reactor_ids: List[int] = []
+):
 
     if bio_reactor_ids:
         # Querys database with list of bio_reactor ids list of bio_reactors is returned
-        bio_reactors = get_bio_reactors_by_li_id(
-            database_session, bio_reactor_ids)
+        bio_reactors = get_bio_reactors_by_li_id(database_session, bio_reactor_ids)
     else:
-        bio_reactors = get_bio_reactors(database_session)   
-    
+        bio_reactors = get_bio_reactors(database_session)
+
     # Converts that list of bio ractors to BioReactor schema
-    bio_reactors_schema = [schema_bio_reactor.BioReactorWithPosts(
-            **asdict(i)) for i in bio_reactors]
+    bio_reactors_schema = [
+        schema_bio_reactor.BioReactorWithPosts(**asdict(i)) for i in bio_reactors
+    ]
 
     return bio_reactors_schema

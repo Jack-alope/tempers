@@ -51,17 +51,22 @@ def get_videos(database_session: Session):
     Returns all vids
     """
     # each vid is retuned as a tuple with the vid object, exp_idenifyer, bio_number
-    result = database_session.query(models.Video,
-                                    models.Experiment.id,
-                                    models.BioReactor.bio_reactor_number).join(
-        models.Experiment).join(models.BioReactor).distinct(models.Video.id).all()
+    result = (
+        database_session.query(
+            models.Video, models.Experiment.id, models.BioReactor.bio_reactor_number
+        )
+        .join(models.Experiment)
+        .join(models.BioReactor)
+        .distinct(models.Video.id)
+        .all()
+    )
 
     def add_bio_and_exp_to_vid(tup):
-        '''
+        """
         Accepts a tuple with a vid object, experiment_idenifer, bio_reactor_number
         Takes those vaules and addes them as attrubues of the vid object
         Returning the tup with the exp and bio attrubutes
-        '''
+        """
 
         setattr(tup[0], "experiment_id", tup[1])
         setattr(tup[0], "bio_reactor_number", tup[2])
@@ -86,12 +91,14 @@ def delete_video(database_session: Session, vid_id: int):
 
 def get_vid_by_id(database_session: Session, vid_id: int):
     """return vid by id"""
-    return database_session.query(models.Video).filter(models.Video.id == vid_id).first()
+    return (
+        database_session.query(models.Video).filter(models.Video.id == vid_id).first()
+    )
 
 
-def update_cal_cross(database_session: Session, video_id,
-                     cal_identifer,
-                     cross_dist_passed: List):
+def update_cal_cross(
+    database_session: Session, video_id, cal_identifer, cross_dist_passed: List
+):
     """update calibration and cross section distance"""
     vid = get_vid_by_id(database_session, video_id)
 
@@ -138,4 +145,9 @@ def get_next_video_id(database_session: Session):
 
 
 def get_frequency_by_id(database_session: Session, vid_id: int):
-    return database_session.query(models.Video).filter(models.Video.id == vid_id).first().frequency
+    return (
+        database_session.query(models.Video)
+        .filter(models.Video.id == vid_id)
+        .first()
+        .frequency
+    )

@@ -1,4 +1,3 @@
-
 """
 CRUD for experiments
 """
@@ -21,17 +20,26 @@ def get_experiments(database_session: Session):
 
 def get_experiment(database_session: Session, exp_id: str):
     """Returns experiment by id"""
-    return database_session.query(models.Experiment).filter(
-        models.Experiment.id == exp_id).first()
+    return (
+        database_session.query(models.Experiment)
+        .filter(models.Experiment.id == exp_id)
+        .first()
+    )
 
 
 def get_experiment_vid(database_session: Session, exp_id: str):
     """Returns experiment by id"""
-    return database_session.query(models.Experiment, models.Video.id).join(
-        models.Video).filter(models.Experiment.id == exp_id).first()
+    return (
+        database_session.query(models.Experiment, models.Video.id)
+        .join(models.Video)
+        .filter(models.Experiment.id == exp_id)
+        .first()
+    )
 
 
-def create_experiment(database_session: Session, experiment: schema_experiment.ExperimentBase):
+def create_experiment(
+    database_session: Session, experiment: schema_experiment.ExperimentBase
+):
     """Add Experiment to DB"""
     db_experiment = models.Experiment(**experiment.dict())
     database_session.add(db_experiment)
@@ -51,8 +59,7 @@ def delete_experiment(database_session: Session, exp_id: str):
                 return False
             database_session.delete(experiment)
             database_session.commit()
-            shutil.rmtree(
-                f"{models.UPLOAD_FOLDER}/{experiment.id}")
+            shutil.rmtree(f"{models.UPLOAD_FOLDER}/{experiment.id}")
             return True
         return False
     except IntegrityError:
@@ -67,5 +74,6 @@ def delete_experiment(database_session: Session, exp_id: str):
 
 def check_experiment_id_exsits(database_session: Session, experiment_id: str):
     """Returns true if experiment_idenifier is in DB"""
-    return database_session.query(exists().where(
-        models.Experiment.id == experiment_id)).scalar()
+    return database_session.query(
+        exists().where(models.Experiment.id == experiment_id)
+    ).scalar()

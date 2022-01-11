@@ -12,9 +12,11 @@ from schemas import schema_calibration_set
 router = APIRouter()
 
 
-@router.get("/calibrationSets",
-            response_model=List[schema_calibration_set.CalibrationSet],
-            tags=["Calibration Set"])
+@router.get(
+    "/calibrationSets",
+    response_model=List[schema_calibration_set.CalibrationSet],
+    tags=["Calibration Set"],
+)
 def get_calibration_sets(database: Session = Depends(get_database)):
     """Returns calibration sets"""
 

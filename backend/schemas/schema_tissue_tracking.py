@@ -16,5 +16,6 @@ class TissueTrackingBase(BaseModel):
 
 class TissueTrackingFull(TissueTrackingBase):
     """Schemea for to JSON"""
+
     id: int
     tissue_id: int
