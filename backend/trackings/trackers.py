@@ -1,6 +1,7 @@
 """
 Tracks posts and add displacements to database
 """
+import logging
 
 import concurrent.futures
 import cv2
@@ -8,6 +9,8 @@ import pandas as pd
 import numpy as np
 from scipy.spatial import distance
 from crud import crud_tissue_tracking, crud_video
+
+log = logging.getLogger("tracking_logger")
 
 
 class TissueTracker:
@@ -37,6 +40,7 @@ class TissueTracker:
         )
         lists = np.array(tracks).T.tolist()
 
+        log.info("Start Tracking")
         with concurrent.futures.ThreadPoolExecutor() as executor:
             post_locs = list(executor.map(self.threaded_centroid, *lists))
             executor.shutdown(wait=True)
@@ -46,6 +50,7 @@ class TissueTracker:
                 rel_index = int((index - 1) / 2)
                 self.add_to_database(post_info, post_locs[index - 1], rel_index)
         crud_video.update_tracked_status(database, video_object.id, True)
+        log.info("Done Tracking")
 
     def add_to_database(self, post_locs_one, post_locs_two, rel_tiss_id):
         """Adds information to database"""

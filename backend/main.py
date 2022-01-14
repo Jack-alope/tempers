@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 import models
+from log_config import init_loggers
 from database import engine
 from routers import (
     router_upload,
@@ -20,12 +21,8 @@ from routers import (
     router_tissue,
 )
 
-logging.basicConfig(
-    format="%(asctime)s,%(msecs)d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s",
-    datefmt="%Y-%m-%d:%H:%M:%S",
-    level=logging.DEBUG,
-    filename="main.log",
-)
+init_loggers()
+log = logging.getLogger("main_logger")
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -40,7 +37,7 @@ app.include_router(router_calibration_set.router)
 app.include_router(router_tissue.router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
-logging.info("New Run Started")
+log.info("New Run Started")
 
 
 app.add_middleware(
