@@ -10,7 +10,10 @@
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "start": "sirv public --single",
-    "validate": "svelte-check"
+    "validate": "svelte-check",
+    "format": "prettier --write ./src/**/*.{js,svelte,html,ts}",
+    "lint": "eslint './src/**/*.{js,ts,svelte}'",
+    "lint:fix": "eslint --fix './src/**/*.{js,ts,svelte}'"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "21.0.1",
@@ -21,6 +24,13 @@
     "@types/file-saver": "2.0.5",
     "rollup": "2.64.0",
     "@types/node": "16.11.19",
+    "@typescript-eslint/eslint-plugin": "^5.9.1",
+    "@typescript-eslint/parser": "^5.9.1",
+    "eslint": "^8.6.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-svelte3": "^3.4.0",
+    "prettier-plugin-svelte": "^2.6.0",
+    "prettier": "^2.5.1",
     "rollup-plugin-css-only": "3.1.0",
     "rollup-plugin-livereload": "2.0.5",
     "rollup-plugin-svelte": "7.1.0",
