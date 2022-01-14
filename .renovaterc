@@ -2,5 +2,19 @@
   "extends": ["config:base", ":dependencyDashboard", ":semanticCommitTypeAll(chore)"],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 10,
-  "labels": ["dependencies"]
+  "labels": ["dependencies"],
+  "npm": {
+    "stabilityDays": 3
+  },
+  "packageRules": [
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "@types/node"
+      ],
+      "versioning": "node"
+    }
+  ]
 }
