@@ -7,9 +7,13 @@ Rianú is an open-source software, released under the BSD 3-Clause License, desi
 [![Website](https://img.shields.io/website?down_color=red&down_message=offline&label=docs&style=flat&up_color=success&up_message=online&url=https://rianu.mrph.dev)](https://rianu.mrph.dev)
 [![paper doi](https://img.shields.io/badge/paper%20doi-manuscript%20in%20preparation-blue)](https://gitlab.com/hect-software/rianu)
 [![project doi](https://img.shields.io/badge/project%20doi-10.17605/OSF.IO/YWCHZ-blue)](https://doi.org/10.17605/OSF.IO/YWCHZ)
+[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://gitlab.com/hect-software/rianu/-/blob/main/LICENSE)
 [![pylint](https://hect-software.gitlab.io/rianu/badges/pylint.svg)](https://hect-software.gitlab.io/rianu/lint/)
+[![code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![pipeline status](https://gitlab.com/hect-software/rianu/badges/main/pipeline.svg)](https://gitlab.com/hect-software/rianu/commits/main)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+
+
 
 
 ## Pronunciation  
