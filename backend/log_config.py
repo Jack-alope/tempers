@@ -33,10 +33,12 @@ logging_config = {
         "console_logger": {
             "handlers": ["console"],
             "level": LOG_LEVEL,
-            # "propagate": False
         },
         "main_logger": {"handlers": ["main_handler"], "level": LOG_LEVEL},
         "tracking_logger": {"handlers": ["tracking_handler"], "level": LOG_LEVEL},
+        "gunicorn": {"propagate": True, "handlers": ["console"]},
+        "uvicorn": {"propagate": True, "handlers": ["console"]},
+        "uvicorn.access": {"propagate": True, "handlers": ["console"]},
     },
 }
 
