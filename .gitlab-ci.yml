@@ -86,6 +86,8 @@ release:
   only:
     - main
   script:
+    - $GIT_AUTHOR_NAME="mrph-bot"
+    - $GIT_AUTHOR_EMAIL="bot@mrph.dev"
     - npm install @semantic-release/gitlab
     - npx semantic-release
   
