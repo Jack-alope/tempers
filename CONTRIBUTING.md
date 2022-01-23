@@ -30,27 +30,31 @@ If you are looking to develop and contribute to this software here is a good pla
 
 ## Commiting Changes
 
-### Pre Commit Checks
+### Python Pre Commit Checks
 
-Before commiting changes  `pre-commit install` needs to be run from withing the python environment.  This installs a git pre-commit hook that ensures the code is formatted and linted correctlly before commiting.  
+Before committing it is recommended to run [Black](https://github.com/psf/black) and [Pylint](https://github.com/PyCQA/pylint), this keeps code in consistent of of high quality. To do this from your python environment fun:
+
+    
+    black <path/to/backend>
+    
+Black will auto automatically reformat the python code accoring to blacks format rules.
 
 ```
-cd backend/
-pipenv shell
-pipenv sync --dev
-pre-commit install
+pylint $(git ls-files '*.py'
+```
 
+Pylint will show warnings in the console, this doesn't have to be perfect, but try to ensure its at least a 7/10.
+
+### Svelte Pre commit checks
+Note: There are alot of linting errors in svelte at the moemt so dont worry about running this too much, till we make some preogress getting it up to speed.
+
+```
+npm run lint:fix
+```
+
+## Commit 
+Note: Remember to exclude the changed comments in [rollup.config.js](./frontend/rollup.config.js) on line 46
+```
 git commit -m "<commit message>"
 ```
 
-This will format coding using [Black](https://github.com/psf/black).
-This will also lint the code with [pylint](https://github.com/PyCQA/pylint.
-
-
-If [Black](https://github.com/psf/black) fixs code run
-```
-git commit -m "<commit message>"
-```
-This will commit the newly formated code.
-
-If [pylint](https://github.com/PyCQA/pylint) fails it will show errors that need to be fixed.  Note: pylint does not need a perficet score of 10 to commit it just needs above a 7.
