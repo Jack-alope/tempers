@@ -1,4 +1,5 @@
 <script>
+  import Shadow from "./Shadow.svelte"
   import { onMount } from "svelte";
   import { saveAs } from "file-saver";
 
@@ -13,6 +14,7 @@
     date_recorded = null;
 
   let json_data_list_value;
+  let done_loading = false;
 
   json_data_list.subscribe((value) => {
     json_data_list_value = value;
@@ -605,7 +607,6 @@
 
       /* ----------------Sliders Update---------------------------------------*/
       Div.on("plotly_restyle", function (eventData) {
-        console.log(eventData[0].graph_edits);
         //Finds which slider was changed, updates that value, and calls toPython function
         if (typeof eventData[0].thresh != "undefined") {
           thresholds[Div.valueOf().id] = eventData[0].thresh;
@@ -711,7 +712,6 @@
         video_id,
       };
     } else if (date_recorded) {
-      console.log("date");
       graph_params = {
         xrange,
         value,
@@ -846,6 +846,7 @@
         name: "Raw Force",
         visible: "legendonly",
       });
+      done_loading = true;
     }
   }
 </script>
@@ -856,13 +857,19 @@
   on:click={() => caculate()}>Download Analysis summary</button
 >
 
+{#if !done_loading}
+<div class="flex flex-row min-h-screen justify-center items-center">
+<Shadow size="60" color="#FF3E00" unit="px" duration="1s"></Shadow>
+</div>
+{/if}
+
 {#each nums as num, i}
   <div class="row">
     <div class="col">
       <div class="card shadow mb-4">
         <div>
           <h6 class="text-primary justfy-center font-weight-bold m-0">
-            Tissue: {nums[i]} Freq: {freqs[i]} Type: {types[i]}
+            Tissue: {num} Freq: {freqs[i]} Type: {types[i]}
           </h6>
         </div>
         <div class="card-body">

@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import Grapher from "../components/Grapher.svelte";
 
-  import { experiments, json_data_list } from "../components/Stores.js";
+  import { json_data_list } from "../components/Stores.js";
 
   let video_id: number;
 
