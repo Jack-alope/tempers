@@ -1,3 +1,21 @@
+"""
+This file configers logging for the project.
+In a file where you would like to use logging.
+
+import logging
+log = logging.getLogger(<name_of_logger>)
+
+Setting <name_of_logger> to console logger will log to the console
+Setting it to tracking_logger or main_logger will log to those files.
+New loggers can also be set up to log to more specific files.
+
+To actually call the logger
+
+log.<log_level>(<message>)
+
+log_level can be INFO, WARN, DEBUG
+"""
+
 from logging.config import dictConfig
 
 LOG_LEVEL: str = "DEBUG"
@@ -51,4 +69,6 @@ logging_config = {
 
 
 def init_loggers():
+    """Config logging"""
+
     dictConfig(logging_config)

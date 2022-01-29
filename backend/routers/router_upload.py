@@ -58,21 +58,21 @@ def _save_video_file(vid_info, vid_file, database_session):
 
     vid = crud_video.create_video(database_session, vid_info)
 
-    # gets save loaction uploadfolder/expermentnum/date/vid
+    # gets save location upload_folder/experiment_num/date/vid
     where_to_save = os.path.join(UPLOAD_FOLDER, experiment_info.id, "videos")
 
-    # cheacks to make sure the save location exists if not exists
+    # checks to make sure the save location exists if not exists
     models.check_path_exisits(where_to_save)
 
-    orginal_filename = vid_file.filename
-    extenstion = orginal_filename.rsplit(".", 1)[1].lower()
+    original_filename = vid_file.filename
+    extension = original_filename.rsplit(".", 1)[1].lower()
 
     bio_reactor_info = crud_bio_reactor.get_bio_reactor(
         database_session, vid_info.bio_reactor_id
     )
-    # makes new file name for the vid format date_frewnum_bionum.ext
+    # makes new file name for the vid format date_fre_num_bionum.ext
     new_filename = f"{date_string}_Freq{str(vid_info.frequency).replace('.','-')}_Bio\
-        {str(bio_reactor_info.bio_reactor_number)}_{str(vid.id)}.{extenstion}"
+        {str(bio_reactor_info.bio_reactor_number)}_{str(vid.id)}.{extension}"
 
     # makes sure file name is correct formats
     safe_filename = secure_filename(new_filename)
@@ -89,7 +89,7 @@ def _save_video_file(vid_info, vid_file, database_session):
 
 
 def _save_csv_file(vid_info, file, database_session):
-    """Saves csv to disk and addes to db with fake vid"""
+    """Saves csv to disk and adds to db with fake vid"""
     date_string = vid_info.date_recorded.strftime("%m_%d_%Y")
     where_to_save = os.path.join(
         UPLOAD_FOLDER, str(vid_info.experiment_id), date_string, "csvfiles"
@@ -116,7 +116,7 @@ def _save_csv_file(vid_info, file, database_session):
 def _add_tissues(
     tissue_li: List[schema_tissue.TissueCreate], vid_id: int, database_session: Session
 ):
-    """Adds tissues to databse"""
+    """Adds tissues to database"""
 
     tissue_id = 0
 
@@ -124,7 +124,7 @@ def _add_tissues(
         tissue_id = crud_tissue.create_tissue(
             database_session, schema_tissue.create_tissue(tissue, vid_id)
         )
-    # REVIEW: Doeen't make much sense to return this
+    # REVIEW: Doesn't make much sense to return this
     return tissue_id
 
 
@@ -147,7 +147,7 @@ async def upload(
 
     else:
         vid_id = _save_video_file(vid_info, file, database_session)
-    # REVIEW: doesnt make sense to assign tissue maybe only for CSV
+    # REVIEW: doesn't make sense to assign tissue maybe only for CSV
     tissue = _add_tissues(vid_info.tissues, vid_id, database_session)
 
     if extension == "csv":
@@ -170,7 +170,7 @@ def _add_calibration_sets_to_db(
     database_session, calibration_sets: schema_calibration_set.CalibrationSet
 ):
     for cal_set in calibration_sets:
-        # REVIEW: Proablly dont want to just delete
+        # REVIEW: Probably don't want to just delete
         crud_calibration_set.delete(
             database_session, cal_set.calibration_set_identifier
         )
@@ -179,7 +179,7 @@ def _add_calibration_sets_to_db(
 
 def _add_experiment_to_db(database_session, experiment_info):
 
-    # REVIEW: Proablly dont want to just delete
+    # REVIEW: Probably don't want to just delete
     crud_experiment.delete_experiment(database_session, experiment_info.id)
 
     # delattr(experiment_info, "id")
@@ -190,12 +190,12 @@ def _add_experiment_to_db(database_session, experiment_info):
     return experiment.id
 
 
-def _add_bio_reactos_to_db(database_session: Session, bio_reactors_info):
+def _add_bio_reactors_to_db(database_session: Session, bio_reactors_info):
     bio_ids = {}
     post_ids = {}
     for bio in bio_reactors_info:
         old_id = bio.id
-        # REVIEW: Probally dont want to just delete
+        # REVIEW: Probally don't want to just delete
         crud_bio_reactor.delete_bio_reactor(database_session, old_id)
         posts = bio.posts
         delattr(bio, "id")
@@ -237,7 +237,7 @@ def _tissue_tracking_csv_to_db(
                     {old_tissue_id: new_tissue_id}, na_action=None
                 )
 
-                # REVIEW: Maybe dont wanna just delete
+                # REVIEW: Maybe don't wanna just delete
                 crud_tissue_tracking.delete(database_session, old_tissue_id)
                 crud_tissue_tracking.create_tissue_tracking(
                     database_session, new_tissue_id, tracking_df
@@ -291,12 +291,12 @@ def _bio_reactor_archive_unpack(database_session: Session, file_path: str):
         data: schema_bio_reactor.BioReactorArchive = (
             schema_bio_reactor.BioReactorArchive(**json.load(file))
         )
-    _add_bio_reactos_to_db(database_session, data.bio_reactors)
+    _add_bio_reactors_to_db(database_session, data.bio_reactors)
 
     return {200: "OK"}
 
 
-def _expirment_file_unpack(database_session: Session, dir_path: str):
+def _experiment_file_unpack(database_session: Session, dir_path: str):
 
     (json_file,) = [
         os.path.join(dir_path, f) for f in os.listdir(dir_path) if f.endswith(".json")
@@ -310,7 +310,7 @@ def _expirment_file_unpack(database_session: Session, dir_path: str):
     vids = data.experiment.vids
 
     _add_calibration_sets_to_db(database_session, data.calibration_sets)
-    bio_ids, post_ids = _add_bio_reactos_to_db(database_session, data.bio_reactors)
+    bio_ids, post_ids = _add_bio_reactors_to_db(database_session, data.bio_reactors)
     experiment_id = _add_experiment_to_db(database_session, data.experiment)
 
     _add_vids_to_db(database_session, vids, experiment_id, bio_ids, post_ids)
@@ -322,7 +322,9 @@ def _expirment_file_unpack(database_session: Session, dir_path: str):
 async def upload_experiment(
     file: UploadFile = File(...), database_session: Session = Depends(get_db)
 ):
-
+    """
+    Accepts archive zip and adds it to database
+    """
     where_to_save = os.path.join(UPLOAD_FOLDER, "temp")
     models.check_path_exisits(where_to_save)
 
@@ -334,7 +336,7 @@ async def upload_experiment(
 
     _unzip_and_delete(archive_path, where_to_save)
 
-    experiment_id = _expirment_file_unpack(database_session, where_to_save)
+    experiment_id = _experiment_file_unpack(database_session, where_to_save)
 
     shutil.move(
         os.path.join(where_to_save, "videos"),
@@ -350,10 +352,13 @@ async def upload_experiment(
 async def upload_bio_reactor_archive(
     file: UploadFile = File(...), database_session: Session = Depends(get_db)
 ):
+    """Accepts bio reactor archive json and adds it to database"""
     where_to_save = os.path.join(UPLOAD_FOLDER, "temp")
     models.check_path_exisits(where_to_save)
-    file_path = f"{where_to_save}/bio_reactos_archive.json"
+    file_path = f"{where_to_save}/bio_reactors_archive.json"
 
     _save_file(file.file, file_path)
     _bio_reactor_archive_unpack(database_session, file_path)
+    # Deletes uploaded json file
+    shutil.rmtree(where_to_save)
     return {200: "OK"}
