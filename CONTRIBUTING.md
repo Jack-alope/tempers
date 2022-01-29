@@ -28,6 +28,28 @@ If you are looking to develop and contribute to this software here is a good pla
     ```
 7. Access the user interface via `http://localhost:5000/`. Changes you make to the code should be automatically updated, no need to rebuild every time.
 
+---
+## Making Database Changes
+
+To manage database versioning we use [alembic](https://github.com/sqlalchemy/alembic) after making changes to the database schema in [models.py](backend/models.py) from your python environment run:
+```
+alembic revision --autogenerate -m "<commit message>"
+```
+This with automatically generate code to upgrade and downgrade the database to and from that point.  
+
+Then to upgrade the database to reflect the changes run:
+
+```
+alembic upgrade head 
+```
+View revsions to the database by running:
+```
+alembic history
+```
+
+
+---
+
 ## Commiting Changes
 
 ### Python Pre Commit Checks

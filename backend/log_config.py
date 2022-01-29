@@ -28,6 +28,11 @@ logging_config = {
             "class": "logging.FileHandler",
             "formatter": "basic",
         },
+        "sqlalchemy_handler": {
+            "filename": "log/sqlalchemy.log",
+            "class": "logging.FileHandler",
+            "formatter": "basic",
+        },
     },
     "loggers": {
         "console_logger": {
@@ -39,6 +44,8 @@ logging_config = {
         "gunicorn": {"propagate": True, "handlers": ["console"]},
         "uvicorn": {"propagate": True, "handlers": ["console"]},
         "uvicorn.access": {"propagate": True, "handlers": ["console"]},
+        "logger_sqlalchemy": {"handlers": ["sqlalchemy_handler"], "level": "WARN"},
+        "logger_alembic": {"handlers": ["sqlalchemy_handler"], "level": "INFO"},
     },
 }
 
