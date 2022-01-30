@@ -9,7 +9,7 @@ black:
   stage: code review
   image: python:3.8-slim
   before_script:
-    - pip install black==21.1.0
+    - pip install black==22.1.0
   script:
     - black --check backend/
   only:
