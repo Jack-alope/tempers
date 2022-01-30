@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import List
 import os
 import logging
+import errno
 
 from pytz import timezone
 from sqlalchemy import Column, Date, ForeignKey, Integer, String, Float
@@ -250,10 +251,9 @@ def delete_empties():
 
 def delete_file(path):
     """Deletes path if exists"""
+    try:
+        os.remove(path)
+    except OSError as e:
+        if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
+            raise # re-raise exception if a different error occurred
 
-    if path is not None:
-        if os.path.exists(path):
-            os.remove(path)
-            delete_empties()
-        else:
-            logging.info("The file does not exist")
