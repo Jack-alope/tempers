@@ -254,6 +254,5 @@ def delete_file(path):
     try:
         os.remove(path)
     except OSError as e:
-        if e.errno != errno.ENOENT: # errno.ENOENT = no such file or directory
-            raise # re-raise exception if a different error occurred
-
+        if e.errno != errno.ENOENT:  # errno.ENOENT = no such file or directory
+            raise  # re-raise exception if a different error occurred
