@@ -7,12 +7,8 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from alembic.config import Config
-from alembic import command
-
-import models
 from log_config import init_loggers
-from database import engine
+from database import init_db
 from routers import (
     router_upload,
     router_tracking,
@@ -27,12 +23,7 @@ from routers import (
 init_loggers()
 log = logging.getLogger("main_logger")
 
-models.Base.metadata.create_all(engine)
-
-# then, load the Alembic configuration and generate the
-# version table, "stamping" it with the most recent rev:
-alembic_cfg = Config("alembic.ini")
-command.stamp(alembic_cfg, "head")
+init_db()
 
 app = FastAPI()
 app.include_router(router_upload.router)
