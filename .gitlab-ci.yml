@@ -18,7 +18,7 @@ black:
 
 pylint:
   stage: code review
-  image: python:3.10-slim
+  image: python:3.8-slim
   before_script:
     - mkdir -p public/badges public/lint
     - echo undefined > public/badges/$CI_JOB_NAME.score
@@ -58,7 +58,7 @@ pages:
 
 test:
   stage: testing
-  image: python:3.10
+  image: python:3.8
   script:
     - pip install pytest coverage pipenv
     - cd backend && pipenv install --system --deploy --ignore-pipfile && cd ..
