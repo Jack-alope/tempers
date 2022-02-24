@@ -93,11 +93,11 @@ docker-builder:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
   script:
-    - docker build --pull -t "$CI_REGISTRY_IMAGE_FRONTEND:latest" -t "$CI_REGISTRY_IMAGE_FRONTEND:$CI_COMMIT_TAG" ./frontend/
-    - docker build --pull -t "$CI_REGISTRY_IMAGE_BACKEND:latest" -t "$CI_REGISTRY_IMAGE_BACKEND:$CI_COMMIT_TAG" ./backend/
-    - docker build --pull -t "$CI_REGISTRY_IMAGE_PROXY:latest" -t "$CI_REGISTRY_IMAGE_PROXY:$CI_COMMIT_TAG" ./nginx/
-    - docker push -a $CI_REGISTRY_IMAGE_FRONTEND
-    - docker push -a $CI_REGISTRY_IMAGE_BACKEND
-    - docker push -a $CI_REGISTRY_IMAGE_PROXY
+    - docker build --pull -t "registry.gitlab.com/hect-software/rianu/frontend:latest" -t "registry.gitlab.com/hect-software/rianu/frontend:$CI_COMMIT_TAG" ./frontend/
+    - docker build --pull -t "registry.gitlab.com/hect-software/rianu/backend:latest" -t "registry.gitlab.com/hect-software/rianu/backend:$CI_COMMIT_TAG" ./backend/
+    - docker build --pull -t "registry.gitlab.com/hect-software/rianu/proxy:latest" -t "registry.gitlab.com/hect-software/rianu/proxy:$CI_COMMIT_TAG" ./nginx/
+    - docker push -a registry.gitlab.com/hect-software/rianu/frontend
+    - docker push -a registry.gitlab.com/hect-software/rianu/backend
+    - docker push -a registry.gitlab.com/hect-software/rianu/proxy
   
 
