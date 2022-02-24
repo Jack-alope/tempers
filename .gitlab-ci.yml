@@ -91,14 +91,14 @@ docker-builder:
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
   script:
-    - docker build --pull -t $CI_REGISTRY_IMAGE_FRONTEND ./frontend/
-    - docker build --pull -t $CI_REGISTRY_IMAGE_BACKEND ./backend/
-    - docker build --pull -t $CI_REGISTRY_IMAGE_PROXY ./nginx/
-    - docker push $CI_REGISTRY_IMAGE_FRONTEND
-    - docker push $CI_REGISTRY_IMAGE_BACKEND
-    - docker push $CI_REGISTRY_IMAGE_PROXY
+    - docker build --pull -t "$CI_REGISTRY_IMAGE_FRONTEND:latest" -t "$CI_REGISTRY_IMAGE_FRONTEND:$CI_COMMIT_TAG" ./frontend/
+    - docker build --pull -t "$CI_REGISTRY_IMAGE_BACKEND:latest" -t "$CI_REGISTRY_IMAGE_BACKEND:$CI_COMMIT_TAG" ./backend/
+    - docker build --pull -t "$CI_REGISTRY_IMAGE_PROXY:latest" -t "$CI_REGISTRY_IMAGE_PROXY:$CI_COMMIT_TAG" ./nginx/
+    - docker push -a $CI_REGISTRY_IMAGE_FRONTEND
+    - docker push -a $CI_REGISTRY_IMAGE_BACKEND
+    - docker push -a $CI_REGISTRY_IMAGE_PROXY
   only:
     - main
-  when: manual
+  when: always
   
 
