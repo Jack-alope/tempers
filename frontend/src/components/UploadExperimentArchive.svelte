@@ -1,38 +1,32 @@
 <script lang="ts">
+  import { checkExpExist } from '../apiCalls'
 
-  import { checkExpExist } from "../apiCalls";
-
-  let files;
+  let files
   let experiment_idenifer: string
 
-  export let uploadArchive: boolean = false;
+  export let uploadArchive = false
 
   async function checkExp() {
     if (await checkExpExist(experiment_idenifer)) {
-      alert("Experirment Exsists uploading will over write exsisting data");
+      alert('Experirment Exsists uploading will over write exsisting data')
     }
   }
 
   async function addArchive() {
-    const formData = new FormData();
-    formData.append("file", files[0]);
+    const formData = new FormData()
+    formData.append('file', files[0])
 
-
-    const res = await fetch(
-      process.env.API_URL + "/upload/experiment_archive",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+    const res = await fetch(process.env.API_URL + '/upload/experiment_archive', {
+      method: 'POST',
+      body: formData
+    })
 
     if (res.ok) {
-      uploadArchive = false;
+      uploadArchive = false
     } else {
-      alert("Something went wrong");
+      alert('Something went wrong')
     }
   }
-
 </script>
 
 <form class="w-full" on:submit|preventDefault={addArchive}>

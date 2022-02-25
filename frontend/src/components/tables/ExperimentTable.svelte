@@ -4,15 +4,17 @@
   import Modal from "../../components/Modal.svelte";
   import AddExperimet from "../../components/AddExperimet.svelte";
   import UploadExperimentArchive from "../../components/UploadExperimentArchive.svelte";
-  import { showExperiment, experiments } from "../../components/Stores.js";
+  import { experiments } from "../../components/Stores.js";
   import DownloadModal from "../DownloadModal.svelte"
 
-  let uploadArchive: boolean = false;
-  let showDownloadModal: boolean = false;
+  let uploadArchive = false;
+  let showDownloadModal = false;
+  let showExperiment =false;
 
   onMount(async () => {
     await getExperiments();
   });
+
 
   async function handleExperimentDownload(id: number) {
     showDownloadModal = true;
@@ -117,7 +119,7 @@
   <div class="w-1/2 overflow-hidden">
     <button
       class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-      on:click={() => ($showExperiment = true)}>Add Experiment</button
+      on:click={() => (showExperiment = true)}>Add Experiment</button
     >
   </div>
   <div class="w-1/2 overflow-hidden">
@@ -137,11 +139,11 @@
   </Modal>
 {:else if showDownloadModal}
   <DownloadModal bind:showDownloadModal />
-{:else if $showExperiment}
-  <Modal on:close={() => ($showExperiment = false)}>
+{:else if showExperiment}
+  <Modal on:close={() => (showExperiment = false)}>
     <h1 slot="header">Add a Experiment</h1>
     <p slot="content">
-      <AddExperimet />
+      <AddExperimet bind:showExperiment on:updateExps={async () => getExperiments()}/>
     </p>
   </Modal>
 {/if}

@@ -1,8 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import Modal from "../../components/Modal.svelte";
+
+  
   import { getBioReactors } from "../../apiCalls.js";
-  import { showBioReactor, bio_reactors } from "../../components/Stores.js";
+  import { bio_reactors } from "../../components/Stores.js";
+
+  import Modal from "../../components/Modal.svelte";
   import AddBioReactor from "../../components/AddBioReactor.svelte";
   import DownloadModal from "../DownloadModal.svelte";
   import UploadBioReactorArchive from "../UploadBioReactorArchive.svelte";
@@ -12,8 +15,9 @@
     await getBioReactors();
   });
 
-  let showDownloadModal: boolean = false;
-  let uploadBioReactorArchive: boolean = false;
+  let showDownloadModal = false;
+  let uploadBioReactorArchive = false;
+  let showBioReactor = false;
 
   async function handleBioReactorDel(id: number) {
     const res = await fetch(process.env.API_URL + `/bio_reactor/${id}`, {
@@ -141,7 +145,7 @@
   <div class="w-1/3 overflow-hidden">
     <button
     class="appearance-none justify-center block w-3/4 bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-    on:click={() => ($showBioReactor = true)}>Add Bio Reactor</button
+    on:click={() => (showBioReactor = true)}>Add Bio Reactor</button
   >
   </div>
   <div class="w-1/3 overflow-hidden">
@@ -161,11 +165,11 @@
   </div>
 </div>
 
-{#if $showBioReactor}
-  <Modal on:close={() => ($showBioReactor = false)}>
+{#if showBioReactor}
+  <Modal on:close={() => (showBioReactor = false)}>
     <h1 slot="header">Add a Bio Reactor</h1>
     <p slot="content">
-      <AddBioReactor />
+      <AddBioReactor bind:showBioReactor on:updateBios= {async () => getBioReactors()}></AddBioReactor>/>
     </p>
   </Modal>
 {:else if showDownloadModal}

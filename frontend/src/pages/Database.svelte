@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ExperimentTable from "../components/tables/ExperimentTable.svelte";
-  import BioReactorTable from "../components/tables/BioReactorTable.svelte";
-  import VideoAccordian from "../components/VideoAccordian.svelte";
+  import ExperimentTable from '../components/tables/ExperimentTable.svelte'
+  import BioReactorTable from '../components/tables/BioReactorTable.svelte'
+  import VideoAccordian from '../components/VideoAccordian.svelte'
 </script>
 
 <div class="flex flex-wrap overflow-hidden">

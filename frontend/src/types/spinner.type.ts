@@ -22,8 +22,8 @@
 // https://github.com/Schum123/svelte-loading-spinners
 
 export type SpinnerTypes = {
-    size: string | number
-    color: string
-    unit: string
-    duration: string
-  }
+  size: string | number
+  color: string
+  unit: string
+  duration: string
+}

@@ -1,45 +1,43 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount } from 'svelte'
 
-  export let experiment_id: string;
-  export let date_recorded: string = null;
+  export let experiment_id: string
+  export let date_recorded: string = null
 
-  let selectedTissueNumber: number;
-  let tissue_numbers;
+  let selectedTissueNumber: number
+  let tissue_numbers
 
   onMount(async () => {
-    await getTissueNumbers();
-  });
+    await getTissueNumbers()
+  })
 
   async function getTissueNumbers() {
-    let url;
+    let url
     if (date_recorded) {
       url =
         process.env.API_URL +
-        `/tissues_in_experiment_by_date_recorded?experiment_id=${experiment_id}&date_recorded=${date_recorded}`;
+        `/tissues_in_experiment_by_date_recorded?experiment_id=${experiment_id}&date_recorded=${date_recorded}`
     } else {
-      url =
-        process.env.API_URL +
-        `/tissues_in_experiment?experiment_id=${experiment_id}`;
+      url = process.env.API_URL + `/tissues_in_experiment?experiment_id=${experiment_id}`
     }
     const res = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-      },
-    });
+        'Content-Type': 'application/json'
+      }
+    })
     if (res.ok) {
-      tissue_numbers = await res.json();
+      tissue_numbers = await res.json()
     } else {
-      return undefined;
+      return undefined
     }
   }
 
   async function handleTissueNumberSubmitted() {
     if (date_recorded) {
-      window.location.href = `/analyze?experiment_id=${experiment_id}&tissue_number=${selectedTissueNumber}&date_recorded=${date_recorded}`;
+      window.location.href = `/analyze?experiment_id=${experiment_id}&tissue_number=${selectedTissueNumber}&date_recorded=${date_recorded}`
     } else {
-      window.location.href = `/analyze?experiment_id=${experiment_id}&tissue_number=${selectedTissueNumber}`;
+      window.location.href = `/analyze?experiment_id=${experiment_id}&tissue_number=${selectedTissueNumber}`
     }
   }
 </script>

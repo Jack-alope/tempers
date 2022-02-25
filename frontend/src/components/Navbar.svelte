@@ -14,14 +14,11 @@
           <a href="/upload" class="p-3 text-white hover:text-black">Upload</a>
         </li>
         <li class="sm:inline-block">
-          <a href="/database" class="p-3 text-white hover:text-black"
-            >Database</a
-          >
+          <a href="/database" class="p-3 text-white hover:text-black">Database</a>
         </li>
         <li class="sm:inline-block">
-          <a
-            href="https://rianu.mrph.dev/"
-            class="p-3 text-white hover:text-black">Docs</a
+          <a href="https://rianu.mrph.dev/" class="p-3 text-white hover:text-black"
+            >Docs</a
           >
         </li>
       </ul>

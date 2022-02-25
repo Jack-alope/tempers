@@ -1,80 +1,82 @@
 <script lang="ts">
-  import { createForm } from "svelte-forms-lib";
+  import { createEventDispatcher } from 'svelte'
 
-  import { showBioReactor, bio_reactors } from "../components/Stores.js";
+  import { createForm } from 'svelte-forms-lib'
+
+  import { bio_reactors } from '../components/Stores.js'
+
+  export let showBioReactor: boolean
+
+  const dispatch = createEventDispatcher()
 
   async function handleBioReactorSubmitted(bio_reactor_info) {
-    const res = await fetch(process.env.API_URL + "/addBioReactor", {
-      method: "POST",
+    const res = await fetch(process.env.API_URL + '/addBioReactor', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(bio_reactor_info),
-    });
+      body: JSON.stringify(bio_reactor_info)
+    })
 
     if (res.ok) {
-      showBioReactor.set(false);
-      if ($bio_reactors) {
-        $bio_reactors.push(await res.json());
-      }
+      showBioReactor = false
+      dispatch('updateBios')
     } else {
       if (res.status == 409) {
-        alert("Bio Number is taken");
+        alert('Bio Number is taken')
       } else {
-        alert("Something went wrong");
+        alert('Something went wrong')
       }
     }
   }
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
-      date_added: "",
-      bio_reactor_number: "",
-      bio_reactor_note: "",
+      date_added: '',
+      bio_reactor_number: '',
+      bio_reactor_note: '',
       post_distance: 6,
       youngs_modulus: 1.33,
       posts: [
         {
-          post_number: "",
-          left_post_height: "",
-          left_tissue_height: "",
-          right_post_height: "",
-          right_tissue_height: "",
-          radius: "",
-        },
-      ],
+          post_number: '',
+          left_post_height: '',
+          left_tissue_height: '',
+          right_post_height: '',
+          right_tissue_height: '',
+          radius: ''
+        }
+      ]
     },
-    onSubmit: (values) => {
-      console.log(values);
-      handleBioReactorSubmitted(values);
-    },
-  });
+    onSubmit: values => {
+      console.log(values)
+      handleBioReactorSubmitted(values)
+    }
+  })
 
   const add = () => {
     $form.posts = $form.posts.concat({
-      post_number: "",
-      left_post_height: "",
-      left_tissue_height: "",
-      right_post_height: "",
-      right_tissue_height: "",
-      radius: "",
-    });
+      post_number: '',
+      left_post_height: '',
+      left_tissue_height: '',
+      right_post_height: '',
+      right_tissue_height: '',
+      radius: ''
+    })
     // $errors.posts = $posts.posts.concat({ name: "", email: "" });
-  };
+  }
 
-  const remove = (i) => () => {
-    $form.posts = $form.posts.filter((u, j) => j !== i);
+  const remove = i => () => {
+    $form.posts = $form.posts.filter((u, j) => j !== i)
     // $errors.posts = $errors.posts.filter((u, j) => j !== i);
-  };
+  }
 </script>
 
 <form class="w-full" on:submit={handleSubmit}>
   <!-- TODO: Maybe use grid instead -->
 
   <div class="w-full px-3 py-5">
-    <h1
-      class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-    >
+    <h1 class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
       Add posts
     </h1>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { video_interface } from "../../interfaces";
+  import type { vid_date_show } from "../../types/interfaces"
 
-  export let videos: video_interface[];
+  export let vids : vid_date_show[];
 
   async function handleVideoDel(id: number) {
     const res = await fetch(process.env.API_URL + `/video/${id}`, {
@@ -11,7 +11,8 @@
       },
     });
     if (res.ok) {
-      videos = videos.filter((video) => video.id !== id);
+      vids = vids.filter((video) => video.id !== id);
+      console.log("deleted")
     } else {
       alert("Something went wrong");
     }
@@ -66,10 +67,7 @@
   </thead>
 
   <tbody class="bg-white divide-y divide-gray-200">
-    {#if !videos}
-      No Videos
-    {:else}
-      {#each videos as video}
+      {#each vids as video}
         <tr>
           <td class="px-6 py-4 whitespace-nowrap">{video.id}</td>
           <td class="px-6 py-4 whitespace-nowrap">{video.date_recorded}</td>
@@ -111,6 +109,5 @@
           >
         </tr>
       {/each}
-    {/if}
   </tbody>
 </table>

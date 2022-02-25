@@ -1,28 +1,29 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { Accordion, AccordionItem } from "svelte-accessible-accordion";
+  import { onMount } from 'svelte'
+  import { Accordion, AccordionItem } from 'svelte-accessible-accordion'
 
-  import TissueNumberSelector from "./TissueNumberSelector.svelte";
-  import VideoTable from "./tables/VideoTable.svelte";
-  import type { vid_show } from "../interfaces";
+  import TissueNumberSelector from './TissueNumberSelector.svelte'
+  import VideoTable from './tables/VideoTable.svelte'
 
-  let videos: vid_show;
+  import type { vid_show } from '../types/interfaces'
+
+  let videos: vid_show
 
   onMount(async () => {
-    await getVideos();
-  });
+    await getVideos()
+  })
 
   async function getVideos() {
-    const res = await fetch(process.env.API_URL + "/videos_show", {
-      method: "GET",
+    const res = await fetch(process.env.API_URL + '/videos_show', {
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json",
-      },
-    });
+        'Content-Type': 'application/json'
+      }
+    })
     if (res.ok) {
-      videos = await res.json();
+      videos = await res.json()
     } else {
-      return undefined;
+      return undefined
     }
   }
 </script>
@@ -40,7 +41,7 @@
               title="Date Recorded: {date_recorded}"
               class="shadow-sm rounded-lg border-2 border-blue-600 border-opacity-50"
             >
-              <VideoTable videos={vids} />
+              <VideoTable bind:vids />
               <TissueNumberSelector experiment_id={exp} {date_recorded} />
             </AccordionItem>
           {/each}

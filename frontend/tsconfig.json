@@ -10,8 +10,8 @@
   },
   "extends": "@tsconfig/svelte/tsconfig.json",
   "typeRoots": ["../node_modules/@types"],
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/types/interfaces.ts"],
   "exclude": ["node_modules/*", "__sapper__/*", "public/*"],
-  "include": ["src/**/*", "src/node_modules/**/*"],
+  "include": ["src/**/*", "src/node_modules/**/*", "src/types/interfaces.ts"],
   "exclude": ["node_modules/*", "__sapper__/*", "static/*"]
 }

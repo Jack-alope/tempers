@@ -1,31 +1,32 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
   // import * as yup from "yup";
+  import { createEventDispatcher } from 'svelte'
 
-  import { createForm } from "svelte-forms-lib";
-  import { showExperiment, experiments } from "../components/Stores.js";
+  import { createForm } from 'svelte-forms-lib'
 
-  import type { experiment_interface } from "../interfaces";
+  import type { experiment_interface } from '../types/interfaces'
 
-  async function handleExperimentSubmitted(experimentInfo) {
-    const res = await fetch(process.env.API_URL + "/addExperiment", {
-      method: "POST",
+  export let showExperiment: boolean
+
+  const dispatch = createEventDispatcher()
+
+  async function handleExperimentSubmitted(experimentInfo: experiment_interface) {
+    const res = await fetch(process.env.API_URL + '/addExperiment', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(experimentInfo),
-    });
+      body: JSON.stringify(experimentInfo)
+    })
 
     if (res.ok) {
-      showExperiment.set(false);
-      if ($experiments) {
-        $experiments.push(await res.json());
-      }
+      showExperiment = false
+      dispatch('updateExps')
     } else {
       if (res.status == 409) {
-        alert("Experiment Idenifier is taken");
+        alert('Experiment Idenifier is taken')
       } else {
-        alert("Something went wrong");
+        alert('Something went wrong')
       }
     }
   }
@@ -38,13 +39,13 @@
 
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
-      start_date: "",
-      id: "",
+      start_date: new Date(),
+      id: ''
     },
-    onSubmit: (values) => {
-      handleExperimentSubmitted(values);
-    },
-  });
+    onSubmit: values => {
+      handleExperimentSubmitted(values)
+    }
+  })
 </script>
 
 <form class="w-full" on:submit={handleSubmit}>

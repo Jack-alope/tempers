@@ -1,62 +1,57 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { createForm } from "svelte-forms-lib";
+  import { onMount } from 'svelte'
+  import { createForm } from 'svelte-forms-lib'
   // import * as yup from "yup";
-  import {
-    getBioReactors,
-    getExperiments,
-    getPostOptions,
-  } from "../apiCalls.js";
-  import { bio_reactors, experiments } from "../components/Stores.js";
+  import { getBioReactors, getExperiments, getPostOptions } from '../apiCalls.js'
+  import { bio_reactors, experiments } from '../components/Stores.js'
   import type {
     bio_reactor_interface,
     experiment_interface,
-    post_interface,
-  } from "../interfaces";
-
-  let files;
-  let experiments_value: experiment_interface[];
-  let bio_reactors_value: bio_reactor_interface[];
-  let post_options: post_interface[];
+    post_interface
+  } from '../types/interface'
+  let files
+  let experiments_value: experiment_interface[]
+  let bio_reactors_value: bio_reactor_interface[]
+  let post_options: post_interface[]
 
   onMount(async () => {
-    await getBioReactors();
-    await getExperiments();
-  });
+    await getBioReactors()
+    await getExperiments()
+  })
 
   async function addVid(values) {
-    const formData = new FormData();
-    formData.append("info", JSON.stringify(values));
-    formData.append("file", files[0]);
+    const formData = new FormData()
+    formData.append('info', JSON.stringify(values))
+    formData.append('file', files[0])
 
-    const res = await fetch(process.env.API_URL + "/upload", {
-      method: "POST",
-      body: formData,
-    });
+    const res = await fetch(process.env.API_URL + '/upload', {
+      method: 'POST',
+      body: formData
+    })
 
     if (res.ok) {
-      window.location.replace("/database");
+      window.location.replace('/database')
     } else {
-      alert("Something went wrong");
+      alert('Something went wrong')
     }
   }
   // TODO: add form validations
   const { form, errors, state, handleChange, handleSubmit } = createForm({
     initialValues: {
-      date_recorded: "",
-      bio_reactor_id: "",
-      experiment_id: "",
+      date_recorded: '',
+      bio_reactor_id: '',
+      experiment_id: '',
 
       tissues: [
         {
-          post_id: "",
-          tissue_number: "",
-          tissue_type: "",
-        },
+          post_id: '',
+          tissue_number: '',
+          tissue_type: ''
+        }
       ],
 
-      frequency: "",
-      video_note: "",
+      frequency: '',
+      video_note: ''
     },
     /*
     TODO: figure out validation lo dash error
@@ -66,27 +61,27 @@
       experiment_id: yup.number().required(),
     }),
     */
-    onSubmit: (values) => {
-      addVid(values);
-    },
-  });
+    onSubmit: values => {
+      addVid(values)
+    }
+  })
 
   const add = () => {
     $form.tissues = $form.tissues.concat({
-      post_id: "",
-      tissue_number: "",
-      tissue_type: "",
-    });
+      post_id: '',
+      tissue_number: '',
+      tissue_type: ''
+    })
     // $errors.tissues = $tissues.tissues.concat({ name: "", email: "" });
-  };
+  }
 
-  const remove = (i) => () => {
-    $form.tissues = $form.tissues.filter((u, j) => j !== i);
+  const remove = i => () => {
+    $form.tissues = $form.tissues.filter((u, j) => j !== i)
     // $errors.tissues = $errors.tissues.filter((u, j) => j !== i);
-  };
+  }
 
   async function handleBioChange() {
-    post_options = await getPostOptions($form.bio_reactor_id);
+    post_options = await getPostOptions($form.bio_reactor_id)
   }
 </script>
 
@@ -125,9 +120,7 @@
           <option>NA</option>>
         {:else}
           {#each $bio_reactors as bio_reactor}
-            <option value={bio_reactor.id}
-              >{bio_reactor.bio_reactor_number}</option
-            >
+            <option value={bio_reactor.id}>{bio_reactor.bio_reactor_number}</option>
           {/each}
         {/if}
       </select>
@@ -157,9 +150,7 @@
       </select>
     </div>
     <div class="w-full px-3 py-5">
-      <h1
-        class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2"
-      >
+      <h1 class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
         Add Tissues
       </h1>
 
