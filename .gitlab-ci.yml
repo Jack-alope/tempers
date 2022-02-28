@@ -89,7 +89,7 @@ docker-builder:
   image: docker:latest
   stage: build
   services:
-    - docker:dind
+    - docker:bind
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
   script:
