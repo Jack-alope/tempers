@@ -26,7 +26,7 @@ If you are looking to develop and contribute to this software here is a good pla
     npm ci
     npm run dev
     ```
-7. Access the user interface via `http://localhost:5000/`. Changes you make to the code should be automatically updated, no need to rebuild every time.
+7. Access the user interface via `http://localhost:8080/`. Changes you make to the code should be automatically updated, no need to rebuild every time.
 
 ---
 ## Making Database Changes
@@ -50,7 +50,7 @@ alembic history
 
 ---
 
-## Commiting Changes
+## Committing Changes
 
 ### Python Pre Commit Checks
 
@@ -59,16 +59,16 @@ Before committing it is recommended to run [Black](https://github.com/psf/black)
     
     black <path/to/backend>
     
-Black will auto automatically reformat the python code accoring to blacks format rules.
+Black will auto automatically reformat the python code according to blacks format rules.
 
 ```
-pylint $(git ls-files '*.py'
+pylint $(git ls-files '*.py')
 ```
 
 Pylint will show warnings in the console, this doesn't have to be perfect, but try to ensure its at least a 7/10.
 
 ### Svelte Pre commit checks
-Note: There are alot of linting errors in svelte at the moemt so dont worry about running this too much, till we make some preogress getting it up to speed.
+Note: There are a lot of linting errors in svelte at the moment so don't worry about running this too much, till we make some progress getting it up to speed.
 
 ```
 npm run lint:fix
